@@ -1,11 +1,12 @@
 #ユーザーファイルや履歴のディレクトリなど
-files
-img
-record
+files/*
+img/*
+record/*
 _____TEST_____.js
 *.json
 
-#パッケージ情報用のJSONは除外
+#パッケージ情報用のJSONとデフォルトのアイコンは除外
+!img/default.jpeg
 !package-lock.json
 !package.json
 
