@@ -606,7 +606,7 @@ io.on("connection", (socket) => {
 // 認証関連
 
     //認証
-    socket.on("auth", (key) => { //key = "パスワード"
+    socket.on("auth", (key, CLIENT_VERSION) => { //key = "パスワード"
         console.log("auth :: 受信 ↓");
         console.log(key);
 
