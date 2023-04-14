@@ -14,4 +14,4 @@ npm install
 node index.js
 ```
 
-デフォルトのポートは 33333 
+デフォルトのポートは ```:33333asdf```
