@@ -43,7 +43,7 @@ let msgMix = function msgMix(m) {
         m.content === undefined ||
         m.content.length >= 250 || //長さが250文字以上だったら
         m.content.length == 0 || //長さが0だったら
-        (m.content.includes("<img") && m.content.includes("onerror")) ||
+        (m.content.includes("<img") && m.content.includes("onerror")) || //XSS避け
         m.content.replace(/　/g,"").length === 0 || //空白だけのメッセージだった時用
         m.content.replace(/ /g,"").length === 0 //半角も同様
     ) {
@@ -471,7 +471,7 @@ let msgRecord = function msgRecord(json) {
     let pathOfJson = "./record/" + json.channelid + "/" + fulldate + ".json";
     
     //JSONファイルを開いてみて、いけたらそのまま読み込み、なかったら作る
-    try { //存在確認
+    try { //JSONの存在確認
         //ファイルを読み込んでみる(使いはしない、存在を確認するだけ)
         fs.statSync(pathOfJson);
 
@@ -580,12 +580,6 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
     return dat.reverse(); //追加された順だと古い順なので
 
 }
-
-//メッセージの既読時間を更新する
-// let updateReadTime = function updateReadTime(dat) {
-
-
-// }
 
 exports.msgMix = msgMix; //メッセージ送受信
 exports.addUrlPreview = addUrlPreview; //URLプレビュー設定
