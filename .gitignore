@@ -1,9 +1,11 @@
+#ユーザーファイルや履歴のディレクトリなど
 files
 img
 record
 _____TEST_____.js
 *.json
 
+#パッケージ情報用のJSONは除外
 !package-lock.json
 !package.json
 
