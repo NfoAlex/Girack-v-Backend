@@ -13,3 +13,8 @@ npm install
 ```sh
 node index.js
 ```
+
+デフォルトのポートは
+```sh
+:33333
+```
