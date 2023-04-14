@@ -59,7 +59,7 @@ try { //読み込んでみる
 {
     "servername": "Girack",
     "registration": {
-        "available": true,
+        "available": false,
         "invite": {
             "inviteOnly": false,
             "inviteCode": ""
