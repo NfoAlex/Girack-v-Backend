@@ -4,6 +4,9 @@ record
 _____TEST_____.js
 *.json
 
+!package-lock.json
+!package.json
+
 #####################################################
 
 # Logs
