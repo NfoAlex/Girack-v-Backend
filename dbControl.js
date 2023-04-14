@@ -38,10 +38,15 @@ try { //読み込んでみる
     fs.writeFileSync("./user.json", dataUserInitText); //JSONファイルを作成
     dataUser = JSON.parse(fs.readFileSync("./user.json", "utf-8")); //ユーザーデータのJSON読み込み
     
+    console.log("***********************************");
+    console.log("***********************************");
     console.log("Girackへようこそ!");
     console.log("次のユーザー情報でログインしてください。");
     console.log("\n");
     console.log("パスワード : " + pwGenResult)
+    console.log("\n");
+    console.log("***********************************");
+    console.log("***********************************");
 }
 
 //サーバー情報や設定を記録しているJSONファイルを読み取る
