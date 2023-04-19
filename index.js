@@ -35,18 +35,27 @@ app.get('/', (req, res) => {
 
 });
 
-//画像ファイルを返す
+//アイコン用ファイルを返す
 app.get('/img/:src', (req, res) => {
+    //JPEG
     try {
         fs.statSync(__dirname + '/img/' + req.params.src + ".jpeg");
         res.sendFile(__dirname + '/img/' + req.params.src + ".jpeg");
         return;
     }
     catch(e) {
-        console.log("index :: これがなかった -> " + req.params.src + ".jpeg");
-        //res.sendFile(__dirname + '/img/default.jpeg');
     }
 
+    //PNG
+    try {
+        fs.statSync(__dirname + '/img/' + req.params.src + ".png");
+        res.sendFile(__dirname + '/img/' + req.params.src + ".png");
+        return;
+    }
+    catch(e) {
+    }
+
+    //GIF
     try {
         fs.statSync(__dirname + '/img/' + req.params.src + ".gif");
         res.sendFile(__dirname + '/img/' + req.params.src + ".gif");
@@ -356,9 +365,10 @@ io.on("connection", (socket) => {
 
         //もしJPEGかGIFじゃないなら拒否
         if (
-            !["image/jpeg","image/gif", "image/png"].includes(dat.fileData.type) ||
+            !["image/jpeg","image/gif","image/png"].includes(dat.fileData.type) ||
             dat.fileData.size > 3072000
         ) {
+            console.log("このアイコン無理だわ");
             return -1;
 
         }
@@ -414,7 +424,7 @@ io.on("connection", (socket) => {
             iconExtension = ".png";
 
         }
-        
+
         //アイコン画像書き込み
         fs.writeFile("./img/"+dat.reqSender.userid+iconExtension, dat.fileData.buffer, (err) => {
             console.log("result->", err);
