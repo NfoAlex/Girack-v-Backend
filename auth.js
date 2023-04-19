@@ -56,8 +56,12 @@ let authUser = function authUser(key) {
 
 //パスワードを変更
 let changePassword = function changePassword(dat) {
+    //今のパスワードが一致しないならここで停止
+    if ( db.dataUser.user[dat.reqSender.userid].pw !== dat.currentPassword ) return -1;
+
     //パスワード変更
-    db.dataUser.user[dat.reqSender.userid].pw = dat.password;
+    db.dataUser.user[dat.reqSender.userid].pw = dat.newPassword;
+    fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
     return;
 
@@ -195,6 +199,7 @@ function generateKey(){
 }
 
 exports.authUser = authUser; //ユーザーの認証
+exports.changePassword = changePassword; //パスワード変更
 exports.authUserByCookie = authUserByCookie; //クッキーによる認証
 exports.checkUserSession = checkUserSession; //セッションIDの確認をするだけの関数
 exports.registerUser = registerUser; //ユーザーの新規登録
