@@ -17,14 +17,10 @@ const SERVER_VERSION = "alpha_20230419";
 const app = express();
 const server = http.createServer(app);
 
-const frontendURL = ["http://localhost:5173", "http://127.0.0.1:5173", "http://192.168.0.134:5173", "http://192.168.0.134:5173", "https://48f7-202-12-245-136.jp.ngrok.io"];
-//const frontendURL = ["http://localhost:5173", "http://127.0.0.1:5173", "http://202.12.245.136:4173/"];
-
 //CORS設定
 const io = socketIo(server, {
     maxHttpBufferSize: 1e8, // 100 MB
     cors: {
-        origin: frontendURL,  // react port
         credentials: true
     }
 });
