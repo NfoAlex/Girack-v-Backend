@@ -357,7 +357,7 @@ io.on("connection", (socket) => {
         //もしJPEGかGIFじゃないなら拒否
         if (
             !["image/jpeg","image/gif"].includes(dat.fileData.type) ||
-            dat.fileData.size > 1024000
+            dat.fileData.size > 3072000
         ) {
             return -1;
 
