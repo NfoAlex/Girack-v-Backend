@@ -642,6 +642,7 @@ io.on("connection", (socket) => {
 
     });
 
+    //パスワードを変更する
     socket.on("changePassword", (dat) => {
         /*
         dat
@@ -661,9 +662,10 @@ io.on("connection", (socket) => {
 
         if ( !checkDataIntegrality(dat, paramRequire, "changeProfileSecurity") ) return -1
 
-        auth.changePassword(dat);
+        let result = auth.changePassword(dat);
 
-        return;
+        //パスワードの変更結果を送信
+        socket.emit("changePasswordResult", result);
 
     });
 

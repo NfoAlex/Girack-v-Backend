@@ -63,7 +63,7 @@ let changePassword = function changePassword(dat) {
     db.dataUser.user[dat.reqSender.userid].pw = dat.newPassword;
     fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
-    return;
+    return 1;
 
 }
 
