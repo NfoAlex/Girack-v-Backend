@@ -8,7 +8,6 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const { config } = require("process");
-const { getLinkPreview } = require("link-preview-js");
 const e = require("express");
 
 const port = process.env.PORT || 33333;
@@ -106,7 +105,7 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
     //セッションIDの確認
     if ( !auth.checkUserSession(dat.reqSender) ) { return false; }
 
-    console.log("確認できたな");
+    console.log("index :: checkDataIntegrality : 確認できた => " + funcName);
 
     //確認できたと返す
     return true;
@@ -182,7 +181,7 @@ io.on("connection", (socket) => {
     });
 
 // ===========================================================
-// ユーザーとサーバーの管理
+// ユーザーとサーバーの情報更新管理
 
     //設定の更新とか
     socket.on("config", (dat) => {
@@ -640,6 +639,31 @@ io.on("connection", (socket) => {
         }
 
         socket.emit("authResult", loginAttempt); //認証結果を送信
+
+    });
+
+    socket.on("changePassword", (dat) => {
+        /*
+        dat
+        {
+            currentPassword: "..."
+            newPassword: "fdsa"
+            reqSender: {...}
+        }
+        */
+
+        console.log("受信はした");
+
+        let paramRequire = [
+            "currentPassword",
+            "newPassword"
+        ];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "changeProfileSecurity") ) return -1
+
+        auth.changePassword(dat);
+
+        return;
 
     });
 
