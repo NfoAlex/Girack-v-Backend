@@ -356,7 +356,7 @@ io.on("connection", (socket) => {
 
         //もしJPEGかGIFじゃないなら拒否
         if (
-            !["image/jpeg","image/gif"].includes(dat.fileData.type) ||
+            !["image/jpeg","image/gif", "image/png"].includes(dat.fileData.type) ||
             dat.fileData.size > 3072000
         ) {
             return -1;
@@ -389,9 +389,32 @@ io.on("connection", (socket) => {
 
         });
 
-        //拡張子を判別して設定
-        let iconExtension = (dat.fileData.type==="image/jpeg")?".jpeg":".gif";
+        //もしPNGが先に存在しているなら削除しておく
+        fs.access("./img/"+dat.reqSender.userid+".png", (err) => {
+            if ( !err ) {
+                fs.unlink("./img/"+dat.reqSender.userid+".png", (err) => {
+                    if ( err ) console.log(err);
+                    console.log("file action taken with PNG");
 
+                });
+
+            }
+
+        });
+
+        let iconExtension;
+        //拡張子を判別して設定
+        if ( dat.fileData.type === "image/jpeg" ) {
+            iconExtension = ".jpeg";
+
+        } else if ( dat.fileData.type === "image/gif" ) {
+            iconExtension = ".gif";
+
+        } else if ( dat.fileData.type === "image/png" ) {
+            iconExtension = ".png";
+
+        }
+        
         //アイコン画像書き込み
         fs.writeFile("./img/"+dat.reqSender.userid+iconExtension, dat.fileData.buffer, (err) => {
             console.log("result->", err);
