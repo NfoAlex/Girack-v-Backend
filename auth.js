@@ -54,6 +54,15 @@ let authUser = function authUser(key) {
 
 }
 
+//パスワードを変更
+let changePassword = function changePassword(dat) {
+    //パスワード変更
+    db.dataUser.user[dat.reqSender.userid].pw = dat.password;
+
+    return;
+
+}
+
 //クッキーを使ったユーザー認証
 let authUserByCookie = function authUserByCookie(sessionid) {
     console.log("authUserByCookie :: これから確認... -> " + sessionid);

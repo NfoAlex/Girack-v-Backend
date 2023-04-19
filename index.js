@@ -182,7 +182,7 @@ io.on("connection", (socket) => {
     });
 
 // ===========================================================
-// ユーザーとサーバーの管理
+// ユーザーとサーバーの情報更新管理
 
     //設定の更新とか
     socket.on("config", (dat) => {
@@ -640,6 +640,27 @@ io.on("connection", (socket) => {
         }
 
         socket.emit("authResult", loginAttempt); //認証結果を送信
+
+    });
+
+    socket.on("changeProfileSecurity", (dat) => {
+        /*
+        dat
+        {
+            password: 1234
+            reqSender: {...}
+        }
+        */
+
+        let paramRequire = [
+            "password"
+        ];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "changeProfileSecurity") ) return -1
+
+        auth.changePassword(dat);
+
+        return;
 
     });
 
