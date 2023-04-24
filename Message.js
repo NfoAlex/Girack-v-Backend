@@ -110,7 +110,21 @@ let msgMix = function msgMix(m) {
     //ファイルが添付されているなら
     if ( m.fileData.isAttatched ) {
         console.log("ファイル処理作業始めるわ");
+        //添付ファイルへID振り分け
+        for ( let index in m.fileData.attatchmentData ) {
+            //IDは日付+チャンネルID+ユーザーID+乱数8桁
+            m.fileData.attatchmentData[index].fileid = m.channelid + m.userid + parseInt(Math.random()*99999999);
+
+        }
+
         uploadFile(m.fileData); //ファイル処理開始
+
+        //履歴へ書き込むためにファイルデータそのものを削除
+        for ( let index in m.fileData.attatchmentData ) {
+            delete m.fileData.attatchmentData[index].buffer;
+
+        }
+
 
     }
 
@@ -137,11 +151,15 @@ let msgMix = function msgMix(m) {
 
 //ファイルが添付されているならいろいろ処理する部分
 let uploadFile = function uploadFile(fileData) {
-    //ファイルを書き込み
-    fs.writeFile("./files/"+fileData.attatchmentData[0].name, fileData.attatchmentData[0].buffer, (err) => {
-        console.log("Message :: uploadFile : ", err);
+    try {
+        //ファイルを書き込み
+        fs.writeFile("./files/"+fileData.attatchmentData[0].name, fileData.attatchmentData[0].buffer, (err) => {
+            console.log("Message :: uploadFile : アップロードエラー", err);
 
-    });
+        });
+    } catch(e) {
+        console.log("Message :: uploadFIle : ファイル書き込みできなかった?");
+    }
 
 }
 
@@ -509,6 +527,7 @@ let msgRecord = function msgRecord(json) {
                 time: json.time,
                 content: json.content,
                 replyData: json.replyData,
+                fileData: json.fileData,
                 hasUrl: json.hasUrl,
                 urlData: json.urlData,
                 reaction: {}
