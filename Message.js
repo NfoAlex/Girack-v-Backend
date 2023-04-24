@@ -117,9 +117,9 @@ let msgMix = function msgMix(m) {
 
         }
 
-        uploadFile(m.fileData); //ファイル処理開始
+        writeUploadedFile(m.fileData); //ファイル処理開始
 
-        //履歴へ書き込むためにファイルデータそのものを削除
+        //履歴へ書き込む際は不要なためファイルデータそのものを削除
         for ( let index in m.fileData.attatchmentData ) {
             delete m.fileData.attatchmentData[index].buffer;
 
@@ -150,7 +150,7 @@ let msgMix = function msgMix(m) {
 }
 
 //ファイルが添付されているならいろいろ処理する部分
-let uploadFile = function uploadFile(fileData) {
+let writeUploadedFile = function uploadFile(fileData) {
     try {
         //ファイルを書き込み
         fs.writeFile("./files/"+fileData.attatchmentData[0].name, fileData.attatchmentData[0].buffer, (err) => {
