@@ -115,7 +115,7 @@ let msgMix = function msgMix(m) {
 
         }
 
-        writeUploadedFile(m.fileData); //ファイル処理開始
+        writeUploadedFile(m.fileData, m.channelid); //ファイル処理開始
 
         //履歴へ書き込む際は不要なためファイルデータそのものを削除
         for ( let index in m.fileData.attatchmentData ) {
@@ -147,10 +147,12 @@ let msgMix = function msgMix(m) {
 }
 
 //ファイルが添付されているならいろいろ処理する部分
-let writeUploadedFile = function uploadFile(fileData) {
+let writeUploadedFile = function uploadFile(fileData, channelid) {
+    try{fs.mkdirSync("./files/"+channelid);}catch(e){}
+
     try {
         //ファイルを書き込み
-        fs.writeFile("./files/"+fileData.attatchmentData[0].name, fileData.attatchmentData[0].buffer, (err) => {
+        fs.writeFile("./files/"+channelid+"/"+fileData.attatchmentData[0].name, fileData.attatchmentData[0].buffer, (err) => {
             console.log("Message :: uploadFile : アップロードエラー", err);
 
         });
