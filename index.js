@@ -73,6 +73,24 @@ app.get('/img/:src', (req, res) => {
 
 });
 
+//ファイルを返す
+app.get('/file/:channelid/:fileid', (req, res) => {
+    let fileid = req.params.fileid; //ファイルIDを取得
+    let channelid = req.params.channelid;
+    //ファイルIDからJSON名を取得
+    let fileidIndexJsonName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
+    //ファイルIDインデックスを取得
+    let fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + channelid + '/' + fileidIndexJsonName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+
+    try {
+        //ファイルを返す
+        res.sendFile(__dirname + "/files/" + channelid + "/" + fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
+    } catch(e) {
+        console.log("index :: app.get('/file/') : ファイル送信失敗", e)
+    }
+
+});
+
 ////////////////////////////////////////////////////////////////
 
 //URLデータを更新させる
