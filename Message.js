@@ -105,8 +105,6 @@ let msgMix = function msgMix(m) {
 
     }
 
-    console.log("Message :: msgMix : fileData", m.fileData);
-
     //ファイルが添付されているなら
     if ( m.fileData.isAttatched ) {
         console.log("ファイル処理作業始めるわ");
@@ -124,7 +122,6 @@ let msgMix = function msgMix(m) {
             delete m.fileData.attatchmentData[index].buffer;
 
         }
-
 
     }
 
@@ -501,6 +498,7 @@ let msgRecord = function msgRecord(json) {
 
     //メッセージを送るチャンネルの履歴データのディレクトリ
     let pathOfJson = "./record/" + json.channelid + "/" + fulldate + ".json";
+    let pathOfJsonFileIndex = "./fileidIndex/" + json.channelid + "/" + fulldate + ".json";
     
     //JSONファイルを開いてみて、いけたらそのまま読み込み、なかったら作る
     try { //JSONの存在確認
@@ -514,24 +512,57 @@ let msgRecord = function msgRecord(json) {
 
     }
 
+    //ファイルID用JSONにも同じく
+    try { //JSONの存在確認
+        //ファイルを読み込んでみる(使いはしない、存在を確認するだけ)
+        fs.statSync(pathOfJsonFileIndex);
+
+    } catch(err) { //存在無しなら(読み込みエラーなら)
+        //そのチャンネルのファイルＩＤ用ディレクトリ作成もトライ(過去に作ってたならスルー)
+        try{fs.mkdirSync("./fileidIndex/" + json.channelid);}catch(e){/* ここにくるなら存在するから過去に作っていたということ */}
+        fs.writeFileSync(pathOfJsonFileIndex, "{}"); //空のJSONを保存
+
+    }
+
     let dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
+    let fileidIndex = JSON.parse(fs.readFileSync(pathOfJsonFileIndex, 'utf-8')); //ファイルIDインデックスJSON読み込み
     let latestMessage = []; //履歴の最後
 
+    //ファイル添付があればファイルIDインデックスへファイル情報を記録してファイル情報を削除(typeとファイルIDがあるはず)
+    if ( json.fileData.isAttatched ) {
+        for ( let index in json.fileData.attatchmentData ) {
+            try {
+                fileidIndex[json.fileData.attatchmentData[index].fileid] = {
+                    name: json.fileData.attatchmentData[index].name,
+                    size: json.fileData.attatchmentData[index].size,
+                    type: json.fileData.attatchmentData[index].type,
+                };
+                delete json.fileData.attatchmentData[index].name;
+                delete json.fileData.attatchmentData[index].size;
+            } catch(e) {
+                console.log("Message :: msgRecord : ファイルID記録に失敗");
+            }
+
+        }
+
+    }
+
+    //履歴書き込み開始
     try {
-            //DBに追加
-            dataHistory[[receivedTime,json.messageid].join("")] = { //JSONでの順番はキーでソートされるから時間を最初に挿入している
-                //type: json.type,
-                messageid: [receivedTime,json.messageid].join(""), //メッセージID
-                userid: json.userid,
-                channelid: json.channelid,
-                time: json.time,
-                content: json.content,
-                replyData: json.replyData,
-                fileData: json.fileData,
-                hasUrl: json.hasUrl,
-                urlData: json.urlData,
-                reaction: {}
-            };
+        //DBに追加
+        dataHistory[[receivedTime,json.messageid].join("")] = { //JSONでの順番はキーでソートされるから時間を最初に挿入している
+            //type: json.type,
+            messageid: [receivedTime,json.messageid].join(""), //メッセージID
+            userid: json.userid,
+            channelid: json.channelid,
+            time: json.time,
+            content: json.content,
+            replyData: json.replyData,
+            fileData: json.fileData,
+            hasUrl: json.hasUrl,
+            urlData: json.urlData,
+            reaction: {}
+        };
 
     }
     catch(e) {
@@ -543,6 +574,7 @@ let msgRecord = function msgRecord(json) {
     //console.log("msgRecord :: 4");
     //fs.writeFileSync(pathOfJson, JSON.stringify(dataHistorySorted, null, 4));
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
+    fs.writeFileSync(pathOfJsonFileIndex, JSON.stringify(fileidIndex, null, 4));
 
     //console.log("msgRecord :: jsonファイルが -> " + isExist + " , " + dataHistory);
 
