@@ -39,6 +39,7 @@ let msgMix = function msgMix(m) {
 
     m.time = receivedTime; //送信時間を受信メッセージに追加
 
+    //メッセージがそもそも有効なものかどうか
     if (
         m.content === undefined ||
         m.content.length >= 250 || //長さが250文字以上だったら
@@ -104,6 +105,15 @@ let msgMix = function msgMix(m) {
 
     }
 
+    console.log("Message :: msgMix : fileData", m.fileData);
+
+    //ファイルが添付されているなら
+    if ( m.fileData.isAttatched ) {
+        console.log("ファイル処理作業始めるわ");
+        uploadFile(m.fileData); //ファイル処理開始
+
+    }
+
     try {
         //もし返信なら
         if ( m.replyData.isReplying ) {
@@ -119,15 +129,19 @@ let msgMix = function msgMix(m) {
 
     msgRecord(m); //メッセージをDBに記録
 
-    let M = getLatestMessage(m.channelid); //DBからメッセージ取得して送信
+    let MessageCompiled = getLatestMessage(m.channelid); //DBからメッセージ取得して送信
 
-    return M;
+    return MessageCompiled;
 
 }
 
 //ファイルが添付されているならいろいろ処理する部分
-let uploadFile = function uploadFile(files) {
+let uploadFile = function uploadFile(fileData) {
+    //ファイルを書き込み
+    fs.writeFile("./files/"+fileData.attatchmentData[0].name, fileData.attatchmentData[0].buffer, (err) => {
+        console.log("Message :: uploadFile : ", err);
 
+    });
 
 }
 
