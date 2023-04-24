@@ -109,11 +109,11 @@ let msgMix = function msgMix(m) {
     if ( m.fileData.isAttatched ) {
         console.log("ファイル処理作業始めるわ");
         //添付ファイルへID振り分け
-        for ( let index in m.fileData.attatchmentData ) {
-            //IDは日付+チャンネルID+ユーザーID+乱数8桁
-            m.fileData.attatchmentData[index].fileid = m.channelid + m.userid + parseInt(Math.random()*99999999);
+        // for ( let index in m.fileData.attatchmentData ) {
+        //     //IDは日付+チャンネルID+ユーザーID+乱数8桁
+        //     m.fileData.attatchmentData[index].fileid = m.channelid + m.userid + parseInt(Math.random()*99999999);
 
-        }
+        // }
 
         writeUploadedFile(m.fileData, m.channelid); //ファイル処理開始
 
@@ -532,6 +532,14 @@ let msgRecord = function msgRecord(json) {
 
     //ファイル添付があればファイルIDインデックスへファイル情報を記録してファイル情報を削除(typeとファイルIDがあるはず)
     if ( json.fileData.isAttatched ) {
+        //ファイルIDの振り分け
+        for ( let index in json.fileData.attatchmentData ) {
+            //IDは日付+ユーザーID+乱数8桁
+            json.fileData.attatchmentData[index].fileid = json.time + json.userid + parseInt(Math.random()*99999999);
+        
+        }
+        
+        //ファイルIDへファイル情報を追記
         for ( let index in json.fileData.attatchmentData ) {
             try {
                 fileidIndex[json.fileData.attatchmentData[index].fileid] = {
