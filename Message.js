@@ -534,6 +534,7 @@ let msgRecord = function msgRecord(json) {
             try {
                 fileidIndex[json.fileData.attatchmentData[index].fileid] = {
                     name: json.fileData.attatchmentData[index].name,
+                    userid: json.userid,
                     size: json.fileData.attatchmentData[index].size,
                     type: json.fileData.attatchmentData[index].type,
                 };
