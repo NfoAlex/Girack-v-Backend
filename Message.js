@@ -149,6 +149,8 @@ let msgMix = function msgMix(m) {
 //ファイルが添付されているならいろいろ処理する部分
 let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePath) {
     try{fs.mkdirSync("./files/"+channelid+"/"+receivedDatePath);}catch(e){}
+
+    //ファイルの書き込み(複数の書き込み用にfor)
     for ( let index in fileData.attatchmentData ) {
         try {
             //ファイルを書き込み
