@@ -88,6 +88,7 @@ app.get('/file/:channelid/:fileid', (req, res) => {
         res.sendFile(__dirname + "/files/" + channelid + "/" + fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
     } catch(e) {
         console.log("index :: app.get('/file/') : ファイル送信失敗", e)
+        res.send("ファイルがねえ");
     }
 
 });
