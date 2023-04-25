@@ -526,8 +526,10 @@ let msgRecord = function msgRecord(json) {
 
     }
 
-    let dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
-    let fileidIndex = JSON.parse(fs.readFileSync(pathOfJsonFileIndex, 'utf-8')); //ファイルIDインデックスJSON読み込み
+    //メッセージデータのJSON読み込み
+    let dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8'));
+    //ファイルIDインデックスJSON読み込み
+    let fileidIndex = JSON.parse(fs.readFileSync(pathOfJsonFileIndex, 'utf-8'));
     let latestMessage = []; //履歴の最後
 
     //ファイル添付があればファイルIDインデックスへファイル情報を記録してファイル情報を削除(typeとファイルIDがあるはず)
