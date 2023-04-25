@@ -153,7 +153,7 @@ let writeUploadedFile = function uploadFile(fileData, channelid) {
     try {
         //ファイルを書き込み
         fs.writeFile("./files/"+channelid+"/"+fileData.attatchmentData[0].name, fileData.attatchmentData[0].buffer, (err) => {
-            console.log("Message :: uploadFile : アップロードエラー", err);
+            console.log("Message :: uploadFile : アップロード結果 -> ", err);
 
         });
     } catch(e) {
@@ -548,8 +548,8 @@ let msgRecord = function msgRecord(json) {
                     size: json.fileData.attatchmentData[index].size,
                     type: json.fileData.attatchmentData[index].type,
                 };
-                delete json.fileData.attatchmentData[index].name;
-                delete json.fileData.attatchmentData[index].size;
+                //delete json.fileData.attatchmentData[index].name;
+                //delete json.fileData.attatchmentData[index].size;
             } catch(e) {
                 console.log("Message :: msgRecord : ファイルID記録に失敗");
             }
