@@ -114,8 +114,8 @@ let msgMix = function msgMix(m) {
         //     m.fileData.attatchmentData[index].fileid = m.channelid + m.userid + parseInt(Math.random()*99999999);
 
         // }
-
-        writeUploadedFile(m.fileData, m.channelid); //ファイル処理開始
+        let receivedDatePath = t.getFullYear() + "_" + (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
+        writeUploadedFile(m.fileData, m.channelid, receivedDatePath); //ファイル処理開始
 
         //履歴へ書き込む際は不要なためファイルデータそのものを削除
         for ( let index in m.fileData.attatchmentData ) {
@@ -147,12 +147,12 @@ let msgMix = function msgMix(m) {
 }
 
 //ファイルが添付されているならいろいろ処理する部分
-let writeUploadedFile = function uploadFile(fileData, channelid) {
-    try{fs.mkdirSync("./files/"+channelid);}catch(e){}
+let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePath) {
+    try{fs.mkdirSync("./files/"+channelid+"/"+receivedDatePath);}catch(e){}
 
     try {
         //ファイルを書き込み
-        fs.writeFile("./files/"+channelid+"/"+fileData.attatchmentData[0].name, fileData.attatchmentData[0].buffer, (err) => {
+        fs.writeFile("./files/"+channelid+"/"+receivedDatePath+"/"+fileData.attatchmentData[0].name, fileData.attatchmentData[0].buffer, (err) => {
             console.log("Message :: uploadFile : アップロード結果 -> ", err);
 
         });
