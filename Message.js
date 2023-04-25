@@ -149,15 +149,17 @@ let msgMix = function msgMix(m) {
 //ファイルが添付されているならいろいろ処理する部分
 let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePath) {
     try{fs.mkdirSync("./files/"+channelid+"/"+receivedDatePath);}catch(e){}
+    for ( let index in fileData.attatchmentData ) {
+        try {
+            //ファイルを書き込み
+            fs.writeFile("./files/"+channelid+"/"+receivedDatePath+"/"+fileData.attatchmentData[index].name, fileData.attatchmentData[index].buffer, (err) => {
+                console.log("Message :: uploadFile : アップロード結果 -> ", err);
 
-    try {
-        //ファイルを書き込み
-        fs.writeFile("./files/"+channelid+"/"+receivedDatePath+"/"+fileData.attatchmentData[0].name, fileData.attatchmentData[0].buffer, (err) => {
-            console.log("Message :: uploadFile : アップロード結果 -> ", err);
+            });
+        } catch(e) {
+            console.log("Message :: uploadFIle : ファイル書き込みできなかった?");
+        }
 
-        });
-    } catch(e) {
-        console.log("Message :: uploadFIle : ファイル書き込みできなかった?");
     }
 
 }
