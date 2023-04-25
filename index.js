@@ -85,9 +85,10 @@ app.get('/file/:channelid/:fileid', (req, res) => {
 
     try {
         //ファイルを返す
-        res.sendFile(__dirname + "/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
+        console.log("返すファイルデータ :: ", fileidIndex[fileid]);
+        res.download(__dirname + "/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
     } catch(e) {
-        console.log("index :: app.get('/file/') : ファイル送信失敗", e)
+        console.log("index :: app.get('/file/') : ファイル送信失敗", e);
         res.send("ファイルがねえ");
     }
 
