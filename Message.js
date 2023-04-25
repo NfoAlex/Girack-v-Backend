@@ -39,6 +39,7 @@ let msgMix = function msgMix(m) {
 
     m.time = receivedTime; //送信時間を受信メッセージに追加
 
+    //メッセージがそもそも有効なものかどうか
     if (
         m.content === undefined ||
         m.content.length >= 250 || //長さが250文字以上だったら
@@ -104,6 +105,26 @@ let msgMix = function msgMix(m) {
 
     }
 
+    //ファイルが添付されているなら
+    if ( m.fileData.isAttatched ) {
+        console.log("ファイル処理作業始めるわ");
+        //添付ファイルへID振り分け
+        // for ( let index in m.fileData.attatchmentData ) {
+        //     //IDは日付+チャンネルID+ユーザーID+乱数8桁
+        //     m.fileData.attatchmentData[index].fileid = m.channelid + m.userid + parseInt(Math.random()*99999999);
+
+        // }
+        let receivedDatePath = t.getFullYear() + "_" + (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
+        writeUploadedFile(m.fileData, m.channelid, receivedDatePath); //ファイル処理開始
+
+        //履歴へ書き込む際は不要なためファイルデータそのものを削除
+        for ( let index in m.fileData.attatchmentData ) {
+            delete m.fileData.attatchmentData[index].buffer;
+
+        }
+
+    }
+
     try {
         //もし返信なら
         if ( m.replyData.isReplying ) {
@@ -119,15 +140,36 @@ let msgMix = function msgMix(m) {
 
     msgRecord(m); //メッセージをDBに記録
 
-    let M = getLatestMessage(m.channelid); //DBからメッセージ取得して送信
+    let MessageCompiled = getLatestMessage(m.channelid); //DBからメッセージ取得して送信
 
-    return M;
+    return MessageCompiled;
 
 }
 
 //ファイルが添付されているならいろいろ処理する部分
-let uploadFile = function uploadFile(files) {
+let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePath) {
+    try{fs.mkdirSync("./files/"+channelid+"/"+receivedDatePath);}catch(e){}
 
+    //ファイルの書き込み(複数の書き込み用にfor)
+    for ( let index in fileData.attatchmentData ) {
+        //ファイルサイズが大きかったら書き込まない
+        if ( fileData.attatchmentData[index].size >= 100000000 ) {
+            console.log("このファイルのサイズが大きい");
+        
+        } else {
+            try {
+                //ファイルを書き込み
+                fs.writeFile("./files/"+channelid+"/"+receivedDatePath+"/"+fileData.attatchmentData[index].name, fileData.attatchmentData[index].buffer, (err) => {
+                    console.log("Message :: uploadFile : アップロード結果 -> ", err);
+
+                });
+            } catch(e) {
+                console.log("Message :: uploadFIle : ファイル書き込みできなかった?");
+            }
+            
+        }
+
+    }
 
 }
 
@@ -469,6 +511,7 @@ let msgRecord = function msgRecord(json) {
 
     //メッセージを送るチャンネルの履歴データのディレクトリ
     let pathOfJson = "./record/" + json.channelid + "/" + fulldate + ".json";
+    let pathOfJsonFileIndex = "./fileidIndex/" + json.channelid + "/" + fulldate + ".json";
     
     //JSONファイルを開いてみて、いけたらそのまま読み込み、なかったら作る
     try { //JSONの存在確認
@@ -482,23 +525,68 @@ let msgRecord = function msgRecord(json) {
 
     }
 
-    let dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
+    //ファイルID用JSONにも同じく
+    try { //JSONの存在確認
+        //ファイルを読み込んでみる(使いはしない、存在を確認するだけ)
+        fs.statSync(pathOfJsonFileIndex);
+
+    } catch(err) { //存在無しなら(読み込みエラーなら)
+        //そのチャンネルのファイルＩＤ用ディレクトリ作成もトライ(過去に作ってたならスルー)
+        try{fs.mkdirSync("./fileidIndex/" + json.channelid);}catch(e){/* ここにくるなら存在するから過去に作っていたということ */}
+        fs.writeFileSync(pathOfJsonFileIndex, "{}"); //空のJSONを保存
+
+    }
+
+    //メッセージデータのJSON読み込み
+    let dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8'));
+    //ファイルIDインデックスJSON読み込み
+    let fileidIndex = JSON.parse(fs.readFileSync(pathOfJsonFileIndex, 'utf-8'));
     let latestMessage = []; //履歴の最後
 
+    //ファイル添付があればファイルIDインデックスへファイル情報を記録してファイル情報を削除(typeとファイルIDがあるはず)
+    if ( json.fileData.isAttatched ) {
+        //ファイルIDの振り分け
+        for ( let index in json.fileData.attatchmentData ) {
+            //IDは日付+ユーザーID+乱数8桁
+            json.fileData.attatchmentData[index].fileid = json.time + json.userid + parseInt(Math.random()*99999999);
+        
+        }
+        
+        //ファイルIDへファイル情報を追記
+        for ( let index in json.fileData.attatchmentData ) {
+            try {
+                fileidIndex[json.fileData.attatchmentData[index].fileid] = {
+                    name: json.fileData.attatchmentData[index].name,
+                    userid: json.userid,
+                    size: json.fileData.attatchmentData[index].size,
+                    type: json.fileData.attatchmentData[index].type,
+                };
+                //delete json.fileData.attatchmentData[index].name;
+                //delete json.fileData.attatchmentData[index].size;
+            } catch(e) {
+                console.log("Message :: msgRecord : ファイルID記録に失敗");
+            }
+
+        }
+
+    }
+
+    //履歴書き込み開始
     try {
-            //DBに追加
-            dataHistory[[receivedTime,json.messageid].join("")] = { //JSONでの順番はキーでソートされるから時間を最初に挿入している
-                //type: json.type,
-                messageid: [receivedTime,json.messageid].join(""), //メッセージID
-                userid: json.userid,
-                channelid: json.channelid,
-                time: json.time,
-                content: json.content,
-                replyData: json.replyData,
-                hasUrl: json.hasUrl,
-                urlData: json.urlData,
-                reaction: {}
-            };
+        //DBに追加
+        dataHistory[[receivedTime,json.messageid].join("")] = { //JSONでの順番はキーでソートされるから時間を最初に挿入している
+            //type: json.type,
+            messageid: [receivedTime,json.messageid].join(""), //メッセージID
+            userid: json.userid,
+            channelid: json.channelid,
+            time: json.time,
+            content: json.content,
+            replyData: json.replyData,
+            fileData: json.fileData,
+            hasUrl: json.hasUrl,
+            urlData: json.urlData,
+            reaction: {}
+        };
 
     }
     catch(e) {
@@ -510,6 +598,7 @@ let msgRecord = function msgRecord(json) {
     //console.log("msgRecord :: 4");
     //fs.writeFileSync(pathOfJson, JSON.stringify(dataHistorySorted, null, 4));
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
+    fs.writeFileSync(pathOfJsonFileIndex, JSON.stringify(fileidIndex, null, 4));
 
     //console.log("msgRecord :: jsonファイルが -> " + isExist + " , " + dataHistory);
 

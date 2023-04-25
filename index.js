@@ -12,7 +12,7 @@ const e = require("express");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230422";
+const SERVER_VERSION = "alpha_20230425";
 
 const app = express();
 const server = http.createServer(app);
@@ -28,6 +28,12 @@ const io = socketIo(server, {
 //オンラインのユーザーをカウントする用
 //let sessionOnline = [];
 let sessionOnline = {};
+
+//必要なディレクトリの確認、なければ作成
+try{fs.mkdirSync("./fileidIndex/");}catch(e){}
+try{fs.mkdirSync("./files/");}catch(e){}
+try{fs.mkdirSync("./record/");}catch(e){}
+try{fs.mkdirSync("./img/");}catch(e){}
 
 //もしバックエンドに直接アクセスされたら用
 app.get('/', (req, res) => {
@@ -63,6 +69,27 @@ app.get('/img/:src', (req, res) => {
     catch(e) {
         console.log("index :: これがなかった -> " + req.params.src + ".gif");
         res.sendFile(__dirname + '/img/default.jpeg');
+    }
+
+});
+
+//ファイルを返す
+app.get('/file/:channelid/:fileid', (req, res) => {
+    let fileid = req.params.fileid; //ファイルIDを取得
+    let channelid = req.params.channelid; //チャンネルIDを取得
+
+    //ファイルIDからJSON名を取得(日付部分)
+    let fileidPathName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
+    //ファイルIDインデックスを取得
+    let fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+
+    try {
+        //ファイルを返す
+        console.log("返すファイルデータ :: ", fileidIndex[fileid]);
+        res.download(__dirname + "/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
+    } catch(e) {
+        console.log("index :: app.get('/file/') : ファイル送信失敗", e);
+        res.send("ファイルがねえ");
     }
 
 });

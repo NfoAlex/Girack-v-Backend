@@ -1,5 +1,6 @@
 #ユーザーファイルや履歴のディレクトリなど
 files/*
+fileidIndex/*
 img/*
 record/*
 _____TEST_____.js

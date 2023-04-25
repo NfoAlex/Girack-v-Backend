@@ -78,7 +78,6 @@ try { //読み込んでみる
     dataServer = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
 }
 
-
 //let dataRole = JSON.parse(fs.readFileSync('./role.json', 'utf-8')); //ロールのJSON読み込み
 //let dataFiles = JSON.parse(fs.readFileSync('./files.json', 'utf-8')); //ロールのJSON読み込み
 
