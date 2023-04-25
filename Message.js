@@ -152,6 +152,8 @@ let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePat
 
     //ファイルの書き込み(複数の書き込み用にfor)
     for ( let index in fileData.attatchmentData ) {
+        //ファイルサイズが大きかったら書き込まない
+        if ( fileData.attatchmentData[index].size >= 100000000 ) { console.log("このファイルのサイズが大きい"); return -1; }
         try {
             //ファイルを書き込み
             fs.writeFile("./files/"+channelid+"/"+receivedDatePath+"/"+fileData.attatchmentData[index].name, fileData.attatchmentData[index].buffer, (err) => {
