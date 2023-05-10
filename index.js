@@ -25,9 +25,21 @@ const io = socketIo(server, {
     }
 });
 
-//オンラインのユーザーをカウントする用
-//let sessionOnline = [];
-let sessionOnline = {};
+//接続しているSocketJSON
+let socketOnline = {
+    /*
+    "g1r4ck": "12345",
+    "asdfghjkl": "12345",
+    "socketの接続id": "ユーザーid"
+    */
+};
+//オンラインのユーザーJSON
+let userOnline = {
+    /*
+    "12345": 2,
+    "ユーザーid": 接続数
+    */
+};
 
 //必要なディレクトリの確認、なければ作成
 try{fs.mkdirSync("./fileidIndex/");}catch(e){}
@@ -120,8 +132,11 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
     try{
         //パラメータが足りているか確認
         for ( let termIndex in paramRequire ) {
-            if ( dat[paramRequire[termIndex]] === undefined ) { 
+            if ( dat[paramRequire[termIndex]] === undefined ) {
+                console.log("-------------------------------");
+                console.log("ERROR IN ", dat);
                 throw new Error("does not have enough parameter > " + paramRequire[termIndex]);
+                console.log("-------------------------------");
 
             }
 
@@ -676,7 +691,29 @@ io.on("connection", (socket) => {
 
         if ( loginAttempt.result ) {
             //オンラインの人リストへ追加
-            sessionOnline[socket.id] = loginAttempt.userid;
+            if ( userOnline[loginAttempt.userid] === undefined ) {
+                socketOnline[socket.id] = loginAttempt.userid;
+                userOnline[loginAttempt.userid] = 1;
+
+            } else {
+                socketOnline[socket.id] = loginAttempt.userid;
+                userOnline[loginAttempt.userid] += 1;
+
+            }
+            
+            //-------------------------------------------
+            //known bug: keyがundefinedの時がある
+            if ( loginAttempt.userid === undefined ) {
+                console.log("index :: auth : ユーザーIDがundefinedになっている");
+                console.log(key);
+                try {
+                    delete userOnline[loginAttempt.userid];
+                    console.log("index :: auth : 不正なユーザーID分は消した");
+                } catch(e) {console.log("index :: auth : しかも消せなかった");}
+
+            }
+            //-------------------------------------------
+
             //認証済みセッションとして登録
             socket.join("loggedin");
 
@@ -686,11 +723,10 @@ io.on("connection", (socket) => {
             fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
             console.log("index :: auth : 現在のオンラインセッションりすと -> ");
-            console.log(sessionOnline);
+            console.log(userOnline);
 
             //オンライン人数を更新
-            //io.to("loggedin").emit("sessionOnlineUpdate", sessionOnline.length);
-            io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(sessionOnline).length);
+            io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
         }
 
@@ -742,7 +778,15 @@ io.on("connection", (socket) => {
         //認証に成功したら
         if ( loginAttempt.result ) {
             //オンラインの人リストへ追加
-            sessionOnline[socket.id] = loginAttempt.userid;
+            if ( userOnline[loginAttempt.userid] === undefined ) {
+                socketOnline[socket.id] = loginAttempt.userid;
+                userOnline[loginAttempt.userid] = 1;
+
+            } else {
+                socketOnline[socket.id] = loginAttempt.userid;
+                userOnline[loginAttempt.userid] += 1;
+
+            }
 
             //ユーザーのオンライン状態を設定
             db.dataUser.user[loginAttempt.userid].state.loggedin = true;
@@ -751,14 +795,13 @@ io.on("connection", (socket) => {
             fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
             console.log("index :: authByCookie : 現在のオンラインセッションりすと -> ");
-            console.log(sessionOnline);
+            console.log(userOnline);
 
             //認証済みセッションとして登録
             socket.join("loggedin");
 
             //オンライン人数を更新
-            //io.to("loggedin").emit("sessionOnlineUpdate", sessionOnline.length);
-            io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(sessionOnline).length);
+            io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
         }
 
@@ -794,7 +837,16 @@ io.on("connection", (socket) => {
         //セッションIDを認証してから加算
         if ( auth.checkUserSession(dat.reqSender) ) {
             //オンラインと保存
-            sessionOnline[socket.id] = dat.reqSender.userid;
+            if ( userOnline[dat.reqSender.userid] === undefined ) {
+                socketOnline[socket.id] = dat.reqSender.userid;
+                userOnline[dat.reqSender.userid] = 1;
+
+            } else {
+                socketOnline[socket.id] = dat.reqSender.userid;
+                userOnline[dat.reqSender.userid] += 1;
+
+            }
+
             //ユーザーのオンライン状態を設定
             db.dataUser.user[dat.reqSender.userid].state.loggedin = true;
 
@@ -805,7 +857,7 @@ io.on("connection", (socket) => {
             socket.join("loggedin");
 
             //オンライン数を通知
-            io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(sessionOnline).length);
+            io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
         }
 
@@ -926,12 +978,12 @@ io.on("connection", (socket) => {
         let sessionOnlineList = [];
 
         //オンラインリストのJSONを配列化
-        let objSessionOnline = Object.entries(sessionOnline);
+        let objUserOnline = Object.keys(userOnline);
 
         //リストの長さ分配列へユーザーIDを追加
-        for ( let index in objSessionOnline ) {
+        for ( let index in objUserOnline ) {
             //配列へ追加
-            sessionOnlineList.push(objSessionOnline[index][1]);
+            sessionOnlineList.push(objUserOnline[index]);
 
         }
 
@@ -980,13 +1032,19 @@ io.on("connection", (socket) => {
             },
         }
         */
-        let info = -1; //返す情報用
+        let channelJoinedUserList = -1; //返す情報用
 
-        //セッションが適合か確認
-        if ( auth.checkUserSession({userid:dat.reqSender.userid, sessionid:dat.reqSender.sessionid}) ) {
-            channelJoinedUserList = db.getInfoChannelJoinedUserList(dat); //情報収集
+        let paramRequire = [
+            "targetid"
+        ];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "getInfoChannelJoinedUserList") ) {
+            return -1;
 
         }
+
+        //セッションが適合か確認
+        channelJoinedUserList = db.getInfoChannelJoinedUserList(dat); //情報収集
 
         //チャンネルの情報送信
         socket.emit("infoChannelJoinedUserList", channelJoinedUserList);
@@ -1005,7 +1063,11 @@ io.on("connection", (socket) => {
         }
         */
 
-        if ( !auth.checkUserSession(dat.reqSender) ) {
+        let paramRequire = [
+            "query"
+        ];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "searchUserDynamic") ) {
             return -1;
 
         }
@@ -1032,11 +1094,13 @@ io.on("connection", (socket) => {
 
         let serverSettings = {};
 
-        //セッションが適合か確認
-        if ( auth.checkUserSession(dat.reqSender) ) {
-            serverSettings = db.getServerSettings(dat); //情報収集
+        if ( !checkDataIntegrality(dat, [], "getServerSettings") ) {
+            return -1;
 
         }
+
+        //セッションが適合か確認
+        serverSettings = db.getServerSettings(dat); //情報収集
 
         //情報送信
         socket.emit("infoServerSettings", serverSettings);
@@ -1076,9 +1140,14 @@ io.on("connection", (socket) => {
        //履歴用の変数(初期値はエラーを示す-1)
        let history = -1;
 
-       //セッション認証
-        if ( !auth.checkUserSession(req.reqSender) ) {
-           return -1;
+       let paramRequire = [
+            "channelid",
+            "readLength",
+            //"startLength" undefinedだったら0として扱う
+       ];
+
+        if ( !checkDataIntegrality(req, paramRequire, "getInfoChannelJoinedUserList") ) {
+            return -1;
 
         }
 
@@ -1127,6 +1196,18 @@ io.on("connection", (socket) => {
 
         let result = -1; //結果用変数
 
+        let paramRequire = [
+            "action",
+            "channelid",
+            "messageid",
+            "contentId",
+        ];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "actMessage") ) {
+            return -1;
+
+        }
+
         switch( dat.action ) {
             case "delete":
                 //削除、そして更新するメッージのIDなどを取り込む
@@ -1150,6 +1231,42 @@ io.on("connection", (socket) => {
     //切断時のログ
     socket.on("disconnect", () => {
         console.log("*** " + socket.id + " 切断 ***");
+        let useridDisconnecting = "";
+
+        //切断したユーザーをオンラインセッションリストから外す
+        try {
+            //切断されるsocketIDからユーザーIDを取り出す
+            useridDisconnecting = socketOnline[socket.id];
+            //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
+            if ( userOnline[useridDisconnecting] <= 1 ) {
+                delete userOnline[useridDisconnecting];
+
+            } else {
+                userOnline[useridDisconnecting] -= 1;
+
+            }
+
+            delete socketOnline[socket.id]; //接続していたsocketid項目を削除
+        } catch(e) {
+            console.log("index :: disconnect : 切断時のオンラインユーザー管理でエラー", e);
+        }
+
+        //-------------------------------------------
+        try {
+            //known bug: keyがundefinedの時がある
+            if ( useridDisconnecting === undefined ) {
+                console.log("index :: disconnect : ユーザーIDがundefinedになっている");
+                console.log(useridDisconnecting);
+                try {
+                    delete userOnline[useridDisconnecting];
+                    console.log("index :: disconnect : 不正なユーザーID分は消した");
+                } catch(e) {console.log("index :: disconnect : しかも消せなかった");}
+
+            }
+        } catch (e) {
+            console.log("index :: disconnect : エラー回避用でエラー", e);
+        }
+        //-------------------------------------------
 
         //ユーザーのオンライン状態を設定
         try {
@@ -1159,14 +1276,11 @@ io.on("connection", (socket) => {
         //DBをJSONへ保存
         fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
-        //切断したユーザーをオンラインセッションリストから外す
-        delete sessionOnline[socket.id]
-
         //オンライン人数を更新
-        io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(sessionOnline).length);
+        io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
         console.log("index :: authByCookie : 現在のオンラインセッションりすと -> ");
-        console.log(sessionOnline);
+        console.log(userOnline);
 
     });
 
