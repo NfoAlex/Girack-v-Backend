@@ -701,6 +701,18 @@ io.on("connection", (socket) => {
 
             }
             
+            //-------------------------------------------
+            //known bug: keyがundefinedの時がある
+            if ( loginAttempt.userid === undefined ) {
+                console.log("index :: auth : ユーザーIDがundefinedになっている");
+                console.log(key);
+                try {
+                    delete userOnline[loginAttempt.userid];
+                    console.log("index :: auth : 不正なユーザーID分は消した");
+                } catch(e) {console.log("index :: auth : しかも消せなかった");}
+
+            }
+            //-------------------------------------------
 
             //認証済みセッションとして登録
             socket.join("loggedin");
@@ -1219,13 +1231,13 @@ io.on("connection", (socket) => {
     //切断時のログ
     socket.on("disconnect", () => {
         console.log("*** " + socket.id + " 切断 ***");
+        let useridDisconnecting = "";
 
         //切断したユーザーをオンラインセッションリストから外す
-          //delete sessionOnline[socket.id]
         try {
             //切断されるsocketIDからユーザーIDを取り出す
-            let useridDisconnecting = socketOnline[socket.id];
-            //ユーザーIDの接続数が1だけならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
+            useridDisconnecting = socketOnline[socket.id];
+            //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
             if ( userOnline[useridDisconnecting] <= 1 ) {
                 delete userOnline[useridDisconnecting];
 
@@ -1235,7 +1247,26 @@ io.on("connection", (socket) => {
             }
 
             delete socketOnline[socket.id]; //接続していたsocketid項目を削除
-        } catch(e) {}
+        } catch(e) {
+            console.log("index :: disconnect : 切断時のオンラインユーザー管理でエラー", e);
+        }
+
+        //-------------------------------------------
+        try {
+            //known bug: keyがundefinedの時がある
+            if ( useridDisconnecting === undefined ) {
+                console.log("index :: disconnect : ユーザーIDがundefinedになっている");
+                console.log(key);
+                try {
+                    delete userOnline[useridDisconnecting];
+                    console.log("index :: disconnect : 不正なユーザーID分は消した");
+                } catch(e) {console.log("index :: disconnect : しかも消せなかった");}
+
+            }
+        } catch (e) {
+            console.log("index :: disconnect : エラー回避用でエラー", e);
+        }
+        //-------------------------------------------
 
         //ユーザーのオンライン状態を設定
         try {
