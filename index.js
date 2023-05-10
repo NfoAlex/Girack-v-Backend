@@ -693,7 +693,7 @@ io.on("connection", (socket) => {
             //オンラインの人リストへ追加
             if ( userOnline[loginAttempt.userid] === undefined ) {
                 socketOnline[socket.id] = loginAttempt.userid;
-                userOnline[loginAttempt.userid] = 0;
+                userOnline[loginAttempt.userid] = 1;
 
             } else {
                 socketOnline[socket.id] = loginAttempt.userid;
