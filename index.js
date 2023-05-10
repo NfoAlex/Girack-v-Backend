@@ -120,8 +120,11 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
     try{
         //パラメータが足りているか確認
         for ( let termIndex in paramRequire ) {
-            if ( dat[paramRequire[termIndex]] === undefined ) { 
+            if ( dat[paramRequire[termIndex]] === undefined ) {
+                console.log("-------------------------------");
+                console.log("ERROR IN ", dat);
                 throw new Error("does not have enough parameter > " + paramRequire[termIndex]);
+                console.log("-------------------------------");
 
             }
 
