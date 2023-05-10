@@ -985,11 +985,17 @@ io.on("connection", (socket) => {
         */
         let info = -1; //返す情報用
 
-        //セッションが適合か確認
-        if ( auth.checkUserSession({userid:dat.reqSender.userid, sessionid:dat.reqSender.sessionid}) ) {
-            channelJoinedUserList = db.getInfoChannelJoinedUserList(dat); //情報収集
+        let paramRequire = [
+            "targetid"
+        ];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "getInfoChannelJoinedUserList") ) {
+            return -1;
 
         }
+
+        //セッションが適合か確認
+        channelJoinedUserList = db.getInfoChannelJoinedUserList(dat); //情報収集
 
         //チャンネルの情報送信
         socket.emit("infoChannelJoinedUserList", channelJoinedUserList);
@@ -1008,7 +1014,11 @@ io.on("connection", (socket) => {
         }
         */
 
-        if ( !auth.checkUserSession(dat.reqSender) ) {
+        let paramRequire = [
+            "query"
+        ];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "searchUserDynamic") ) {
             return -1;
 
         }
@@ -1035,11 +1045,13 @@ io.on("connection", (socket) => {
 
         let serverSettings = {};
 
-        //セッションが適合か確認
-        if ( auth.checkUserSession(dat.reqSender) ) {
-            serverSettings = db.getServerSettings(dat); //情報収集
+        if ( !checkDataIntegrality(dat, [], "getServerSettings") ) {
+            return -1;
 
         }
+
+        //セッションが適合か確認
+        serverSettings = db.getServerSettings(dat); //情報収集
 
         //情報送信
         socket.emit("infoServerSettings", serverSettings);
@@ -1079,9 +1091,14 @@ io.on("connection", (socket) => {
        //履歴用の変数(初期値はエラーを示す-1)
        let history = -1;
 
-       //セッション認証
-        if ( !auth.checkUserSession(req.reqSender) ) {
-           return -1;
+       let paramRequire = [
+            "channelid",
+            "readLength",
+            //"startLength" undefinedだったら0として扱う
+       ];
+
+        if ( !checkDataIntegrality(req, paramRequire, "getInfoChannelJoinedUserList") ) {
+            return -1;
 
         }
 
@@ -1129,6 +1146,18 @@ io.on("connection", (socket) => {
         //msg.msgDelete(dat);
 
         let result = -1; //結果用変数
+
+        let paramRequire = [
+            "action",
+            "channelid",
+            "messageid",
+            "contentId",
+        ];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "actMessage") ) {
+            return -1;
+
+        }
 
         switch( dat.action ) {
             case "delete":
