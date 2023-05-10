@@ -714,7 +714,6 @@ io.on("connection", (socket) => {
             console.log(userOnline);
 
             //オンライン人数を更新
-            //io.to("loggedin").emit("sessionOnlineUpdate", sessionOnline.length);
             io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
         }
@@ -790,7 +789,6 @@ io.on("connection", (socket) => {
             socket.join("loggedin");
 
             //オンライン人数を更新
-            //io.to("loggedin").emit("sessionOnlineUpdate", sessionOnline.length);
             io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
         }
