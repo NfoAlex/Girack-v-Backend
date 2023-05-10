@@ -1032,7 +1032,7 @@ io.on("connection", (socket) => {
             },
         }
         */
-        let info = -1; //返す情報用
+        let channelJoinedUserList = -1; //返す情報用
 
         let paramRequire = [
             "targetid"
@@ -1256,7 +1256,7 @@ io.on("connection", (socket) => {
             //known bug: keyがundefinedの時がある
             if ( useridDisconnecting === undefined ) {
                 console.log("index :: disconnect : ユーザーIDがundefinedになっている");
-                console.log(key);
+                console.log(useridDisconnecting);
                 try {
                     delete userOnline[useridDisconnecting];
                     console.log("index :: disconnect : 不正なユーザーID分は消した");
