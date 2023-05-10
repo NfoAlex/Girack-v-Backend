@@ -1185,7 +1185,6 @@ io.on("connection", (socket) => {
             action: "delete",
             channelid: channelid,
             messageid: msgId,
-            contentId: contentId,
             reqSender: {
                 userid: userinfo.userid,
                 sessionid: userinfo.sessionid
@@ -1200,7 +1199,6 @@ io.on("connection", (socket) => {
             "action",
             "channelid",
             "messageid",
-            "contentId",
         ];
 
         if ( !checkDataIntegrality(dat, paramRequire, "actMessage") ) {
