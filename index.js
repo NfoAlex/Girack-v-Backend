@@ -837,6 +837,11 @@ io.on("connection", (socket) => {
 
         }
 
+        //ユーザーのオンライン状態をオフラインとして設定
+        db.dataUser.user[loginAttempt.userid].state.loggedin = false;
+        //DBをJSONへ保存
+        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+
         //オンライン人数を更新
         io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
