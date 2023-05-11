@@ -827,7 +827,8 @@ io.on("connection", (socket) => {
         }
 
         //このsocketのIDのユーザーIDを空に
-        sessionOnline[socket.id] = "";
+        //sessionOnline[socket.id] = "";
+        
         //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
         if ( userOnline[dat.reqSender.userid] <= 1 ) {
             delete userOnline[dat.reqSender.userid];
