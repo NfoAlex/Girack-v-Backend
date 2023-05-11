@@ -827,19 +827,21 @@ io.on("connection", (socket) => {
         }
 
         //このsocketのIDのユーザーIDを空に
-        //sessionOnline[socket.id] = "";
-        
+        //socketOnline[socket.id] = "";
+
         //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
-        if ( userOnline[dat.reqSender.userid] <= 1 ) {
-            delete userOnline[dat.reqSender.userid];
+        if ( userOnline[dat.reqSender.userid] >= 2 ) {
+            userOnline[dat.reqSender.userid] -= 1;
+            console.log("index :: logout : 削除結果 -> ");
+            console.log(userOnline);
 
         } else {
-            userOnline[dat.reqSender.userid] -= 1;
+            delete userOnline[dat.reqSender.userid];
 
         }
 
         //ユーザーのオンライン状態をオフラインとして設定
-        db.dataUser.user[loginAttempt.userid].state.loggedin = false;
+        db.dataUser.user[dat.reqSender.userid].state.loggedin = false;
         //DBをJSONへ保存
         fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
@@ -1274,12 +1276,14 @@ io.on("connection", (socket) => {
         try {
             //切断されるsocketIDからユーザーIDを取り出す
             useridDisconnecting = socketOnline[socket.id];
+            console.log("index :: disconnect : これから消すuserid", useridDisconnecting, socketOnline);
+
             //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
-            if ( userOnline[useridDisconnecting] <= 1 ) {
-                delete userOnline[useridDisconnecting];
+            if ( userOnline[useridDisconnecting] >= 2 ) {
+                userOnline[useridDisconnecting] -= 1;
 
             } else {
-                userOnline[useridDisconnecting] -= 1;
+                delete userOnline[useridDisconnecting];
 
             }
 
@@ -1316,7 +1320,7 @@ io.on("connection", (socket) => {
         //オンライン人数を更新
         io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
-        console.log("index :: authByCookie : 現在のオンラインセッションりすと -> ");
+        console.log("index :: disconnect : 現在のオンラインセッションりすと -> ");
         console.log(userOnline);
 
     });
