@@ -832,8 +832,6 @@ io.on("connection", (socket) => {
         //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
         if ( userOnline[dat.reqSender.userid] >= 2 ) {
             userOnline[dat.reqSender.userid] -= 1;
-            console.log("index :: logout : 削除結果 -> ");
-            console.log(userOnline);
 
         } else {
             delete userOnline[dat.reqSender.userid];
@@ -1272,6 +1270,13 @@ io.on("connection", (socket) => {
         console.log("*** " + socket.id + " 切断 ***");
         let useridDisconnecting = "";
 
+        //ユーザーのオンライン状態をオフラインと設定
+        console.log("index :: disconnect : これからこいつはオフライン", socketOnline[socket.id]);
+        db.dataUser.user[socketOnline[socket.id]].state.loggedin = false;
+
+        //DBをJSONへ保存
+        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+
         //切断したユーザーをオンラインセッションリストから外す
         try {
             //切断されるsocketIDからユーザーIDを取り出す
@@ -1308,14 +1313,6 @@ io.on("connection", (socket) => {
             console.log("index :: disconnect : エラー回避用でエラー", e);
         }
         //-------------------------------------------
-
-        //ユーザーのオンライン状態を設定
-        try {
-            db.dataUser.user[sessionOnline[socket.id]].state.loggedin = false;
-        } catch(e) {}
-
-        //DBをJSONへ保存
-        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
         //オンライン人数を更新
         io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
