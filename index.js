@@ -12,7 +12,7 @@ const e = require("express");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230510";
+const SERVER_VERSION = "alpha_20230511";
 
 const app = express();
 const server = http.createServer(app);
@@ -689,6 +689,7 @@ io.on("connection", (socket) => {
 
         let loginAttempt = auth.authUser(key); //ログイン結果
 
+        //認証結果を元にユーザーをオンラインとして記録する
         if ( loginAttempt.result ) {
             //オンラインの人リストへ追加
             if ( userOnline[loginAttempt.userid] === undefined ) {
@@ -806,6 +807,44 @@ io.on("connection", (socket) => {
         }
 
         socket.emit("authResult", loginAttempt); //認証結果を送信
+
+    });
+
+    //ログアウト
+    socket.on("logout", (dat) => {
+        /*
+        dat
+        {
+            reqSender: { ... }
+        }
+        */
+
+        let paramRequire = [];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "logout") ) {
+            return -1
+
+        }
+
+        //このsocketのIDのユーザーIDを空に
+        //socketOnline[socket.id] = "";
+
+        //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
+        if ( userOnline[dat.reqSender.userid] >= 2 ) {
+            userOnline[dat.reqSender.userid] -= 1;
+
+        } else {
+            delete userOnline[dat.reqSender.userid];
+
+        }
+
+        //ユーザーのオンライン状態をオフラインとして設定
+        db.dataUser.user[dat.reqSender.userid].state.loggedin = false;
+        //DBをJSONへ保存
+        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+
+        //オンライン人数を更新
+        io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
     });
 
@@ -1231,16 +1270,25 @@ io.on("connection", (socket) => {
         console.log("*** " + socket.id + " 切断 ***");
         let useridDisconnecting = "";
 
+        //ユーザーのオンライン状態をオフラインと設定
+        console.log("index :: disconnect : これからこいつはオフライン", socketOnline[socket.id]);
+        db.dataUser.user[socketOnline[socket.id]].state.loggedin = false;
+
+        //DBをJSONへ保存
+        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+
         //切断したユーザーをオンラインセッションリストから外す
         try {
             //切断されるsocketIDからユーザーIDを取り出す
             useridDisconnecting = socketOnline[socket.id];
+            console.log("index :: disconnect : これから消すuserid", useridDisconnecting, socketOnline);
+
             //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
-            if ( userOnline[useridDisconnecting] <= 1 ) {
-                delete userOnline[useridDisconnecting];
+            if ( userOnline[useridDisconnecting] >= 2 ) {
+                userOnline[useridDisconnecting] -= 1;
 
             } else {
-                userOnline[useridDisconnecting] -= 1;
+                delete userOnline[useridDisconnecting];
 
             }
 
@@ -1266,18 +1314,10 @@ io.on("connection", (socket) => {
         }
         //-------------------------------------------
 
-        //ユーザーのオンライン状態を設定
-        try {
-            db.dataUser.user[sessionOnline[socket.id]].state.loggedin = false;
-        } catch(e) {}
-
-        //DBをJSONへ保存
-        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
-
         //オンライン人数を更新
         io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
-        console.log("index :: authByCookie : 現在のオンラインセッションりすと -> ");
+        console.log("index :: disconnect : 現在のオンラインセッションりすと -> ");
         console.log(userOnline);
 
     });
