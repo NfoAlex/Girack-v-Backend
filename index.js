@@ -12,7 +12,7 @@ const e = require("express");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230510";
+const SERVER_VERSION = "alpha_20230511";
 
 const app = express();
 const server = http.createServer(app);
@@ -689,6 +689,7 @@ io.on("connection", (socket) => {
 
         let loginAttempt = auth.authUser(key); //ログイン結果
 
+        //認証結果を元にユーザーをオンラインとして記録する
         if ( loginAttempt.result ) {
             //オンラインの人リストへ追加
             if ( userOnline[loginAttempt.userid] === undefined ) {
@@ -806,6 +807,38 @@ io.on("connection", (socket) => {
         }
 
         socket.emit("authResult", loginAttempt); //認証結果を送信
+
+    });
+
+    //ログアウト
+    socket.on("logout", (dat) => {
+        /*
+        dat
+        {
+            reqSender: { ... }
+        }
+        */
+
+        let paramRequire = [];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "logout") ) {
+            return -1
+
+        }
+
+        //このsocketのIDのユーザーIDを空に
+        sessionOnline[socket.id] = "";
+        //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
+        if ( userOnline[dat.reqSender.userid] <= 1 ) {
+            delete userOnline[dat.reqSender.userid];
+
+        } else {
+            userOnline[dat.reqSender.userid] -= 1;
+
+        }
+
+        //オンライン人数を更新
+        io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
     });
 
