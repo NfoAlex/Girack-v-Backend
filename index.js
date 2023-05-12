@@ -1270,9 +1270,15 @@ io.on("connection", (socket) => {
         console.log("*** " + socket.id + " 切断 ***");
         let useridDisconnecting = "";
 
-        //ユーザーのオンライン状態をオフラインと設定
-        console.log("index :: disconnect : これからこいつはオフライン", socketOnline[socket.id]);
-        db.dataUser.user[socketOnline[socket.id]].state.loggedin = false;
+        //ユーザーのオンライン状態をオフラインと設定してJSONファイルへ書き込む
+        try {
+            //オフラインと設定
+            db.dataUser.user[socketOnline[socket.id]].state.loggedin = false;
+            //DBをJSONへ保存
+            fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+        } catch(e) {
+            console.log("index :: disconnect : こいつでオフラインにしようとしたらエラー", socketOnline[socket.id]);
+        }
 
         //DBをJSONへ保存
         fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
