@@ -12,7 +12,7 @@ const e = require("express");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230515";
+const SERVER_VERSION = "alpha_20230516";
 
 const app = express();
 const server = http.createServer(app);
