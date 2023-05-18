@@ -431,11 +431,26 @@ let searchUserDynamic = function searchUserDynamic(dat) {
 let getUserSave = function getUserSave(dat) {
     let dataUserSave = {};
 
+    //データ読み取り、なければ作成
     try{
         dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     } catch(e) {
-        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserInitText); //JSONファイルを作成
+        let dataUserSaveInit = `
+            {
+                configAvailable: false,
+                config: {
+                },
+                msgReadStateAvailable: false,
+                msgReadState: {
+                    
+                }
+            }
+        `;
+        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     }
+
+    return dataUserSave;
 
 }
 
