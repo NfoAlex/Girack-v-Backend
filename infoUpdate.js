@@ -200,11 +200,11 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat) {
     } catch(e) {
         let dataUserSaveInit = `
             {
-                configAvailable: false,
-                config: {
+                "configAvailable": false,
+                "config": {
                 },
-                msgReadStateAvailable: false,
-                msgReadState: {
+                "msgReadStateAvailable": false,
+                "msgReadState": {
                     
                 }
             }
