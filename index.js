@@ -1120,6 +1120,29 @@ io.on("connection", (socket) => {
 
     });
 
+    //ユーザーの個人用データを取得
+    socket.on("getUserSave", (dat) => {
+        /*
+        dat
+        {
+            reqSender: {
+                ...
+            }
+        }
+        */
+
+        let paramRequire = [];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "getUserSave") ) { return -1; }
+
+        //ユーザーの個人用データ取得
+        let userSave = db.getUserSave(dat);
+
+        //データ送信
+        socket.emit("infoUserSave", userSave);
+
+    });
+
     //サーバー設定の取得
     socket.on("getServerSettings", (dat) => {
         /*
