@@ -214,6 +214,8 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat) {
     }
 
     dataUserSave.config = dat.config;
+    dataUserSave.configAvailable = true;
+    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイルを作成
 
 }
 
