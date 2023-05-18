@@ -476,13 +476,12 @@ io.on("connection", (socket) => {
 
     });
 
-    //ユーザーの個人用データを取得
-    socket.on("updateUserSave", (dat) => {
+    //ユーザーの個人用データで設定情報を上書き保存
+    socket.on("updateUserSaveConfig", (dat) => {
         /*
         dat
         {
             config: {...},
-            msgReadState: {...}
             reqSender: {
                 ...
             }
@@ -491,13 +490,37 @@ io.on("connection", (socket) => {
 
         let paramRequire = [
             "config",
-            "msgReadState"
         ];
 
+        //整合性確認
         if ( !checkDataIntegrality(dat, paramRequire, "updateUserSave") ) { return -1; }
 
         //ユーザーの個人用データ保存
-        db.updateUserSave(dat);
+        db.updateUserSaveConfig(dat);
+
+    });
+
+    //ユーザーの個人用データで設定情報を上書き保存
+    socket.on("updateUserSaveMsgReadState", (dat) => {
+        /*
+        dat
+        {
+            msgReadState: {...},
+            reqSender: {
+                ...
+            }
+        }
+        */
+
+        let paramRequire = [
+            "msgReadState",
+        ];
+
+        //整合性確認
+        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSave") ) { return -1; }
+
+        //ユーザーの個人用データ保存
+        db.updateUserSaveMsgReadState(dat);
 
     });
 
