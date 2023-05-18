@@ -10,6 +10,7 @@ try { //読み込んでみる
     const pwSource = "abcdefghijklmnopqrstuvwxyz0123456789"; //元になる文字
     let pwGenResult = "";
 
+    //生成
     for(let i=0; i<pwLength; i++){
         pwGenResult += pwSource[Math.floor(Math.random() * pwSource.length)];
 
@@ -38,6 +39,7 @@ try { //読み込んでみる
     fs.writeFileSync("./user.json", dataUserInitText); //JSONファイルを作成
     dataUser = JSON.parse(fs.readFileSync("./user.json", "utf-8")); //ユーザーデータのJSON読み込み
     
+    //初回起動時にログインを促すためのメッセージ
     console.log("***********************************");
     console.log("***********************************");
     console.log("Girackへようこそ!");
@@ -79,7 +81,6 @@ try { //読み込んでみる
 }
 
 //let dataRole = JSON.parse(fs.readFileSync('./role.json', 'utf-8')); //ロールのJSON読み込み
-//let dataFiles = JSON.parse(fs.readFileSync('./files.json', 'utf-8')); //ロールのJSON読み込み
 
 //起動したときに全員をオフライン状態にする
 for ( let index in Object.keys(dataUser.user) ) {
@@ -426,6 +427,18 @@ let searchUserDynamic = function searchUserDynamic(dat) {
 
 }
 
+//ユーザーの設定や既読状態などのデータを取得
+let getUserSave = function getUserSave(dat) {
+    let dataUserSave = {};
+
+    try{
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    } catch(e) {
+        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserInitText); //JSONファイルを作成
+    }
+
+}
+
 //サーバーの設定情報を取得
 let getServerSettings = function getServerSettings(dat) {
     let sendersInfo = getInfoUser({
@@ -463,6 +476,7 @@ exports.getInfoChannel = getInfoChannel; //チャンネル情報を取得
 exports.getInfoChannelJoinedUserList = getInfoChannelJoinedUserList; //チャンネルに参加したユーザーのリスト取得
 exports.getInfoList = getInfoList; //チャンネルリストの取得
 exports.searchUserDynamic = searchUserDynamic; //ユーザーを検索する関数
+exports.getUserSave = getUserSave; //ユーザーの個人データ(設定や既読状態)を取得
 exports.getServerSettings = getServerSettings; //サーバーの詳細設定を取得
 exports.getInitInfo = getInitInfo; //サーバーの初期情報
 
