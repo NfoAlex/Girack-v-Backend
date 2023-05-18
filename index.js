@@ -1168,8 +1168,8 @@ io.on("connection", (socket) => {
 
     });
 
-    //ユーザーの個人用データを取得
-    socket.on("getUserSave", (dat) => {
+    //ユーザーの個人用データで設定データを取得
+    socket.on("getUserSaveConfig", (dat) => {
         /*
         dat
         {
@@ -1187,7 +1187,30 @@ io.on("connection", (socket) => {
         let userSave = db.getUserSave(dat);
 
         //データ送信
-        socket.emit("infoUserSave", userSave);
+        socket.emit("infoUserSaveConfig", userSave.config);
+
+    });
+
+    //ユーザーの個人用データで既読状態を取得
+    socket.on("getUserSaveMsgReadState", (dat) => {
+        /*
+        dat
+        {
+            reqSender: {
+                ...
+            }
+        }
+        */
+
+        let paramRequire = [];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "getUserSave") ) { return -1; }
+
+        //ユーザーの個人用データ取得
+        let userSave = db.getUserSave(dat);
+
+        //データ送信
+        socket.emit("infoUserSaveMsgReadState", userSave.msgReadState);
 
     });
 
