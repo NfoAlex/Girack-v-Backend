@@ -427,6 +427,34 @@ let searchUserDynamic = function searchUserDynamic(dat) {
 
 }
 
+//ユーザーの設定や既読状態などのデータを上書き保存する
+let updateUserSave = function updateUserSave(dat) {
+    let dataUserSave = {};
+
+    //データ読み取り、なければ作成
+    try{
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    } catch(e) {
+        let dataUserSaveInit = `
+            {
+                configAvailable: false,
+                config: {
+                },
+                msgReadStateAvailable: false,
+                msgReadState: {
+                    
+                }
+            }
+        `;
+        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    }
+
+    dataUserSave.config = dat.config;
+    dataUserSave.msgReadState = dat.msgReadState;
+
+}
+
 //ユーザーの設定や既読状態などのデータを取得
 let getUserSave = function getUserSave(dat) {
     let dataUserSave = {};
@@ -491,6 +519,7 @@ exports.getInfoChannel = getInfoChannel; //チャンネル情報を取得
 exports.getInfoChannelJoinedUserList = getInfoChannelJoinedUserList; //チャンネルに参加したユーザーのリスト取得
 exports.getInfoList = getInfoList; //チャンネルリストの取得
 exports.searchUserDynamic = searchUserDynamic; //ユーザーを検索する関数
+exports.updateUserSave = updateUserSave; //ユーザーの個人データ(設定や既読状態)をを上書き保存
 exports.getUserSave = getUserSave; //ユーザーの個人データ(設定や既読状態)を取得
 exports.getServerSettings = getServerSettings; //サーバーの詳細設定を取得
 exports.getInitInfo = getInitInfo; //サーバーの初期情報

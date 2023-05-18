@@ -476,6 +476,31 @@ io.on("connection", (socket) => {
 
     });
 
+    //ユーザーの個人用データを取得
+    socket.on("updateUserSave", (dat) => {
+        /*
+        dat
+        {
+            config: {...},
+            msgReadState: {...}
+            reqSender: {
+                ...
+            }
+        }
+        */
+
+        let paramRequire = [
+            "config",
+            "msgReadState"
+        ];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSave") ) { return -1; }
+
+        //ユーザーの個人用データ保存
+        db.updateUserSave(dat);
+
+    });
+
     //ユーザーの管理、監視
     socket.on("mod", (dat) => {
         /*
