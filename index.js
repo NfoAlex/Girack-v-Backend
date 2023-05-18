@@ -496,7 +496,7 @@ io.on("connection", (socket) => {
         if ( !checkDataIntegrality(dat, paramRequire, "updateUserSave") ) { return -1; }
 
         //ユーザーの個人用データ保存
-        db.updateUserSaveConfig(dat);
+        infoUpdate.updateUserSaveConfig(dat);
 
     });
 
@@ -520,7 +520,7 @@ io.on("connection", (socket) => {
         if ( !checkDataIntegrality(dat, paramRequire, "updateUserSave") ) { return -1; }
 
         //ユーザーの個人用データ保存
-        db.updateUserSaveMsgReadState(dat);
+        infoUpdate.updateUserSaveMsgReadState(dat);
 
     });
 

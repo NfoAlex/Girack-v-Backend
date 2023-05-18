@@ -214,7 +214,6 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat) {
     }
 
     dataUserSave.config = dat.config;
-    dataUserSave.msgReadState = dat.msgReadState;
 
 }
 
