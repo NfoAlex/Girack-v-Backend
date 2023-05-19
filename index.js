@@ -1181,7 +1181,7 @@ io.on("connection", (socket) => {
 
         let paramRequire = [];
 
-        if ( !checkDataIntegrality(dat, paramRequire, "getUserSave") ) { return -1; }
+        if ( !checkDataIntegrality(dat, paramRequire, "getUserSaveConfig") ) { return -1; }
 
         //ユーザーの個人用データ取得
         let userSave = db.getUserSave(dat);
@@ -1207,7 +1207,7 @@ io.on("connection", (socket) => {
 
         let paramRequire = [];
 
-        if ( !checkDataIntegrality(dat, paramRequire, "getUserSave") ) { return -1; }
+        if ( !checkDataIntegrality(dat, paramRequire, "getUserSaveMsgReadState") ) { return -1; }
 
         //ユーザーの個人用データ取得
         let userSave = db.getUserSave(dat);
