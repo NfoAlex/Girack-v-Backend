@@ -1187,7 +1187,10 @@ io.on("connection", (socket) => {
         let userSave = db.getUserSave(dat);
 
         //データ送信
-        socket.emit("infoUserSaveConfig", userSave.config);
+        socket.emit("infoUserSaveConfig", {
+            configAvailable: userSave.configAvailable,
+            config: userSave.config
+        });
 
     });
 
