@@ -1213,7 +1213,10 @@ io.on("connection", (socket) => {
         let userSave = db.getUserSave(dat);
 
         //データ送信
-        socket.emit("infoUserSaveMsgReadState", userSave.msgReadState);
+        socket.emit("infoUserSaveMsgReadState", {
+            msgReadStateAvailable: userSave.msgReadStateAvailable,
+            msgReadState: userSave.msgReadState
+        });
 
     });
 
