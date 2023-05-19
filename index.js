@@ -12,7 +12,7 @@ const e = require("express");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230516";
+const SERVER_VERSION = "alpha_20230519";
 
 const app = express();
 const server = http.createServer(app);
@@ -44,6 +44,7 @@ let userOnline = {
 //必要なディレクトリの確認、なければ作成
 try{fs.mkdirSync("./fileidIndex/");}catch(e){}
 try{fs.mkdirSync("./files/");}catch(e){}
+try{fs.mkdirSync("./usersave/")}catch(e){}
 try{fs.mkdirSync("./record/");}catch(e){}
 try{fs.mkdirSync("./img/");}catch(e){}
 
@@ -475,6 +476,54 @@ io.on("connection", (socket) => {
 
     });
 
+    //ユーザーの個人用データで設定情報を上書き保存
+    socket.on("updateUserSaveConfig", (dat) => {
+        /*
+        dat
+        {
+            config: {...},
+            reqSender: {
+                ...
+            }
+        }
+        */
+
+        let paramRequire = [
+            "config",
+        ];
+
+        //整合性確認
+        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSaveConfig") ) { return -1; }
+
+        //ユーザーの個人用データ保存
+        infoUpdate.updateUserSaveConfig(dat);
+
+    });
+
+    //ユーザーの個人用データで既読状態を上書き保存
+    socket.on("updateUserSaveMsgReadState", (dat) => {
+        /*
+        dat
+        {
+            msgReadState: {...},
+            reqSender: {
+                ...
+            }
+        }
+        */
+
+        let paramRequire = [
+            "msgReadState",
+        ];
+
+        //整合性確認
+        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSaveMsgReadState") ) { return -1; }
+
+        //ユーザーの個人用データ保存
+        infoUpdate.updateUserSaveMsgReadState(dat);
+
+    });
+
     //ユーザーの管理、監視
     socket.on("mod", (dat) => {
         /*
@@ -606,19 +655,8 @@ io.on("connection", (socket) => {
                 socket.emit("infoUser",userinfoNew);
 
             });
-            
-            //infoUpdate.channelCreate(dat);
 
         }
-
-        //現在のチャンネルリストを取得
-        // let channelList = db.getInfoList({
-        //     target: "channel",
-        //     reqSender: dat.reqSender
-        // });
-
-        //送信
-        //io.emit("infoList", channelList);
 
     });
 
@@ -1116,6 +1154,58 @@ io.on("connection", (socket) => {
 
         //検索結果を送信
         socket.emit("infoSearchUser", searchResult);
+
+    });
+
+    //ユーザーの個人用データで設定データを取得
+    socket.on("getUserSaveConfig", (dat) => {
+        /*
+        dat
+        {
+            reqSender: {
+                ...
+            }
+        }
+        */
+
+        let paramRequire = [];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "getUserSaveConfig") ) { return -1; }
+
+        //ユーザーの個人用データ取得
+        let userSave = db.getUserSave(dat);
+
+        //データ送信
+        socket.emit("infoUserSaveConfig", {
+            configAvailable: userSave.configAvailable,
+            config: userSave.config
+        });
+
+    });
+
+    //ユーザーの個人用データで既読状態を取得
+    socket.on("getUserSaveMsgReadState", (dat) => {
+        /*
+        dat
+        {
+            reqSender: {
+                ...
+            }
+        }
+        */
+
+        let paramRequire = [];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "getUserSaveMsgReadState") ) { return -1; }
+
+        //ユーザーの個人用データ取得
+        let userSave = db.getUserSave(dat);
+
+        //データ送信
+        socket.emit("infoUserSaveMsgReadState", {
+            msgReadStateAvailable: userSave.msgReadStateAvailable,
+            msgReadState: userSave.msgReadState
+        });
 
     });
 

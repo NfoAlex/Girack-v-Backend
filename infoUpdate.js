@@ -190,6 +190,64 @@ let changeProfileIcon = function changeProfileIcon(dat) {
 
 }
 
+//ユーザーの設定のデータを上書き保存する
+let updateUserSaveConfig = function updateUserSaveConfig(dat) {
+    let dataUserSave = {};
+
+    //データ読み取り、なければ作成
+    try{
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    } catch(e) {
+        let dataUserSaveInit = `
+            {
+                "configAvailable": false,
+                "config": {
+                },
+                "msgReadStateAvailable": false,
+                "msgReadState": {
+                    
+                }
+            }
+        `;
+        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    }
+
+    dataUserSave.config = dat.config;
+    dataUserSave.configAvailable = true;
+    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイルを作成
+
+}
+
+//ユーザーの既読状態のデータを上書き保存する
+let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat) {
+    let dataUserSave = {};
+
+    //データ読み取り、なければ作成
+    try{
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    } catch(e) {
+        let dataUserSaveInit = `
+            {
+                "configAvailable": false,
+                "config": {
+                },
+                "msgReadStateAvailable": false,
+                "msgReadState": {
+                    
+                }
+            }
+        `;
+        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    }
+
+    dataUserSave.msgReadState = dat.msgReadState;
+    dataUserSave.msgReadStateAvailable = true;
+    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイルを作成
+
+}
+
 //チャンネルの参加・退出処理
 let channelAction = function channelAction(dat) {
     /*
@@ -367,6 +425,8 @@ exports.mod = mod; //管理者からのユーザー管理
 exports.changeServerSettings = changeServerSettings; //サーバーの設定変更
 exports.changeChannelSettings = changeChannelSettings; //チャンネルの設定変更
 exports.changeProfile = changeProfile; //プロフィールの変更
+exports.updateUserSaveConfig = updateUserSaveConfig; //ユーザーの個人データで設定データを上書き保存
+exports.updateUserSaveMsgReadState = updateUserSaveMsgReadState; //ユーザーの個人データで既読状態を上書き保存
 exports.channelAction = channelAction; //チャンネルの参加・退出
 exports.channelCreate = channelCreate; //チャンネル作成
 exports.channelRemove = channelRemove; //チャンネル削除
