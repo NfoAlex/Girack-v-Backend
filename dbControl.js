@@ -437,11 +437,11 @@ let getUserSave = function getUserSave(dat) {
     } catch(e) {
         let dataUserSaveInit = `
             {
-                configAvailable: false,
-                config: {
+                "configAvailable": false,
+                "config": {
                 },
-                msgReadStateAvailable: false,
-                msgReadState: {
+                "msgReadStateAvailable": false,
+                "msgReadState": {
                     
                 }
             }
