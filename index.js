@@ -493,14 +493,14 @@ io.on("connection", (socket) => {
         ];
 
         //整合性確認
-        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSave") ) { return -1; }
+        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSaveConfig") ) { return -1; }
 
         //ユーザーの個人用データ保存
         infoUpdate.updateUserSaveConfig(dat);
 
     });
 
-    //ユーザーの個人用データで設定情報を上書き保存
+    //ユーザーの個人用データで既読状態を上書き保存
     socket.on("updateUserSaveMsgReadState", (dat) => {
         /*
         dat
@@ -517,7 +517,7 @@ io.on("connection", (socket) => {
         ];
 
         //整合性確認
-        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSave") ) { return -1; }
+        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSaveMsgReadState") ) { return -1; }
 
         //ユーザーの個人用データ保存
         infoUpdate.updateUserSaveMsgReadState(dat);
@@ -655,19 +655,8 @@ io.on("connection", (socket) => {
                 socket.emit("infoUser",userinfoNew);
 
             });
-            
-            //infoUpdate.channelCreate(dat);
 
         }
-
-        //現在のチャンネルリストを取得
-        // let channelList = db.getInfoList({
-        //     target: "channel",
-        //     reqSender: dat.reqSender
-        // });
-
-        //送信
-        //io.emit("infoList", channelList);
 
     });
 
