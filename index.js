@@ -1246,7 +1246,7 @@ io.on("connection", (socket) => {
             serverVersion: SERVER_VERSION //招待制かどうか
         };
 
-        socket.emit("serverinfo", initInfo);
+        socket.emit("infoServer", initInfo);
 
     });
 
