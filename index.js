@@ -1358,25 +1358,25 @@ io.on("connection", (socket) => {
     //切断時のログ
     socket.on("disconnect", () => {
         console.log("*** " + socket.id + " 切断 ***");
-        let useridDisconnecting = "";
+        let useridDisconnecting = socketOnline[socket.id];
 
         //ユーザーのオンライン状態をオフラインと設定してJSONファイルへ書き込む
         try {
-            //オフラインと設定
-            db.dataUser.user[socketOnline[socket.id]].state.loggedin = false;
-            //DBをJSONへ保存
-            fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
-        } catch(e) {
-            console.log("index :: disconnect : こいつでオフラインにしようとしたらエラー", socketOnline[socket.id]);
-        }
+            //もしユーザーの接続数が1以下ならオフラインと記録(次の処理で減算して接続数が0になるから)
+            if ( userOnline[useridDisconnecting] <= 1 ) {
+                //オフラインと設定
+                db.dataUser.user[useridDisconnecting].state.loggedin = false;
+                //DBをJSONへ保存
+                fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
-        //DBをJSONへ保存
-        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+            }
+        } catch(e) {
+            console.log("index :: disconnect : こいつでオフラインにしようとしたらエラー", useridDisconnecting);
+        }
 
         //切断したユーザーをオンラインセッションリストから外す
         try {
             //切断されるsocketIDからユーザーIDを取り出す
-            useridDisconnecting = socketOnline[socket.id];
             console.log("index :: disconnect : これから消すuserid", useridDisconnecting, socketOnline);
 
             //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
