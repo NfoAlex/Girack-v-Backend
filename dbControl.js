@@ -340,8 +340,27 @@ let getInfoUser = function getInfoUser(dat) {
 let getInfoChannel = function getInfoChannel(dat) {
     let infoParsed = {};
 
+    //権限チェックのためにユーザー情報を取得
+    let reqSenderInfo = getInfoUser({
+        targetid: dat.reqSender.userid,
+        reqSender: dat.reqSender
+    });
+
     //情報収集
     try {
+        //もしユーザーがメンバーなのにプライベートチャンネルを取得しようとしているなら空データを返す
+        if ( reqSenderInfo.role === "Member" && dataServer.channels[dat.targetid].scope === "private" ) {
+            infoParsed = {
+                channelname: null,
+                channelid: null,
+                description: null,
+                scope: null
+            };
+
+            return infoParsed;
+
+        }
+
         infoParsed = {
             channelname: dataServer.channels[dat.targetid].name,
             channelid: dat.targetid,
