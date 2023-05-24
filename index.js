@@ -1086,11 +1086,13 @@ io.on("connection", (socket) => {
         */
         let info = -1; //返す情報用
 
-        //セッションが適合か確認
-        if ( auth.checkUserSession({userid:dat.reqSender.userid, sessionid:dat.reqSender.sessionid}) ) {
-            info = db.getInfoChannel(dat); //情報収集
+        let paramRequire = [
+            "targetid"
+        ];
 
-        }
+        if ( !checkDataIntegrality(dat, paramRequire, "getInfoChannel") ) return -1;
+
+        info = db.getInfoChannel(dat); //情報収集
 
         //チャンネルの情報送信
         socket.emit("infoChannel", info);
