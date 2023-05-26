@@ -1023,15 +1023,6 @@ io.on("connection", (socket) => {
 
         socket.emit("infoUser", info);
 
-        //ユーザー自身のための情報なら送信者にだけ送信
-        // if ( info.userid === dat.reqSender.userid ) {
-        //     io.to(socket.id).emit("infoUser", info);
-
-        // } else { //他人の情報なら
-        //     io.emit("infoUser", info);
-
-        // }
-
     });
 
     //オンラインのユーザーリストを返す
