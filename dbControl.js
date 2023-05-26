@@ -401,9 +401,9 @@ let getInfoChannel = function getInfoChannel(dat) {
     catch(e) {
         //読み取れなかったら
         infoParsed = {
-            channelname: "削除されたチャンネル",
+            channelname: "存在しないチャンネル",
             channelid: dat.targetid,
-            description: "このチャンネルは削除されています。これが見えていたらおかしいよ。",
+            description: "このチャンネルの情報がありません。これが見えていたらおかしいよ。",
             scope: "deleted"
         }
     }
