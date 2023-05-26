@@ -308,12 +308,38 @@ let getInfoUser = function getInfoUser(dat) {
     */
 
     let infoParsed = {}; //収集した情報を入れる
+    let targetChannelJoined = []; //チャンネル参加リスト。プライベートは隠す処理をするため予め変数を設定
+
+    //もし送信者が同じか権限によって渡すチャンネル参加リストを変える
+    if ( dat.reqSender.userid === dat.targetid || dataUser.user[dat.reqSender.userid].role !== "Member" ) {
+        targetChannelJoined = dataUser.user[dat.targetid].channel;
+
+    } else { //リクエスト送信者が通常メンバーならプライベートチャンネルを隠す(送信者が参加していた場合をのぞく)
+        //送信者の参加チャンネルリストを取得
+        let reqSenderInfoChannelJoined = dataUser.user[dat.reqSender.userid].channel;
+
+        //ターゲットユーザーの参加チャンネルリスト分確認
+        for ( let index in dataUser.user[dat.targetid].channel ) {
+            let checkingChannelid =  dataUser.user[dat.targetid].channel[index];
+
+            //チャンネルがプライベートなら送信者が参加しているかを確認してから追加
+            if (
+                dataServer.channels[checkingChannelid].scope !== "private" ||
+                reqSenderInfoChannelJoined.includes(checkingChannelid)
+            ) {
+                targetChannelJoined.push(checkingChannelid);
+
+            }
+
+        }
+
+    }
 
     try{
         infoParsed = {
             username: dataUser.user[dat.targetid].name, //ユーザーの表示名
             userid: dat.targetid, //ユーザーID
-            channelJoined: dataUser.user[dat.targetid].channel, //入っているチャンネルリスト(array)
+            channelJoined: targetChannelJoined, //入っているチャンネルリスト(array)
             role: dataUser.user[dat.targetid].role, //ユーザーのロール
             loggedin: dataUser.user[dat.targetid].state.loggedin, //ユーザーがログインしている状態かどうか
             banned: dataUser.user[dat.targetid].state.banned //BANされているかどうか
