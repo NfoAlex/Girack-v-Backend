@@ -279,7 +279,8 @@ let channelAction = function channelAction(dat) {
         if ( dat.userid !== dat.reqSender.userid ) {
             //送信者の情報取得
             let senderInfo = db.getInfoUser({
-                targetid: dat.reqSender.userid
+                targetid: dat.reqSender.userid,
+                reqSender: dat.reqSender
             });
 
             //ロールチェック
