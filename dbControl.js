@@ -378,7 +378,7 @@ let getInfoChannel = function getInfoChannel(dat) {
         if (
             reqSenderInfo.role === "Member" &&
             dataServer.channels[dat.targetid].scope === "private" &&
-            !reqSenderInfo.channel.includes(dat.targetid)
+            !reqSenderInfo.channelJoined.includes(dat.targetid)
         ) {
             infoParsed = {
                 channelname: null,
@@ -406,6 +406,7 @@ let getInfoChannel = function getInfoChannel(dat) {
             description: "このチャンネルの情報がありません。これが見えていたらおかしいよ。",
             scope: "deleted"
         }
+        console.log("dbControl :: getInfoChannel : エラー->", e);
     }
 
     return infoParsed;
