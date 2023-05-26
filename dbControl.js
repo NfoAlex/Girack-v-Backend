@@ -375,7 +375,11 @@ let getInfoChannel = function getInfoChannel(dat) {
     //情報収集
     try {
         //もしユーザーがメンバーなのにプライベートチャンネルを取得しようとしているなら空データを返す
-        if ( reqSenderInfo.role === "Member" && dataServer.channels[dat.targetid].scope === "private" ) {
+        if (
+            reqSenderInfo.role === "Member" &&
+            dataServer.channels[dat.targetid].scope === "private" &&
+            !reqSenderInfo.channel.includes(dat.targetid)
+        ) {
             infoParsed = {
                 channelname: null,
                 channelid: null,
