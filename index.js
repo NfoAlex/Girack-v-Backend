@@ -584,17 +584,7 @@ io.on("connection", (socket) => {
         if ( !checkDataIntegrality(dat, paramRequire, "channelAction") ) { return -1; }
 
         let result = infoUpdate.channelAction(dat);
-
-        //送信者自身が参加or退出をしているなら
-        if ( dat.userid === dat.reqSender.userid ) {
-            //ユーザーの情報を更新させる
-            socket.emit("infoUser", result); //送信者に対してだけ
-
-        } else {
-            //ユーザーの情報を更新させる
-            io.to("loggedin").emit("infoUser", result); //全員に対して伝える
-
-        }
+        io.to("loggedin").emit("infoUser", result); //全員に情報を更新させる
         
     });
 
