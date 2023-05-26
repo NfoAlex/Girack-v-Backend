@@ -1014,12 +1014,13 @@ io.on("connection", (socket) => {
         }
         */
         let info = -1; //返す情報用
+        let paramRequire = [
+            "targetid"
+        ];
 
-        //セッションが適合か確認
-        if ( auth.checkUserSession({userid:dat.reqSender.userid, sessionid:dat.reqSender.sessionid}) ) {
-            info = db.getInfoUser(dat); //情報収集
+        if ( !checkDataIntegrality(dat, paramRequire, "getInfoUser") ) return -1;
 
-        }
+        info = db.getInfoUser(dat); //情報収集
 
         socket.emit("infoUser", info);
 
