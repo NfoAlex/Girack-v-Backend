@@ -260,16 +260,9 @@ let channelAction = function channelAction(dat) {
             reqSender: dat.reqSender
         });
 
-        //参加する人の情報取得
-        let joiningUserInfo = db.getInfoUser({
-            targetid: dat.userid,
-            reqSender: dat.reqSender
-        });
-
         //チャンネルがプライベートで参加者が権力者でなく、招待者がそのチャンネルに参加していなら拒否
         if (
             db.dataServer.channels[dat.channelid].scope === "private" &&
-            //joiningUserInfo.role === "Member" &&
             !senderInfo.channelJoined.includes(dat.channelid)
         ) {
             return -1;
