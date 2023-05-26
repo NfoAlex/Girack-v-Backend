@@ -558,7 +558,7 @@ io.on("connection", (socket) => {
 // ===========================================================
 // チャンネル操作、アクション
 
-    //チャンネルへの参加、退出
+    //チャンネルへの参加(招待)、退出(キック)
     socket.on("channelAction", (dat) => {
         /*
         dat
@@ -586,7 +586,7 @@ io.on("connection", (socket) => {
         let result = infoUpdate.channelAction(dat);
 
         //送信者自身が参加or退出をしているなら
-        if ( dat.userid === dat.reqSender.userid ) {
+        if ( dat.userid === dat.reqSender.userid || result !== -1 ) {
             //ユーザーの情報を更新させる
             socket.emit("infoUser", result); //送信者に対してだけ
 
