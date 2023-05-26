@@ -269,15 +269,17 @@ let channelAction = function channelAction(dat) {
         
         //送信者の情報取得
         let senderInfo = db.getInfoUser({
-            targetid: dat.reqSender.userid
+            targetid: dat.reqSender.userid,
+            reqSender: dat.reqSender
         });
 
         //参加する人の情報取得
         let joiningUserInfo = db.getInfoUser({
-            targetid: dat.userid
+            targetid: dat.userid,
+            reqSender: dat.reqSender
         });
 
-        //チャンネルがプライベートで参加者がAdminでなく、招待者がそのチャンネルに参加していなら拒否
+        //チャンネルがプライベートで参加者が権力者でなく、招待者がそのチャンネルに参加していなら拒否
         if (
             db.dataServer.channels[dat.channelid].scope === "private" &&
             joiningUserInfo.role !== "Admin" &&
