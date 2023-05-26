@@ -2,7 +2,7 @@ let db = require("./dbControl.js");
 
 const fs = require('fs'); //履歴書き込むため
 
-//ユーザーの情報更新とか
+//ユーザーの情報更新とか(いらない...?)
 let config = function config(dat) {
     let answer;
     console.log("config :: データ更新↓");
@@ -172,19 +172,6 @@ let changeProfile = function changeProfile(dat) {
         targetid: dat.reqSender.userid,
         reqSender: dat.reqSender
     });
-
-    return answer;
-
-}
-
-//プロフィール変更
-let changeProfileIcon = function changeProfileIcon(dat) {
-    //db.dataUser.user[dat.reqSender.userid].name = dat.name; //DB更新
-    
-    //DBをJSONへ保存
-    //fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
-    
-    //更新したデータを収集
 
     return answer;
 
