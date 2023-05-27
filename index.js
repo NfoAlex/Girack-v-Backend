@@ -12,7 +12,7 @@ const e = require("express");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230524";
+const SERVER_VERSION = "alpha_20230527";
 
 const app = express();
 const server = http.createServer(app);
@@ -91,10 +91,15 @@ app.get('/file/:channelid/:fileid', (req, res) => {
     let fileid = req.params.fileid; //ファイルIDを取得
     let channelid = req.params.channelid; //チャンネルIDを取得
 
-    //ファイルIDからJSON名を取得(日付部分)
-    let fileidPathName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
-    //ファイルIDインデックスを取得
-    let fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    try {
+        //ファイルIDからJSON名を取得(日付部分)
+        let fileidPathName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
+        //ファイルIDインデックスを取得
+        let fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    } catch(e) {
+        console.log("index :: app.get('/file/') : ファイル送信失敗", e);
+        res.send("内部エラー");
+    }
 
     try {
         //ファイルを返す
@@ -558,7 +563,7 @@ io.on("connection", (socket) => {
 // ===========================================================
 // チャンネル操作、アクション
 
-    //チャンネルへの参加、退出
+    //チャンネルへの参加(招待)、退出(キック)
     socket.on("channelAction", (dat) => {
         /*
         dat
@@ -584,17 +589,7 @@ io.on("connection", (socket) => {
         if ( !checkDataIntegrality(dat, paramRequire, "channelAction") ) { return -1; }
 
         let result = infoUpdate.channelAction(dat);
-
-        //送信者自身が参加or退出をしているなら
-        if ( dat.userid === dat.reqSender.userid ) {
-            //ユーザーの情報を更新させる
-            socket.emit("infoUser", result); //送信者に対してだけ
-
-        } else {
-            //ユーザーの情報を更新させる
-            io.to("loggedin").emit("infoUser", result); //全員に対して伝える
-
-        }
+        io.to("loggedin").emit("infoUser", result); //全員に情報を更新させる
         
     });
 
@@ -1014,23 +1009,17 @@ io.on("connection", (socket) => {
         }
         */
         let info = -1; //返す情報用
+        let paramRequire = [
+            "targetid"
+        ];
 
-        //セッションが適合か確認
-        if ( auth.checkUserSession({userid:dat.reqSender.userid, sessionid:dat.reqSender.sessionid}) ) {
-            info = db.getInfoUser(dat); //情報収集
+        console.log("index :: getInfoUser : データ->", dat);
 
-        }
+        if ( !checkDataIntegrality(dat, paramRequire, "getInfoUser") ) return -1;
+
+        info = db.getInfoUser(dat); //情報収集
 
         socket.emit("infoUser", info);
-
-        //ユーザー自身のための情報なら送信者にだけ送信
-        // if ( info.userid === dat.reqSender.userid ) {
-        //     io.to(socket.id).emit("infoUser", info);
-
-        // } else { //他人の情報なら
-        //     io.emit("infoUser", info);
-
-        // }
 
     });
 
@@ -1086,11 +1075,13 @@ io.on("connection", (socket) => {
         */
         let info = -1; //返す情報用
 
-        //セッションが適合か確認
-        if ( auth.checkUserSession({userid:dat.reqSender.userid, sessionid:dat.reqSender.sessionid}) ) {
-            info = db.getInfoChannel(dat); //情報収集
+        let paramRequire = [
+            "targetid"
+        ];
 
-        }
+        if ( !checkDataIntegrality(dat, paramRequire, "getInfoChannel") ) return -1;
+
+        info = db.getInfoChannel(dat); //情報収集
 
         //チャンネルの情報送信
         socket.emit("infoChannel", info);

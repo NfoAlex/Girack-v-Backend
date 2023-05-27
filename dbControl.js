@@ -308,12 +308,53 @@ let getInfoUser = function getInfoUser(dat) {
     */
 
     let infoParsed = {}; //収集した情報を入れる
+    let targetChannelJoined = []; //チャンネル参加リスト。プライベートは隠す処理をするため予め変数を設定
+
+    try{
+        dataUser.user[dat.targetid].channel;
+        if ( dataUser.user[dat.targetid] === undefined ) throw err;
+    } catch(e) {
+        console.log("dbControl :: getInfoUser : ユーザーデータを読み取れませんでした->", e);
+        return {
+            username: "存在しないユーザー", //ユーザーの表示名
+            userid: dat.targetid,
+            channelJoined: [], //入っているチャンネルリスト(array)
+            role: "Deleted", //ユーザーのロール
+            loggedin: false,
+            banned: false //BANされているかどうか
+        };
+    }
+
+    //もし送信者が同じか権限によって渡すチャンネル参加リストを変える
+    if ( dat.reqSender.userid === dat.targetid || dataUser.user[dat.reqSender.userid].role !== "Member" ) {
+        targetChannelJoined = dataUser.user[dat.targetid].channel;
+
+    } else { //リクエスト送信者が通常メンバーならプライベートチャンネルを隠す(送信者が参加していた場合をのぞく)
+        //送信者の参加チャンネルリストを取得
+        let reqSenderInfoChannelJoined = dataUser.user[dat.reqSender.userid].channel;
+
+        //ターゲットユーザーの参加チャンネルリスト分確認
+        for ( let index in dataUser.user[dat.targetid].channel ) {
+            let checkingChannelid =  dataUser.user[dat.targetid].channel[index];
+
+            //チャンネルがプライベートなら送信者が参加しているかを確認してから追加
+            if (
+                dataServer.channels[checkingChannelid].scope !== "private" ||
+                reqSenderInfoChannelJoined.includes(checkingChannelid)
+            ) {
+                targetChannelJoined.push(checkingChannelid);
+
+            }
+
+        }
+
+    }
 
     try{
         infoParsed = {
             username: dataUser.user[dat.targetid].name, //ユーザーの表示名
             userid: dat.targetid, //ユーザーID
-            channelJoined: dataUser.user[dat.targetid].channel, //入っているチャンネルリスト(array)
+            channelJoined: targetChannelJoined, //入っているチャンネルリスト(array)
             role: dataUser.user[dat.targetid].role, //ユーザーのロール
             loggedin: dataUser.user[dat.targetid].state.loggedin, //ユーザーがログインしている状態かどうか
             banned: dataUser.user[dat.targetid].state.banned //BANされているかどうか
@@ -340,8 +381,31 @@ let getInfoUser = function getInfoUser(dat) {
 let getInfoChannel = function getInfoChannel(dat) {
     let infoParsed = {};
 
+    //権限チェックのためにユーザー情報を取得
+    let reqSenderInfo = getInfoUser({
+        targetid: dat.reqSender.userid,
+        reqSender: dat.reqSender
+    });
+
     //情報収集
     try {
+        //もしユーザーがメンバーなのにプライベートチャンネルを取得しようとしているなら空データを返す
+        if (
+            reqSenderInfo.role === "Member" &&
+            dataServer.channels[dat.targetid].scope === "private" &&
+            !reqSenderInfo.channelJoined.includes(dat.targetid)
+        ) {
+            infoParsed = {
+                channelname: null,
+                channelid: null,
+                description: null,
+                scope: null
+            };
+
+            return infoParsed;
+
+        }
+
         infoParsed = {
             channelname: dataServer.channels[dat.targetid].name,
             channelid: dat.targetid,
@@ -352,11 +416,12 @@ let getInfoChannel = function getInfoChannel(dat) {
     catch(e) {
         //読み取れなかったら
         infoParsed = {
-            channelname: "削除されたチャンネル",
+            channelname: "存在しないチャンネル",
             channelid: dat.targetid,
-            description: "このチャンネルは削除されています。これが見えていたらおかしいよ。",
+            description: "このチャンネルの情報がありません。これが見えていたらおかしいよ。",
             scope: "deleted"
         }
+        console.log("dbControl :: getInfoChannel : エラー->", e);
     }
 
     return infoParsed;

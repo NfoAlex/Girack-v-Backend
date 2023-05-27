@@ -2,7 +2,7 @@ let db = require("./dbControl.js");
 
 const fs = require('fs'); //履歴書き込むため
 
-//ユーザーの情報更新とか
+//ユーザーの情報更新とか(いらない...?)
 let config = function config(dat) {
     let answer;
     console.log("config :: データ更新↓");
@@ -177,19 +177,6 @@ let changeProfile = function changeProfile(dat) {
 
 }
 
-//プロフィール変更
-let changeProfileIcon = function changeProfileIcon(dat) {
-    //db.dataUser.user[dat.reqSender.userid].name = dat.name; //DB更新
-    
-    //DBをJSONへ保存
-    //fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
-    
-    //更新したデータを収集
-
-    return answer;
-
-}
-
 //ユーザーの設定のデータを上書き保存する
 let updateUserSaveConfig = function updateUserSaveConfig(dat) {
     let dataUserSave = {};
@@ -269,18 +256,13 @@ let channelAction = function channelAction(dat) {
         
         //送信者の情報取得
         let senderInfo = db.getInfoUser({
-            targetid: dat.reqSender.userid
+            targetid: dat.reqSender.userid,
+            reqSender: dat.reqSender
         });
 
-        //参加する人の情報取得
-        let joiningUserInfo = db.getInfoUser({
-            targetid: dat.userid
-        });
-
-        //チャンネルがプライベートで参加者がAdminでなく、招待者がそのチャンネルに参加していなら拒否
+        //チャンネルがプライベートで参加者が権力者でなく、招待者がそのチャンネルに参加していなら拒否
         if (
             db.dataServer.channels[dat.channelid].scope === "private" &&
-            joiningUserInfo.role !== "Admin" &&
             !senderInfo.channelJoined.includes(dat.channelid)
         ) {
             return -1;
@@ -297,7 +279,8 @@ let channelAction = function channelAction(dat) {
         if ( dat.userid !== dat.reqSender.userid ) {
             //送信者の情報取得
             let senderInfo = db.getInfoUser({
-                targetid: dat.reqSender.userid
+                targetid: dat.reqSender.userid,
+                reqSender: dat.reqSender
             });
 
             //ロールチェック
@@ -381,7 +364,7 @@ let channelCreate = function channelCreate(dat) {
     
 }
 
-//チャンネル作成
+//チャンネル削除
 let channelRemove = function channelRemove(dat) {
     /*
     dat
