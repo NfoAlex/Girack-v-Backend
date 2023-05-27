@@ -325,6 +325,9 @@ let channelCreate = async function channelCreate(dat) {
     }
     */
 
+    //チャンネル名が32文字以上ならスルー
+    if ( dat.channelname.length > 32 ) return -1;
+
     let newChannelId = "";
     return new Promise((resolve) => {
         //IDを探すまでループ
@@ -349,8 +352,6 @@ let channelCreate = async function channelCreate(dat) {
 
         //チャンネル作成者をそのまま参加させる
         db.dataUser.user[dat.reqSender.userid].channel.push(newChannelId);
-
-        console.log("infoUpdate :: channelCreate : 作った");
     
         //ユーザー情報をファイルへ書き込み
         fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
