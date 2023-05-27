@@ -313,7 +313,7 @@ let channelAction = function channelAction(dat) {
 }
 
 //チャンネル作成
-let channelCreate = function channelCreate(dat) {
+let channelCreate = async function channelCreate(dat) {
     /*
     dat
     {
