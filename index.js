@@ -91,10 +91,15 @@ app.get('/file/:channelid/:fileid', (req, res) => {
     let fileid = req.params.fileid; //ファイルIDを取得
     let channelid = req.params.channelid; //チャンネルIDを取得
 
-    //ファイルIDからJSON名を取得(日付部分)
-    let fileidPathName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
-    //ファイルIDインデックスを取得
-    let fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    try {
+        //ファイルIDからJSON名を取得(日付部分)
+        let fileidPathName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
+        //ファイルIDインデックスを取得
+        let fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    } catch(e) {
+        console.log("index :: app.get('/file/') : ファイル送信失敗", e);
+        res.send("内部エラー");
+    }
 
     try {
         //ファイルを返す
@@ -1007,6 +1012,8 @@ io.on("connection", (socket) => {
         let paramRequire = [
             "targetid"
         ];
+
+        console.log("index :: getInfoUser : データ->", dat);
 
         if ( !checkDataIntegrality(dat, paramRequire, "getInfoUser") ) return -1;
 
