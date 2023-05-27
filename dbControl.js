@@ -93,23 +93,6 @@ console.log("=========================");
 console.log("DB認識!");
 console.log("=========================");
 
-//名前からユーザーのインデックス番号を返す
-let findUserName = function findUserName(u) { //u => ユーザー名
-    console.log("findUser :: 確認 => " + u + "?");
-    for (let i=1; i<=Object.keys(dataUser.user).length; i++ ) {
-        if ( dataUser.user[i].name == u ) {
-            console.log("findUser :: ユーザー発見");
-            return i; //ユーザーのインデックス番号を返す
-
-        }
-
-    }
-
-    //ユーザーが見つからなければ
-    return 0;
-
-}
-
 //TODO : これを削除
 //DBから必要な情報を用意
 let parseInfos = function parseInfos(dat) { //i => {target, id}
@@ -549,7 +532,6 @@ let getInitInfo = function getInitInfo() {
     };
 }
 
-exports.findUserName = findUserName; //ユーザー名で情報を探す
 exports.parseInfos = parseInfos; //IDで情報を取得(ToDo削除)
 exports.getInfoUser = getInfoUser; //ユーザー情報を取得
 exports.getInfoChannel = getInfoChannel; //チャンネル情報を取得
