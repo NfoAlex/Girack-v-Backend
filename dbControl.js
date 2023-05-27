@@ -310,6 +310,21 @@ let getInfoUser = function getInfoUser(dat) {
     let infoParsed = {}; //収集した情報を入れる
     let targetChannelJoined = []; //チャンネル参加リスト。プライベートは隠す処理をするため予め変数を設定
 
+    try{
+        dataUser.user[dat.targetid].channel;
+        if ( dataUser.user[dat.targetid] === undefined ) throw err;
+    } catch(e) {
+        console.log("dbControl :: getInfoUser : ユーザーデータを読み取れませんでした->", e);
+        return {
+            username: "存在しないユーザー", //ユーザーの表示名
+            userid: dat.targetid,
+            channelJoined: [], //入っているチャンネルリスト(array)
+            role: "Deleted", //ユーザーのロール
+            loggedin: false,
+            banned: false //BANされているかどうか
+        };
+    }
+
     //もし送信者が同じか権限によって渡すチャンネル参加リストを変える
     if ( dat.reqSender.userid === dat.targetid || dataUser.user[dat.reqSender.userid].role !== "Member" ) {
         targetChannelJoined = dataUser.user[dat.targetid].channel;
