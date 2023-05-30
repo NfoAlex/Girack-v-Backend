@@ -379,10 +379,10 @@ let getInfoChannel = function getInfoChannel(dat) {
             !reqSenderInfo.channelJoined.includes(dat.targetid)
         ) {
             infoParsed = {
-                channelname: null,
-                channelid: null,
-                description: null,
-                scope: null
+                channelname: "存在しないチャンネル",
+                channelid: dat.targetid,
+                description: "このチャンネルの情報がありません。これが見えていたらおかしいよ。",
+                scope: "deleted"
             };
 
             return infoParsed;
@@ -403,7 +403,7 @@ let getInfoChannel = function getInfoChannel(dat) {
             channelid: dat.targetid,
             description: "このチャンネルの情報がありません。これが見えていたらおかしいよ。",
             scope: "deleted"
-        }
+        };
         console.log("dbControl :: getInfoChannel : エラー->", e);
     }
 
