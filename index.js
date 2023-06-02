@@ -91,16 +91,21 @@ app.get('/file/:channelid/:fileid', (req, res) => {
     let fileid = req.params.fileid; //ファイルIDを取得
     let channelid = req.params.channelid; //チャンネルIDを取得
 
+    let fileidPathName = ""; //JSONファイル名
+    let fileidIndex = {}; //JSONファイルから取り出したJSONそのもの
+
+    //JSONファイルの取り出し準備
     try {
         //ファイルIDからJSON名を取得(日付部分)
-        let fileidPathName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
+        fileidPathName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
         //ファイルIDインデックスを取得
-        let fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+        fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
     } catch(e) {
-        console.log("index :: app.get('/file/') : ファイル送信失敗", e);
+        console.log("index :: app.get('/file/') : ファイル送信失敗", fileid, e);
         res.send("内部エラー");
     }
 
+    //JSONから添付ファイルを探して返す
     try {
         //ファイルを返す
         console.log("返すファイルデータ :: ", fileidIndex[fileid]);
