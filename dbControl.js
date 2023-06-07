@@ -433,7 +433,10 @@ let getInfoChannelJoinedUserList = function getInfoChannelJoinedUserList(dat) {
             //配列追加
             channelJoinedUserList.push({
                 userid: objUser[index][0],
-                username: objUser[index][1].name
+                username: objUser[index][1].name,
+                role: objUser[index][1].role,
+                loggedin : objUser[index][1].state.loggedin,
+                banned: objUser[index][1].state.banned
             });
 
         }
