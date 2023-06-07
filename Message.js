@@ -42,11 +42,11 @@ let msgMix = function msgMix(m) {
     //メッセージがそもそも有効なものかどうか
     if (
         m.content === undefined ||
-        m.content.length >= 250 || //長さが250文字以上だったら
-        m.content.length == 0 || //長さが0だったら
-        (m.content.includes("<img") && m.content.includes("onerror")) || //XSS避け
-        m.content.replace(/　/g,"").length === 0 || //空白だけのメッセージだった時用
-        m.content.replace(/ /g,"").length === 0 //半角も同様
+        m.content.length > 250 || //長さが250文字を超えてるなら
+        ( m.content.includes("<img") && m.content.includes("onerror") ) || //XSS避け
+        ( m.content.length === 0 && !m.fileData.isAttatched ) || //長さが0だったら
+        ( m.content.replace(/　/g,"").length === 0 && !m.fileData.isAttatched ) || //添付ファイルがなく、空白だけのメッセージだった時用
+        ( m.content.replace(/ /g,"").length === 0 && !m.fileData.isAttatched ) //添付ファイルがなく、半角も同様
     ) {
         return -1; //エラーとして返す
 
