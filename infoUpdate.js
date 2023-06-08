@@ -406,7 +406,7 @@ let channelRemove = function channelRemove(dat) {
 }
 
 //監査ログへの書き込み
-let recordModeration = function recordModeration(actionBy,actionTo,actionInfo,reqSender) {
+let recordModeration = function recordModeration(actionBy,actionTo,actionInfo) {
     /*
     actionBy => 変更を起こしたユーザーID
         例 : xxxxxx
@@ -418,41 +418,48 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo,re
         }
     actionInfo => 変更内容
         例 : {
-            actionname: "MessageDelete",
-            actionTargetBefore: "123", //変更前の値
-            actionTargetAfter: "" //消されるようなものの場合空
+            actionname: "変更対象のパラメータ(下の一覧を参照)",
+            actionTargetBefore: "asdf", //変更前
+            actionTargetAfter: "fdsa" //変更後
         }
         
     }
 
     actionnameの一覧 => 
         userに対して
-            UserBan,
-            UserPardon,
-            UserDelete,
-            UserKickFromChannel
+            userBan,
+            userPardon,
+            userDelete,
+            userKickFromChannel
+        
         channelに対して
             channelEditName,
             channelEditDesc,
             channelChangeScope,
             channelCreate,
             channelDelete
+        
         messageに対して
-            messageDelete
-        serverに対して
+            messageDelete //メッセージ削除の場合プライバシーを考慮して変更前と変更後の値は空にする
+        
+        serverに対して //serverの場合targetidは空に
             serverEditName,
             serverEditConfig
     */
 
     //日付別にJSONファイルを書き込むため
-    let t = new Date();
+    let t = new Date();  // 正しいコード
     //日付
-    let Date = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
+    let tY = t.getFullYear();
+    let tM = (t.getMonth()+1).toString().padStart(2,0);
+    let tD = t.getDate().toString().padStart(2,0);
+    let tDateForName = tY + "_" +  tM + "_" + tD;
+    
     //変更ID(actionId)用
-    let fullDate = [Date, t.getMilliseconds().toString().padStart(6,0) ].join("");
+    let fullDate = [tY+tM+tD, t.getMilliseconds().toString().padStart(6,0) ].join("");
     
     //JSONのファイル名
-    let nameOfJson = "modlog_" + Date;
+    let nameOfJson = "modlog_" + tDateForName;
     //監査ログを書きこむJSONファイルのディレクトリ
     let pathOfJson = "./modlog/" + nameOfJson + ".json";
 
@@ -466,7 +473,7 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo,re
     }
 
     //監査ログを読み込み
-    let dataModlog = JSON.parse(fs.statSync(pathOfJson));
+    let dataModlog = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8'));
 
     //変更の記録処理
     try {
