@@ -47,6 +47,7 @@ try{fs.mkdirSync("./files/");}catch(e){}
 try{fs.mkdirSync("./usersave/")}catch(e){}
 try{fs.mkdirSync("./record/");}catch(e){}
 try{fs.mkdirSync("./img/");}catch(e){}
+try{fs.mkdirSync("./modlog/");}catch(e){}
 
 //もしバックエンドに直接アクセスされたら用
 app.get('/', (req, res) => {
