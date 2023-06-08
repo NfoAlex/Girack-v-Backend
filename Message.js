@@ -631,6 +631,7 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
     let dirOfJson = "./record/" + cid;
     let readCount = 0;
 
+    //startLengthが空なら最初から読むように
     if ( startLength === undefined ) { startLength = 0; }
 
     try {

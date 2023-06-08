@@ -505,6 +505,37 @@ let getUserSave = function getUserSave(dat) {
 
 }
 
+//監査ログの取得
+let getModlog = async function getModlog(dat) {
+    //JSONファイル一覧を格納する変数
+    let ListOfJson = [];
+    
+    //JSONファイルの一覧を取得
+    try {
+        ListOfJson = await new Promise((resolve) => { //取得が完了するまで処理を待つ
+            //読み込み
+            fs.readdir("./modlog/", (err, files) => {
+                ListOfJson = files; //ファイルの名前取得
+                resolve(); //処理を終了、次の処理へ
+
+            });
+
+        }).then(() => {
+            //追加された順だと古い順なので
+            return ListOfJson.reverse();
+
+        });
+    } catch(e) {
+        return -1;
+    }
+
+    for ( let index in ListOfJson) {
+        console.log("dbControl :: getModlog : ListOfJson->", ListOfJson);
+
+    }
+
+}
+
 //サーバーの設定情報を取得
 let getServerSettings = function getServerSettings(dat) {
     let sendersInfo = getInfoUser({
