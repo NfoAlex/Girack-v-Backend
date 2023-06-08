@@ -405,6 +405,49 @@ let channelRemove = function channelRemove(dat) {
 
 }
 
+//監査ログへの書き込み
+let recordModeration = function recordModeration(actionBy,actionTo,actionInfo,reqSender) {
+    /*
+    actionBy => 変更を起こしたユーザーID
+        例 : xxxxxx
+    actionTo => 変更を受けたチャンネルあるいはユーザーID
+        例 : {
+            type: (user|channel|message|config),
+            targetid: xxxxxxx,
+            messageid: xxxxxxxx //メッセージの場合メッセージID(それ以外だと基本空)
+        }
+    actionInfo => 変更内容
+        例 : {
+            actionname: DeleteMessage,
+            actionTargetBefore: 123, //変更前の値
+            actionTargetAfter: 321 //消されるようなものの場合空
+        }
+        
+    }
+    */
+
+    //日付別にJSONファイルを書き込むため
+    let t = new Date();
+    //JSONのファイル名
+    let nameOfJson = "modlog_" + t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
+    
+    //監査ログを書きこむJSONファイルのディレクトリ
+    let pathOfJson = "./modlog/" + nameOfJson + ".json";
+
+    //JSONファイルを開いてみて、いけたらそのまま読み込んで処理、なかったら作る
+    try { //JSONの存在確認
+        //ファイルを読み込んでみる(使いはしない、存在を確認するだけ)
+        fs.statSync(pathOfJson);
+    } catch(err) { //存在無しなら(読み込みエラーなら)
+        //空のJSONを作成
+        fs.writeFileSync(pathOfJson, "{}"); //DBをJSONで保存
+    }
+
+
+
+
+}
+
 exports.config = config;
 exports.mod = mod; //管理者からのユーザー管理
 exports.changeServerSettings = changeServerSettings; //サーバーの設定変更
@@ -415,3 +458,4 @@ exports.updateUserSaveMsgReadState = updateUserSaveMsgReadState; //ユーザー�
 exports.channelAction = channelAction; //チャンネルの参加・退出
 exports.channelCreate = channelCreate; //チャンネル作成
 exports.channelRemove = channelRemove; //チャンネル削除
+exports.recordModeration = recordModeration; //監査ログを書き込む関数

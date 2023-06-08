@@ -125,11 +125,11 @@ let msgMix = function msgMix(m) {
 
     }
 
+    //返信をしているなら
     try {
-        //もし返信なら
+        //データに返信先の文章を追加
         if ( m.replyData.isReplying ) {
             let msg = getMessage(m.channelid, m.replyData.messageid);
-            console.log("Message :: msgMix : 返信だね", msg);
             m.replyData.content = msg.content;
             m.replyData.userid = msg.userid;
 
