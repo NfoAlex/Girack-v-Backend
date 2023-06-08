@@ -3,6 +3,7 @@
 const fs = require('fs'); //履歴書き込んだり読み込むために
 const { getLinkPreview } = require("link-preview-js");
 const indexjs = require("./index.js");
+const infoUpdate = require("./infoUpdate.js");
 
 //URLプレビュー時のリダイレクト用URLのブロック対象にならないリスト
 const knownRedirectUrls = [
@@ -421,12 +422,31 @@ let msgDelete = function msgDelete(dat) {
         return -1;
     }
 
+    //送信者と削除する人が同じじゃなければ監査ログへ書き込む
+    if ( dat.reqSender.userid !== dataHistory[dat.messageid].userid ) {
+        //記録処理
+        infoUpdate.recordModeration(
+            dat.reqSender.userid,
+            {
+                type: "message",
+                targetid: dataHistory[dat.messageid].userid,
+                messageid: dat.messageid
+            },
+            {
+                actionname: "messageDelete",
+                actionTargetBefore: "",
+                actionAfter: ""
+            }
+        );
+
+    }
+
     //削除!
     delete dataHistory[dat.messageid];
 
     //書き込み
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
-    
+
     //返す結果用に履歴を取得
     //let result = msgRecordCall(dat.channelid, 10);
     let result = {
