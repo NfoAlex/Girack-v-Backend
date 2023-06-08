@@ -1,4 +1,3 @@
-//msg_server.js
 //メッセージ関連
 
 const fs = require('fs'); //履歴書き込んだり読み込むために
