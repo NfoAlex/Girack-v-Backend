@@ -509,7 +509,7 @@ let getUserSave = function getUserSave(dat) {
 let getModlog = async function getModlog(dat) {
     //JSONファイル一覧を格納する変数
     let ListOfJson = [];
-    
+
     //JSONファイルの一覧を取得
     try {
         ListOfJson = await new Promise((resolve) => { //取得が完了するまで処理を待つ
@@ -573,6 +573,7 @@ exports.getInfoChannelJoinedUserList = getInfoChannelJoinedUserList; //チャン
 exports.getInfoList = getInfoList; //チャンネルリストの取得
 exports.searchUserDynamic = searchUserDynamic; //ユーザーを検索する関数
 exports.getUserSave = getUserSave; //ユーザーの個人データ(設定や既読状態)を取得
+exports.getModlog = getModlog; //監査ログを取得
 exports.getServerSettings = getServerSettings; //サーバーの詳細設定を取得
 exports.getInitInfo = getInitInfo; //サーバーの初期情報
 

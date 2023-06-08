@@ -1206,6 +1206,28 @@ io.on("connection", (socket) => {
 
     });
 
+    //監査ログの取得
+    socket.on("getModlog", (dat) => {
+        /*
+        dat
+        {
+            startLength: 0, //メッセージの取得開始位置
+            reqSender: {
+                ...
+            }
+        }
+        */
+       
+        //パケットの整合性確認
+        if ( !checkDataIntegrality(dat, ["startLength"], "getModlog") ) return -1;
+
+        //監査ログ取得
+        let modLog = dbControl.getModlog(dat);
+
+        //送信
+        socket.emit("infoModlog", modLog);
+    });
+
     //サーバー設定の取得
     socket.on("getServerSettings", (dat) => {
         /*
