@@ -454,9 +454,9 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo) {
     let tM = (t.getMonth()+1).toString().padStart(2,0);
     let tD = t.getDate().toString().padStart(2,0);
     let tDateForName = tY + "_" +  tM + "_" + tD;
-    
+
     //変更ID(actionId)用
-    let fullDate = [tY+tM+tD, t.getMilliseconds().toString().padStart(6,0) ].join("");
+    let fullDate = tY+tM+tD;
     
     //JSONのファイル名
     let nameOfJson = "modlog_" + tDateForName;
