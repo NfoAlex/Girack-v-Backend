@@ -418,19 +418,41 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo,re
         }
     actionInfo => 変更内容
         例 : {
-            actionname: DeleteMessage,
-            actionTargetBefore: 123, //変更前の値
-            actionTargetAfter: 321 //消されるようなものの場合空
+            actionname: "MessageDelete",
+            actionTargetBefore: "123", //変更前の値
+            actionTargetAfter: "" //消されるようなものの場合空
         }
         
     }
+
+    actionnameの一覧 => 
+        userに対して
+            UserBan,
+            UserPardon,
+            UserDelete,
+            UserKickFromChannel
+        channelに対して
+            channelEditName,
+            channelEditDesc,
+            channelChangeScope,
+            channelCreate,
+            channelDelete
+        messageに対して
+            messageDelete
+        serverに対して
+            serverEditName,
+            serverEditConfig
     */
 
     //日付別にJSONファイルを書き込むため
     let t = new Date();
-    //JSONのファイル名
-    let nameOfJson = "modlog_" + t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
+    //日付
+    let Date = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
+    //変更ID(actionId)用
+    let fullDate = [Date, t.getMilliseconds().toString().padStart(6,0) ].join("");
     
+    //JSONのファイル名
+    let nameOfJson = "modlog_" + Date;
     //監査ログを書きこむJSONファイルのディレクトリ
     let pathOfJson = "./modlog/" + nameOfJson + ".json";
 
@@ -443,8 +465,26 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo,re
         fs.writeFileSync(pathOfJson, "{}"); //DBをJSONで保存
     }
 
+    //監査ログを読み込み
+    let dataModlog = JSON.parse(fs.statSync(pathOfJson));
 
+    //変更の記録処理
+    try {
+        //この変更そのものを判別するためのID
+        let actionId = [fullDate,Object.keys(dataModlog).length+1].join("");
+        //JSONへデータ追加
+        dataModlog[ actionId ] = {
+            actionId: actionId,
+            actionBy: actionBy,
+            actionTo: actionTo,
+            actionInfo: actionInfo
+        };
+    } catch(e) {
+        return -1;
+    }
 
+    //JSONファイルを保存
+    fs.writeFileSync(pathOfJson, JSON.stringify(dataModlog, null, 4));
 
 }
 
