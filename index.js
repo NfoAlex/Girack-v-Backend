@@ -1207,7 +1207,7 @@ io.on("connection", (socket) => {
     });
 
     //監査ログの取得
-    socket.on("getModlog", (dat) => {
+    socket.on("getModlog", async (dat) => {
         /*
         dat
         {
@@ -1221,8 +1221,10 @@ io.on("connection", (socket) => {
         //パケットの整合性確認
         if ( !checkDataIntegrality(dat, ["startLength"], "getModlog") ) return -1;
 
-        //監査ログ取得
-        let modLog = db.getModlog(dat);
+        //監査ログ取得(getModlog関数は時間がかかるためasyncにしているのでawait)
+        let modLog = await db.getModlog(dat);
+
+        console.log("index :: getModlog : modLog->", modLog);
 
         //送信
         socket.emit("infoModlog", modLog);
