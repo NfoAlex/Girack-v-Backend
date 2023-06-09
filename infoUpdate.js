@@ -84,14 +84,49 @@ let mod = function mod(dat) {
     switch( dat.action.change ) {
         //ユーザーのロール変更
         case "role":
+            //監査ログ用
+            let roleBefore = db.dataUser.user[dat.targetid].role;
             //ロール更新
             db.dataUser.user[dat.targetid].role = dat.action.value;
+            
+            //監査ログへの記録処理
+            recordModeration(
+                dat.reqSender.userid,
+                {
+                    type: "user",
+                    userid: dat.targetid,
+                    channelid: "",
+                    messageid: ""
+                },
+                {
+                    actionname: "userChangeRole",
+                    valueBefore: roleBefore,
+                    valueAfter: dat.action.value
+                }
+            );
+            
             break;
 
         //ユーザーのBAN
         case "ban":
             console.log("infoUpdate :: mod : BANしました -> " + dat.targetid);
             db.dataUser.user[dat.targetid].state.banned = dat.action.value;
+            //監査ログへの記録処理
+            recordModeration(
+                dat.reqSender.userid,
+                {
+                    type: "user",
+                    userid: dat.targetid,
+                    channelid: "",
+                    messageid: ""
+                },
+                {
+                    actionname: "userBan",
+                    valueBefore: dat.targetid,
+                    valueAfter: "BANNED"
+                }
+            );
+            
             break;
 
         //ユーザーの削除
@@ -478,6 +513,7 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo) {
             userBan,
             userPardon,
             userDelete,
+            userChangeRole,
             userKickFromChannel
         
         channelに対して
