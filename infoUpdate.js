@@ -100,6 +100,21 @@ let mod = function mod(dat) {
             if ( sendersInfo.role !== "Admin" ) break; //Adminじゃないならここでやめる
             if ( dat.reqSender.userid === dat.targetid ) break; //送信者自身を消そうとしているならやめる
 
+            //監査ログへの記録処理
+            recordModeration(
+                dat.reqSender.userid,
+                {
+                    type: "user",
+                    targetid: dat.targetid,
+                    messageid: ""
+                },
+                {
+                    actionname: "userDelete",
+                    valueBefore: dat.targetid,
+                    valueAfter: ""
+                }
+            );
+
             delete db.dataUser.user[dat.targetid]; //削除
             break;
 
@@ -354,6 +369,21 @@ let channelCreate = async function channelCreate(dat) {
         //チャンネル作成者をそのまま参加させる
         db.dataUser.user[dat.reqSender.userid].channel.push(newChannelId);
     
+        //監査ログへの記録処理
+        recordModeration(
+            dat.reqSender.userid,
+            {
+                type: "channel",
+                targetid: newChannelId,
+                messageid: ""
+            },
+            {
+                actionname: "channelCreate",
+                valueBefore: "",
+                valueAfter: dat.channelname
+            }
+        );
+
         //ユーザー情報をファイルへ書き込み
         fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
