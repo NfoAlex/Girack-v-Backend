@@ -200,6 +200,66 @@ let changeServerSettings = function changeServerSettings(dat) {
 
 //チャンネル設定の更新
 let changeChannelSettings = function changeChannelSettings(dat) {
+    //名前を変更するなら監査記録
+    if ( db.dataServer.channels[dat.targetid].name !== dat.channelname ) {
+        //監査ログへの記録処理
+        recordModeration(
+            dat.reqSender.userid,
+            {
+                type: "channel",
+                userid: "",
+                channelid: dat.targetid,
+                messageid: ""
+            },
+            {
+                actionname: "channelEditName",
+                valueBefore: db.dataServer.channels[dat.targetid].name,
+                valueAfter: dat.channelname
+            }
+        );
+
+    }
+
+    //概要を変更するなら監査記録
+    if ( db.dataServer.channels[dat.targetid].description !== dat.description ) {
+        //監査ログへの記録処理
+        recordModeration(
+            dat.reqSender.userid,
+            {
+                type: "channel",
+                userid: "",
+                channelid: dat.targetid,
+                messageid: ""
+            },
+            {
+                actionname: "channelEditDesc",
+                valueBefore: db.dataServer.channels[dat.targetid].description,
+                valueAfter: dat.description
+            }
+        );
+
+    }
+
+    //公開範囲を変更するなら監査記録
+    if ( db.dataServer.channels[dat.targetid].scope !== dat.scope ) {
+        //監査ログへの記録処理
+        recordModeration(
+            dat.reqSender.userid,
+            {
+                type: "channel",
+                userid: "",
+                channelid: dat.targetid,
+                messageid: ""
+            },
+            {
+                actionname: "channelEditScioe",
+                valueBefore: db.dataServer.channels[dat.targetid].scope,
+                valueAfter: dat.scope
+            }
+        );
+
+    }
+
     //名前と概要と公開範囲を更新
     db.dataServer.channels[dat.targetid].name = dat.channelname;
     db.dataServer.channels[dat.targetid].description = dat.description;
