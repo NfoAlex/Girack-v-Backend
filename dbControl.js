@@ -525,14 +525,53 @@ let getModlog = async function getModlog(dat) {
             return ListOfJson.reverse();
 
         });
-    } catch(e) {
+    } catch(e) { //一覧がとれなかったら失敗と返す
         return -1;
     }
 
-    for ( let index in ListOfJson) {
+    //取り出したデータの個数(デフォルトで10個まで取り出すようにする)
+    let dataCount = 00;
+    //送信する監査ログデータ
+    let dataModlogResult = {
+        endOfData: false,
+        data: []
+    };
+
+    //それぞれのJSONファイルからデータを取得して配列に追加
+    for ( let jsonIndex in ListOfJson) {
+        //監査ログを取り出し
+        let dataModlog = JSON.parse(fs.readFileSync("./modlog/"+ListOfJson[jsonIndex]));
         console.log("dbControl :: getModlog : ListOfJson->", ListOfJson);
 
+        //JSONの長さ
+        let jsonLength = Object.keys(dataModlog).length;
+
+        //JSONのデータの長さ文ループして送信するデータ配列へ追加
+        for ( let itemIndex=0; itemIndex<jsonLength; itemIndex++ ) {
+            //データ個数が10個あるなら切る
+            if ( dataCount>=10 ) break;
+
+            //追加
+            dataModlogResult.data.push(
+                Object.entries(dataModlog)[itemIndex][1]
+            );
+
+            //データ個数をカウント
+            dataCount++;
+
+        }
+
+        if ( dataCount>=10 ) break;
+
     }
+
+    //もしデータ個数が最終的に10個未満ならこれでデータ全部ということを設定
+    if ( dataCount<10 ) dataModlogResult.endOfData=true;
+
+    console.log("dbControl :: getModlog : データ結果->", dataModlogResult);
+
+    return dataModlogResult;
+
 
 }
 
