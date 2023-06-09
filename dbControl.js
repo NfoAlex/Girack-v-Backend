@@ -570,6 +570,8 @@ let getModlog = async function getModlog(dat) {
 
     //console.log("dbControl :: getModlog : データ結果->", dataModlogResult);
 
+    //上から新しい順に出すために逆順番にして返す
+    dataModlogResult.data = dataModlogResult.data.reverse();
     return dataModlogResult;
 
 
