@@ -419,8 +419,8 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo) {
     actionInfo => 変更内容
         例 : {
             actionname: "変更対象のパラメータ(下の一覧を参照)",
-            actionTargetBefore: "asdf", //変更前
-            actionTargetAfter: "fdsa" //変更後
+            valueBefore: "asdf", //変更前
+            valueAfter: "fdsa" //変更後
         }
         
     }

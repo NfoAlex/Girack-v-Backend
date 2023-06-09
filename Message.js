@@ -434,8 +434,8 @@ let msgDelete = function msgDelete(dat) {
             },
             {
                 actionname: "messageDelete",
-                actionTargetBefore: "",
-                actionAfter: ""
+                valueBefore: "",
+                valueAfter: ""
             }
         );
 
