@@ -80,8 +80,6 @@ try { //読み込んでみる
     dataServer = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
 }
 
-//let dataRole = JSON.parse(fs.readFileSync('./role.json', 'utf-8')); //ロールのJSON読み込み
-
 //起動したときに全員をオフライン状態にする
 for ( let index in Object.keys(dataUser.user) ) {
     let userid = Object.keys(dataUser.user)[index]; //ユーザーIDを取得
@@ -528,9 +526,12 @@ let getModlog = async function getModlog(dat) {
     } catch(e) { //一覧がとれなかったら失敗と返す
         return -1;
     }
+    
+    //データを確認した回数
+    let dataCheckedCount = 0;
+    //取り出したデータの個数(デフォルトで１回に10個まで取り出すようにする)
+    let dataSavedCount = 0;
 
-    //取り出したデータの個数(デフォルトで10個まで取り出すようにする)
-    let dataCount = 00;
     //送信する監査ログデータ
     let dataModlogResult = {
         endOfData: false,
@@ -541,7 +542,6 @@ let getModlog = async function getModlog(dat) {
     for ( let jsonIndex in ListOfJson) {
         //監査ログを取り出し
         let dataModlog = JSON.parse(fs.readFileSync("./modlog/"+ListOfJson[jsonIndex]));
-        console.log("dbControl :: getModlog : ListOfJson->", ListOfJson);
 
         //JSONの長さ
         let jsonLength = Object.keys(dataModlog).length;
@@ -549,26 +549,33 @@ let getModlog = async function getModlog(dat) {
         //JSONのデータの長さ文ループして送信するデータ配列へ追加
         for ( let itemIndex=0; itemIndex<jsonLength; itemIndex++ ) {
             //データ個数が10個あるなら切る
-            if ( dataCount>=10 ) break;
+            if ( dataSavedCount>=10 ) break;
 
-            //追加
-            dataModlogResult.data.push(
-                Object.entries(dataModlog)[itemIndex][1]
-            );
+            //もしデータ取得位置がデータ確認回数と同じならデータの追加をする
+            if ( dataCheckedCount >= dat.startLength ) {
 
-            //データ個数をカウント
-            dataCount++;
+                //追加
+                dataModlogResult.data.push(
+                    Object.entries(dataModlog)[itemIndex][1]
+                );
+
+                //データ個数をカウント
+                dataSavedCount++;
+
+            }
+
+            //データ確認回数をカウント
+            dataCheckedCount++;
 
         }
 
-        if ( dataCount>=10 ) break;
+        //次のJSON読み込む前に念のため確認
+        if ( dataSavedCount>=10 ) break;
 
     }
 
     //もしデータ個数が最終的に10個未満ならこれでデータ全部ということを設定
-    if ( dataCount<10 ) dataModlogResult.endOfData=true;
-
-    //console.log("dbControl :: getModlog : データ結果->", dataModlogResult);
+    if ( dataSavedCount<10 ) dataModlogResult.endOfData=true;
 
     //上から新しい順に出すために逆順番にして返す
     dataModlogResult.data = dataModlogResult.data.reverse();
