@@ -216,6 +216,22 @@ let changeServerSettings = function changeServerSettings(dat) {
     //設定更新
     db.dataServer.registration = dat.registration;
 
+    //監査ログへの記録処理
+    recordModeration(
+        dat.reqSender.userid,
+        {
+            type: "server",
+            userid: "",
+            channelid: "",
+            messageid: ""
+        },
+        {
+            actionname: "serverEditConfig",
+            valueBefore: "",
+            valueAfter: ""
+        }
+    );
+
     fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
 
 }
