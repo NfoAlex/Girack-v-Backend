@@ -109,23 +109,45 @@ let mod = function mod(dat) {
 
         //ユーザーのBAN
         case "ban":
-            console.log("infoUpdate :: mod : BANしました -> " + dat.targetid);
+            console.log("infoUpdate :: mod : BAN状態を更新 -> " + dat.targetid);
+            //BAN状態を更新
             db.dataUser.user[dat.targetid].state.banned = dat.action.value;
-            //監査ログへの記録処理
-            recordModeration(
-                dat.reqSender.userid,
-                {
-                    type: "user",
-                    userid: dat.targetid,
-                    channelid: "",
-                    messageid: ""
-                },
-                {
-                    actionname: "userBan",
-                    valueBefore: dat.targetid,
-                    valueAfter: "BANNED"
-                }
-            );
+            //BAN状態に応じて監査ログへの記録
+            if ( dat.action.value ) {
+                //監査ログへの記録処理
+                recordModeration(
+                    dat.reqSender.userid,
+                    {
+                        type: "user",
+                        userid: dat.targetid,
+                        channelid: "",
+                        messageid: ""
+                    },
+                    {
+                        actionname: "userBan",
+                        valueBefore: "false",
+                        valueAfter: "true"
+                    }
+                );
+
+            } else {
+                //監査ログへの記録処理
+                recordModeration(
+                    dat.reqSender.userid,
+                    {
+                        type: "user",
+                        userid: dat.targetid,
+                        channelid: "",
+                        messageid: ""
+                    },
+                    {
+                        actionname: "userPardon",
+                        valueBefore: "true",
+                        valueAfter: "false"
+                    }
+                );
+
+            }
             
             break;
 
@@ -194,12 +216,88 @@ let changeServerSettings = function changeServerSettings(dat) {
     //設定更新
     db.dataServer.registration = dat.registration;
 
+    //監査ログへの記録処理
+    recordModeration(
+        dat.reqSender.userid,
+        {
+            type: "server",
+            userid: "",
+            channelid: "",
+            messageid: ""
+        },
+        {
+            actionname: "serverEditConfig",
+            valueBefore: "",
+            valueAfter: ""
+        }
+    );
+
     fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
 
 }
 
 //チャンネル設定の更新
 let changeChannelSettings = function changeChannelSettings(dat) {
+    //名前を変更するなら監査記録
+    if ( db.dataServer.channels[dat.targetid].name !== dat.channelname ) {
+        //監査ログへの記録処理
+        recordModeration(
+            dat.reqSender.userid,
+            {
+                type: "channel",
+                userid: "",
+                channelid: dat.targetid,
+                messageid: ""
+            },
+            {
+                actionname: "channelEditName",
+                valueBefore: db.dataServer.channels[dat.targetid].name,
+                valueAfter: dat.channelname
+            }
+        );
+
+    }
+
+    //概要を変更するなら監査記録
+    if ( db.dataServer.channels[dat.targetid].description !== dat.description ) {
+        //監査ログへの記録処理
+        recordModeration(
+            dat.reqSender.userid,
+            {
+                type: "channel",
+                userid: "",
+                channelid: dat.targetid,
+                messageid: ""
+            },
+            {
+                actionname: "channelEditDesc",
+                valueBefore: db.dataServer.channels[dat.targetid].description,
+                valueAfter: dat.description
+            }
+        );
+
+    }
+
+    //公開範囲を変更するなら監査記録
+    if ( db.dataServer.channels[dat.targetid].scope !== dat.scope ) {
+        //監査ログへの記録処理
+        recordModeration(
+            dat.reqSender.userid,
+            {
+                type: "channel",
+                userid: "",
+                channelid: dat.targetid,
+                messageid: ""
+            },
+            {
+                actionname: "channelEditScioe",
+                valueBefore: db.dataServer.channels[dat.targetid].scope,
+                valueAfter: dat.scope
+            }
+        );
+
+    }
+
     //名前と概要と公開範囲を更新
     db.dataServer.channels[dat.targetid].name = dat.channelname;
     db.dataServer.channels[dat.targetid].description = dat.description;
@@ -426,7 +524,8 @@ let channelCreate = async function channelCreate(dat) {
             dat.reqSender.userid,
             {
                 type: "channel",
-                targetid: newChannelId,
+                userid: "",
+                channelid: newChannelId,
                 messageid: ""
             },
             {
@@ -477,6 +576,23 @@ let channelRemove = function channelRemove(dat) {
         userChanged.push(userid);
 
     }
+
+    
+    //監査ログへの記録処理
+    recordModeration(
+        dat.reqSender.userid,
+        {
+            type: "channel",
+            userid: "",
+            channelid: dat.channelid,
+            messageid: ""
+        },
+        {
+            actionname: "channelDelete",
+            valueBefore: "",
+            valueAfter: ""
+        }
+    );
 
     //サーバー情報をファイルへ書き込み
     fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
