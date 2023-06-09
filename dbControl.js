@@ -568,7 +568,7 @@ let getModlog = async function getModlog(dat) {
     //もしデータ個数が最終的に10個未満ならこれでデータ全部ということを設定
     if ( dataCount<10 ) dataModlogResult.endOfData=true;
 
-    console.log("dbControl :: getModlog : データ結果->", dataModlogResult);
+    //console.log("dbControl :: getModlog : データ結果->", dataModlogResult);
 
     return dataModlogResult;
 
