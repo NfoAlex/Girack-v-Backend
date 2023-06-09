@@ -539,6 +539,23 @@ let channelRemove = function channelRemove(dat) {
 
     }
 
+    
+    //監査ログへの記録処理
+    recordModeration(
+        dat.reqSender.userid,
+        {
+            type: "channel",
+            userid: "",
+            channelid: dat.channelid,
+            messageid: ""
+        },
+        {
+            actionname: "channelDelete",
+            valueBefore: "",
+            valueAfter: ""
+        }
+    );
+
     //サーバー情報をファイルへ書き込み
     fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
     fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
