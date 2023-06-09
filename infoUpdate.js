@@ -426,7 +426,8 @@ let channelCreate = async function channelCreate(dat) {
             dat.reqSender.userid,
             {
                 type: "channel",
-                targetid: newChannelId,
+                userid: "",
+                channelid: newChannelId,
                 messageid: ""
             },
             {
