@@ -105,7 +105,8 @@ let mod = function mod(dat) {
                 dat.reqSender.userid,
                 {
                     type: "user",
-                    targetid: dat.targetid,
+                    userid: dat.targetid,
+                    channelid: "",
                     messageid: ""
                 },
                 {
@@ -308,6 +309,22 @@ let channelAction = function channelAction(dat) {
 
             console.log("infoUpdate :: channelAction : 誰かが蹴られるぜ");
 
+            //監査ログへの記録処理
+            recordModeration(
+                dat.reqSender.userid,
+                {
+                    type: "user",
+                    userid: dat.userid,
+                    channelid: dat.channelid,
+                    messageid: ""
+                },
+                {
+                    actionname: "userKickFromChannel",
+                    valueBefore: "",
+                    valueAfter: ""
+                }
+            );
+
         }
 
         //配列からチャンネルIDを削除
@@ -443,7 +460,8 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo) {
     actionTo => 変更を受けたチャンネルあるいはユーザーID
         例 : {
             type: (user|channel|message|config),
-            targetid: xxxxxxx,
+            userid: xxxxxxx, //変更に関係があるユーザーID
+            channelid: 0000000, //変更に関係があるチャンネルID
             messageid: xxxxxxxx //メッセージの場合メッセージID(それ以外だと基本空)
         }
     actionInfo => 変更内容

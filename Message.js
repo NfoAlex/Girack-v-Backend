@@ -429,7 +429,8 @@ let msgDelete = function msgDelete(dat) {
             dat.reqSender.userid,
             {
                 type: "message",
-                targetid: dataHistory[dat.messageid].userid,
+                userid: dataHistory[dat.messageid].userid,
+                channelid: dataHistory[dat.messageid].channelid,
                 messageid: dat.messageid
             },
             {
