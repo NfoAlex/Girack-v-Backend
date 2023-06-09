@@ -12,7 +12,7 @@ const e = require("express");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230607";
+const SERVER_VERSION = "alpha_20230609";
 
 const app = express();
 const server = http.createServer(app);
@@ -47,6 +47,7 @@ try{fs.mkdirSync("./files/");}catch(e){}
 try{fs.mkdirSync("./usersave/")}catch(e){}
 try{fs.mkdirSync("./record/");}catch(e){}
 try{fs.mkdirSync("./img/");}catch(e){}
+try{fs.mkdirSync("./modlog/");}catch(e){}
 
 //もしバックエンドに直接アクセスされたら用
 app.get('/', (req, res) => {
@@ -1203,6 +1204,31 @@ io.on("connection", (socket) => {
             msgReadState: userSave.msgReadState
         });
 
+    });
+
+    //監査ログの取得
+    socket.on("getModlog", async (dat) => {
+        /*
+        dat
+        {
+            startLength: 0, //メッセージの取得開始位置
+            reqSender: {
+                ...
+            }
+        }
+        */
+       
+        //パケットの整合性確認
+        if ( !checkDataIntegrality(dat, ["startLength"], "getModlog") ) return -1;
+
+        //監査ログ取得(getModlog関数は時間がかかるためasyncにしているのでawait)
+        let modLog = await db.getModlog(dat);
+
+        console.log("index :: getModlog : modLog->", modLog);
+
+        //送信
+        socket.emit("infoModlog", modLog);
+        
     });
 
     //サーバー設定の取得

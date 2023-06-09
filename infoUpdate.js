@@ -84,14 +84,49 @@ let mod = function mod(dat) {
     switch( dat.action.change ) {
         //ユーザーのロール変更
         case "role":
+            //監査ログ用
+            let roleBefore = db.dataUser.user[dat.targetid].role;
             //ロール更新
             db.dataUser.user[dat.targetid].role = dat.action.value;
+            
+            //監査ログへの記録処理
+            recordModeration(
+                dat.reqSender.userid,
+                {
+                    type: "user",
+                    userid: dat.targetid,
+                    channelid: "",
+                    messageid: ""
+                },
+                {
+                    actionname: "userChangeRole",
+                    valueBefore: roleBefore,
+                    valueAfter: dat.action.value
+                }
+            );
+            
             break;
 
         //ユーザーのBAN
         case "ban":
             console.log("infoUpdate :: mod : BANしました -> " + dat.targetid);
             db.dataUser.user[dat.targetid].state.banned = dat.action.value;
+            //監査ログへの記録処理
+            recordModeration(
+                dat.reqSender.userid,
+                {
+                    type: "user",
+                    userid: dat.targetid,
+                    channelid: "",
+                    messageid: ""
+                },
+                {
+                    actionname: "userBan",
+                    valueBefore: dat.targetid,
+                    valueAfter: "BANNED"
+                }
+            );
+            
             break;
 
         //ユーザーの削除
@@ -99,6 +134,22 @@ let mod = function mod(dat) {
             console.log("infoUpdate :: mod : 削除します -> " + dat.targetid);
             if ( sendersInfo.role !== "Admin" ) break; //Adminじゃないならここでやめる
             if ( dat.reqSender.userid === dat.targetid ) break; //送信者自身を消そうとしているならやめる
+
+            //監査ログへの記録処理
+            recordModeration(
+                dat.reqSender.userid,
+                {
+                    type: "user",
+                    userid: dat.targetid,
+                    channelid: "",
+                    messageid: ""
+                },
+                {
+                    actionname: "userDelete",
+                    valueBefore: dat.targetid,
+                    valueAfter: ""
+                }
+            );
 
             delete db.dataUser.user[dat.targetid]; //削除
             break;
@@ -293,6 +344,22 @@ let channelAction = function channelAction(dat) {
 
             console.log("infoUpdate :: channelAction : 誰かが蹴られるぜ");
 
+            //監査ログへの記録処理
+            recordModeration(
+                dat.reqSender.userid,
+                {
+                    type: "user",
+                    userid: dat.userid,
+                    channelid: dat.channelid,
+                    messageid: ""
+                },
+                {
+                    actionname: "userKickFromChannel",
+                    valueBefore: "",
+                    valueAfter: ""
+                }
+            );
+
         }
 
         //配列からチャンネルIDを削除
@@ -354,6 +421,21 @@ let channelCreate = async function channelCreate(dat) {
         //チャンネル作成者をそのまま参加させる
         db.dataUser.user[dat.reqSender.userid].channel.push(newChannelId);
     
+        //監査ログへの記録処理
+        recordModeration(
+            dat.reqSender.userid,
+            {
+                type: "channel",
+                targetid: newChannelId,
+                messageid: ""
+            },
+            {
+                actionname: "channelCreate",
+                valueBefore: "",
+                valueAfter: dat.channelname
+            }
+        );
+
         //ユーザー情報をファイルへ書き込み
         fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
@@ -405,6 +487,99 @@ let channelRemove = function channelRemove(dat) {
 
 }
 
+//監査ログへの書き込み
+let recordModeration = function recordModeration(actionBy,actionTo,actionInfo) {
+    /*
+    actionBy => 変更を起こしたユーザーID
+        例 : xxxxxx
+    actionTo => 変更を受けたチャンネルあるいはユーザーID
+        例 : {
+            type: (user|channel|message|config),
+            userid: xxxxxxx, //変更に関係があるユーザーID
+            channelid: 0000000, //変更に関係があるチャンネルID
+            messageid: xxxxxxxx //メッセージの場合メッセージID(それ以外だと基本空)
+        }
+    actionInfo => 変更内容
+        例 : {
+            actionname: "変更対象のパラメータ(下の一覧を参照)",
+            valueBefore: "asdf", //変更前
+            valueAfter: "fdsa" //変更後
+        }
+        
+    }
+
+    actionnameの一覧 => 
+        userに対して
+            userBan,
+            userPardon,
+            userDelete,
+            userChangeRole,
+            userKickFromChannel
+        
+        channelに対して
+            channelEditName,
+            channelEditDesc,
+            channelChangeScope,
+            channelCreate,
+            channelDelete
+        
+        messageに対して
+            messageDelete //メッセージ削除の場合プライバシーを考慮して変更前と変更後の値は空にする
+        
+        serverに対して //serverの場合targetidは空に
+            serverEditName,
+            serverEditConfig
+    */
+
+    //日付別にJSONファイルを書き込むため
+    let t = new Date();  // 正しいコード
+    //日付
+    let tY = t.getFullYear();
+    let tM = (t.getMonth()+1).toString().padStart(2,0);
+    let tD = t.getDate().toString().padStart(2,0);
+    let tTime = t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0) + t.getSeconds().toString().padStart(2,0);
+    let tDateForName = tY + "_" +  tM + "_" + tD;
+
+    //変更ID(actionId)用
+    let fullDate = tY+tM+tD+tTime;
+    
+    //JSONのファイル名
+    let nameOfJson = "modlog_" + tDateForName;
+    //監査ログを書きこむJSONファイルのディレクトリ
+    let pathOfJson = "./modlog/" + nameOfJson + ".json";
+
+    //JSONファイルを開いてみて、いけたらそのまま読み込んで処理、なかったら作る
+    try { //JSONの存在確認
+        //ファイルを読み込んでみる(使いはしない、存在を確認するだけ)
+        fs.statSync(pathOfJson);
+    } catch(err) { //存在無しなら(読み込みエラーなら)
+        //空のJSONを作成
+        fs.writeFileSync(pathOfJson, "{}"); //DBをJSONで保存
+    }
+
+    //監査ログを読み込み
+    let dataModlog = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8'));
+
+    //変更の記録処理
+    try {
+        //この変更そのものを判別するためのID
+        let actionId = [fullDate,Object.keys(dataModlog).length+1].join("");
+        //JSONへデータ追加
+        dataModlog[ actionId ] = {
+            actionId: actionId,
+            actionBy: actionBy,
+            actionTo: actionTo,
+            actionInfo: actionInfo
+        };
+    } catch(e) {
+        return -1;
+    }
+
+    //JSONファイルを保存
+    fs.writeFileSync(pathOfJson, JSON.stringify(dataModlog, null, 4));
+
+}
+
 exports.config = config;
 exports.mod = mod; //管理者からのユーザー管理
 exports.changeServerSettings = changeServerSettings; //サーバーの設定変更
@@ -415,3 +590,4 @@ exports.updateUserSaveMsgReadState = updateUserSaveMsgReadState; //ユーザー�
 exports.channelAction = channelAction; //チャンネルの参加・退出
 exports.channelCreate = channelCreate; //チャンネル作成
 exports.channelRemove = channelRemove; //チャンネル削除
+exports.recordModeration = recordModeration; //監査ログを書き込む関数

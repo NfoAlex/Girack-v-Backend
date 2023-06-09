@@ -80,8 +80,6 @@ try { //読み込んでみる
     dataServer = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
 }
 
-//let dataRole = JSON.parse(fs.readFileSync('./role.json', 'utf-8')); //ロールのJSON読み込み
-
 //起動したときに全員をオフライン状態にする
 for ( let index in Object.keys(dataUser.user) ) {
     let userid = Object.keys(dataUser.user)[index]; //ユーザーIDを取得
@@ -505,6 +503,87 @@ let getUserSave = function getUserSave(dat) {
 
 }
 
+//監査ログの取得
+let getModlog = async function getModlog(dat) {
+    //JSONファイル一覧を格納する変数
+    let ListOfJson = [];
+
+    //JSONファイルの一覧を取得
+    try {
+        ListOfJson = await new Promise((resolve) => { //取得が完了するまで処理を待つ
+            //読み込み
+            fs.readdir("./modlog/", (err, files) => {
+                ListOfJson = files; //ファイルの名前取得
+                resolve(); //処理を終了、次の処理へ
+
+            });
+
+        }).then(() => {
+            //追加された順だと古い順なので
+            return ListOfJson.reverse();
+
+        });
+    } catch(e) { //一覧がとれなかったら失敗と返す
+        return -1;
+    }
+    
+    //データを確認した回数
+    let dataCheckedCount = 0;
+    //取り出したデータの個数(デフォルトで１回に10個まで取り出すようにする)
+    let dataSavedCount = 0;
+
+    //送信する監査ログデータ
+    let dataModlogResult = {
+        endOfData: false,
+        data: []
+    };
+
+    //それぞれのJSONファイルからデータを取得して配列に追加
+    for ( let jsonIndex in ListOfJson) {
+        //監査ログを取り出し
+        let dataModlog = JSON.parse(fs.readFileSync("./modlog/"+ListOfJson[jsonIndex]));
+
+        //JSONの長さ
+        let jsonLength = Object.keys(dataModlog).length;
+
+        //JSONのデータの長さ文ループして送信するデータ配列へ追加
+        for ( let itemIndex=0; itemIndex<jsonLength; itemIndex++ ) {
+            //データ個数が10個あるなら切る
+            if ( dataSavedCount>=10 ) break;
+
+            //もしデータ取得位置がデータ確認回数と同じならデータの追加をする
+            if ( dataCheckedCount >= dat.startLength ) {
+
+                //追加
+                dataModlogResult.data.push(
+                    Object.entries(dataModlog)[itemIndex][1]
+                );
+
+                //データ個数をカウント
+                dataSavedCount++;
+
+            }
+
+            //データ確認回数をカウント
+            dataCheckedCount++;
+
+        }
+
+        //次のJSON読み込む前に念のため確認
+        if ( dataSavedCount>=10 ) break;
+
+    }
+
+    //もしデータ個数が最終的に10個未満ならこれでデータ全部ということを設定
+    if ( dataSavedCount<10 ) dataModlogResult.endOfData=true;
+
+    //上から新しい順に出すために逆順番にして返す
+    dataModlogResult.data = dataModlogResult.data.reverse();
+    return dataModlogResult;
+
+
+}
+
 //サーバーの設定情報を取得
 let getServerSettings = function getServerSettings(dat) {
     let sendersInfo = getInfoUser({
@@ -542,6 +621,7 @@ exports.getInfoChannelJoinedUserList = getInfoChannelJoinedUserList; //チャン
 exports.getInfoList = getInfoList; //チャンネルリストの取得
 exports.searchUserDynamic = searchUserDynamic; //ユーザーを検索する関数
 exports.getUserSave = getUserSave; //ユーザーの個人データ(設定や既読状態)を取得
+exports.getModlog = getModlog; //監査ログを取得
 exports.getServerSettings = getServerSettings; //サーバーの詳細設定を取得
 exports.getInitInfo = getInitInfo; //サーバーの初期情報
 

@@ -1,9 +1,9 @@
-//msg_server.js
 //メッセージ関連
 
 const fs = require('fs'); //履歴書き込んだり読み込むために
 const { getLinkPreview } = require("link-preview-js");
 const indexjs = require("./index.js");
+const infoUpdate = require("./infoUpdate.js");
 
 //URLプレビュー時のリダイレクト用URLのブロック対象にならないリスト
 const knownRedirectUrls = [
@@ -125,11 +125,11 @@ let msgMix = function msgMix(m) {
 
     }
 
+    //返信をしているなら
     try {
-        //もし返信なら
+        //データに返信先の文章を追加
         if ( m.replyData.isReplying ) {
             let msg = getMessage(m.channelid, m.replyData.messageid);
-            console.log("Message :: msgMix : 返信だね", msg);
             m.replyData.content = msg.content;
             m.replyData.userid = msg.userid;
 
@@ -422,12 +422,32 @@ let msgDelete = function msgDelete(dat) {
         return -1;
     }
 
+    //送信者と削除する人が同じじゃなければ監査ログへ書き込む
+    if ( dat.reqSender.userid !== dataHistory[dat.messageid].userid ) {
+        //記録処理
+        infoUpdate.recordModeration(
+            dat.reqSender.userid,
+            {
+                type: "message",
+                userid: dataHistory[dat.messageid].userid,
+                channelid: dataHistory[dat.messageid].channelid,
+                messageid: dat.messageid
+            },
+            {
+                actionname: "messageDelete",
+                valueBefore: "",
+                valueAfter: ""
+            }
+        );
+
+    }
+
     //削除!
     delete dataHistory[dat.messageid];
 
     //書き込み
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
-    
+
     //返す結果用に履歴を取得
     //let result = msgRecordCall(dat.channelid, 10);
     let result = {
@@ -612,6 +632,7 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
     let dirOfJson = "./record/" + cid;
     let readCount = 0;
 
+    //startLengthが空なら最初から読むように
     if ( startLength === undefined ) { startLength = 0; }
 
     try {
