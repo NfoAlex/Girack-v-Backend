@@ -1222,10 +1222,11 @@ io.on("connection", (socket) => {
         if ( !checkDataIntegrality(dat, ["startLength"], "getModlog") ) return -1;
 
         //監査ログ取得
-        let modLog = dbControl.getModlog(dat);
+        let modLog = db.getModlog(dat);
 
         //送信
         socket.emit("infoModlog", modLog);
+        
     });
 
     //サーバー設定の取得
