@@ -109,23 +109,45 @@ let mod = function mod(dat) {
 
         //ユーザーのBAN
         case "ban":
-            console.log("infoUpdate :: mod : BANしました -> " + dat.targetid);
+            console.log("infoUpdate :: mod : BAN状態を更新 -> " + dat.targetid);
+            //BAN状態を更新
             db.dataUser.user[dat.targetid].state.banned = dat.action.value;
-            //監査ログへの記録処理
-            recordModeration(
-                dat.reqSender.userid,
-                {
-                    type: "user",
-                    userid: dat.targetid,
-                    channelid: "",
-                    messageid: ""
-                },
-                {
-                    actionname: "userBan",
-                    valueBefore: dat.targetid,
-                    valueAfter: "BANNED"
-                }
-            );
+            //BAN状態に応じて監査ログへの記録
+            if ( dat.action.value ) {
+                //監査ログへの記録処理
+                recordModeration(
+                    dat.reqSender.userid,
+                    {
+                        type: "user",
+                        userid: dat.targetid,
+                        channelid: "",
+                        messageid: ""
+                    },
+                    {
+                        actionname: "userBan",
+                        valueBefore: "false",
+                        valueAfter: "true"
+                    }
+                );
+
+            } else {
+                //監査ログへの記録処理
+                recordModeration(
+                    dat.reqSender.userid,
+                    {
+                        type: "user",
+                        userid: dat.targetid,
+                        channelid: "",
+                        messageid: ""
+                    },
+                    {
+                        actionname: "userPardon",
+                        valueBefore: "true",
+                        valueAfter: "false"
+                    }
+                );
+
+            }
             
             break;
 
