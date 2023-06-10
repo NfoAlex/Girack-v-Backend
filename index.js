@@ -12,7 +12,7 @@ const e = require("express");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230609";
+const SERVER_VERSION = "alpha_20230611";
 
 const app = express();
 const server = http.createServer(app);
@@ -1223,8 +1223,6 @@ io.on("connection", (socket) => {
 
         //監査ログ取得(getModlog関数は時間がかかるためasyncにしているのでawait)
         let modLog = await db.getModlog(dat);
-
-        console.log("index :: getModlog : modLog->", modLog);
 
         //送信
         socket.emit("infoModlog", modLog);

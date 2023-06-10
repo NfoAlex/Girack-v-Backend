@@ -534,14 +534,19 @@ let getModlog = async function getModlog(dat) {
 
     //送信する監査ログデータ
     let dataModlogResult = {
-        endOfData: false,
-        data: []
+        endOfData: false, //監査ログの終わりまで入れたってことを示す
+        data: [] //監査ログのデータいれるところ
     };
+
+    //JSONファイルごとの監査ログ(一時的変数)
+    let dataModlogEachJson = [];
 
     //それぞれのJSONファイルからデータを取得して配列に追加
     for ( let jsonIndex in ListOfJson) {
-        //監査ログを取り出し
+        //監査ログJSONを取り出し
         let dataModlog = JSON.parse(fs.readFileSync("./modlog/"+ListOfJson[jsonIndex]));
+        //監査ログのデータを配列化
+        let objModlog = Object.entries(dataModlog);
 
         //JSONの長さ
         let jsonLength = Object.keys(dataModlog).length;
@@ -549,14 +554,18 @@ let getModlog = async function getModlog(dat) {
         //JSONのデータの長さ文ループして送信するデータ配列へ追加
         for ( let itemIndex=0; itemIndex<jsonLength; itemIndex++ ) {
             //データ個数が10個あるなら切る
-            if ( dataSavedCount>=10 ) break;
+            if ( dataSavedCount>=10 ) {
+                //処理を終える前に一時的配列の順番を新しい順にするために逆にしてから本配列へ追加
+                dataModlogResult.data = dataModlogResult.data.concat(dataModlogEachJson.reverse());
+                break;
+
+            }
 
             //もしデータ取得位置がデータ確認回数と同じならデータの追加をする
             if ( dataCheckedCount >= dat.startLength ) {
-
-                //追加
-                dataModlogResult.data.push(
-                    Object.entries(dataModlog)[itemIndex][1]
+                //データ追加
+                dataModlogEachJson.push(
+                    objModlog[itemIndex][1]
                 );
 
                 //データ個数をカウント
@@ -572,15 +581,17 @@ let getModlog = async function getModlog(dat) {
         //次のJSON読み込む前に念のため確認
         if ( dataSavedCount>=10 ) break;
 
+        //次ファイルに行く前に配列の順番を新しい順にしてから本配列に追加
+        dataModlogResult.data = dataModlogResult.data.concat(dataModlogEachJson.reverse());
+        //ファイルごと用の監査ログデータ配列を初期化
+        dataModlogEachJson = [];
+
     }
 
     //もしデータ個数が最終的に10個未満ならこれでデータ全部ということを設定
     if ( dataSavedCount<10 ) dataModlogResult.endOfData=true;
 
-    //上から新しい順に出すために逆順番にして返す
-    dataModlogResult.data = dataModlogResult.data.reverse();
     return dataModlogResult;
-
 
 }
 
