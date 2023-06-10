@@ -570,6 +570,9 @@ let getModlog = async function getModlog(dat) {
 
         }
 
+        //次ファイルに行く前に配列の順番を新しい順にするために逆にしておく
+        dataModlogResult.data = dataModlogResult.data.reverse();
+
         //次のJSON読み込む前に念のため確認
         if ( dataSavedCount>=10 ) break;
 
@@ -581,7 +584,6 @@ let getModlog = async function getModlog(dat) {
     //上から新しい順に出すために逆順番にして返す
     dataModlogResult.data = dataModlogResult.data.reverse();
     return dataModlogResult;
-
 
 }
 
