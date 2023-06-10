@@ -534,14 +534,16 @@ let getModlog = async function getModlog(dat) {
 
     //送信する監査ログデータ
     let dataModlogResult = {
-        endOfData: false,
-        data: []
+        endOfData: false, //監査ログの終わりまで入れたってことを示す
+        data: [] //監査ログのデータいれるところ
     };
 
     //それぞれのJSONファイルからデータを取得して配列に追加
     for ( let jsonIndex in ListOfJson) {
-        //監査ログを取り出し
+        //監査ログJSONを取り出し
         let dataModlog = JSON.parse(fs.readFileSync("./modlog/"+ListOfJson[jsonIndex]));
+        //監査ログのデータを配列化
+        let objModlog = Object.keys(dataModlog);
 
         //JSONの長さ
         let jsonLength = Object.keys(dataModlog).length;
@@ -553,10 +555,9 @@ let getModlog = async function getModlog(dat) {
 
             //もしデータ取得位置がデータ確認回数と同じならデータの追加をする
             if ( dataCheckedCount >= dat.startLength ) {
-
-                //追加
+                //データ追加
                 dataModlogResult.data.push(
-                    Object.entries(dataModlog)[itemIndex][1]
+                    objModlog[itemIndex][1]
                 );
 
                 //データ個数をカウント
