@@ -543,7 +543,7 @@ let getModlog = async function getModlog(dat) {
         //監査ログJSONを取り出し
         let dataModlog = JSON.parse(fs.readFileSync("./modlog/"+ListOfJson[jsonIndex]));
         //監査ログのデータを配列化
-        let objModlog = Object.keys(dataModlog);
+        let objModlog = Object.entries(dataModlog);
 
         //JSONの長さ
         let jsonLength = Object.keys(dataModlog).length;
