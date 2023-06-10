@@ -1224,8 +1224,6 @@ io.on("connection", (socket) => {
         //監査ログ取得(getModlog関数は時間がかかるためasyncにしているのでawait)
         let modLog = await db.getModlog(dat);
 
-        console.log("index :: getModlog : modLog->", modLog);
-
         //送信
         socket.emit("infoModlog", modLog);
         
