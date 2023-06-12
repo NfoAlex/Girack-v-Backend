@@ -618,7 +618,8 @@ let getServerSettings = function getServerSettings(dat) {
     //情報収集、設定
     let ServerSettings = {
         servername: dataServer.servername,
-        registration: dataServer.registration
+        registration: dataServer.registration,
+        config: dataServer.config
     };
 
     return ServerSettings;
