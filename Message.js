@@ -182,8 +182,6 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
     let dataHistory = {};
 
-    //fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
-
     console.log("Message :: addUrlPreview : これからプレビュー生成");
 
     //URLプレビュー用JSON変数
