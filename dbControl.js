@@ -529,7 +529,7 @@ let getModlog = async function getModlog(dat) {
     
     //データを確認した回数
     let dataCheckedCount = 0;
-    //取り出したデータの個数(デフォルトで１回に10個まで取り出すようにする)
+    //取り出したデータの個数(デフォルトで１回に30個まで取り出すようにする)
     let dataSavedCount = 0;
 
     //送信する監査ログデータ
@@ -554,7 +554,7 @@ let getModlog = async function getModlog(dat) {
         //JSONのデータの長さ文ループして送信するデータ配列へ追加
         for ( let itemIndex=0; itemIndex<jsonLength; itemIndex++ ) {
             //データ個数が10個あるなら切る
-            if ( dataSavedCount>=10 ) {
+            if ( dataSavedCount>=30 ) {
                 //処理を終える前に一時的配列の順番を新しい順にするために逆にしてから本配列へ追加
                 dataModlogResult.data = dataModlogResult.data.concat(dataModlogEachJson.reverse());
                 break;
@@ -579,7 +579,7 @@ let getModlog = async function getModlog(dat) {
         }
 
         //次のJSON読み込む前に念のため確認
-        if ( dataSavedCount>=10 ) break;
+        if ( dataSavedCount>=30 ) break;
 
         //次ファイルに行く前に配列の順番を新しい順にしてから本配列に追加
         dataModlogResult.data = dataModlogResult.data.concat(dataModlogEachJson.reverse());
@@ -589,7 +589,7 @@ let getModlog = async function getModlog(dat) {
     }
 
     //もしデータ個数が最終的に10個未満ならこれでデータ全部ということを設定
-    if ( dataSavedCount<10 ) dataModlogResult.endOfData=true;
+    if ( dataSavedCount<30 ) dataModlogResult.endOfData=true;
 
     return dataModlogResult;
 
