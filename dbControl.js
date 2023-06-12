@@ -610,7 +610,7 @@ let getModlog = async function getModlog(dat) {
 }
 
 //サーバーの設定情報を取得
-let getInfoServer = function getServerSettings(dat) {
+let getInfoServer = function getServerSettings() {
     //サーバー情報を構成
     let ServerSettings = {
         servername: dataServer.servername,
