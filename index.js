@@ -319,7 +319,7 @@ io.on("connection", (socket) => {
         socket.emit("infoServerSettings", serverSettings);
 
         //現在のサーバー情報を全員に通達
-        io.to("loggedin").emit("serverinfo", initInfo);
+        //io.to("loggedin").emit("infoServer", initInfo);
 
     });
 
@@ -1229,44 +1229,14 @@ io.on("connection", (socket) => {
         
     });
 
-    //サーバー設定の取得
-    socket.on("getServerSettings", (dat) => {
-        /*
-        dat
-        {
-            reqSender: {
-                userid: userid
-                sessionid: sessionid
-            }
-        }
-        */
-
-        let serverSettings = {};
-
-        if ( !checkDataIntegrality(dat, [], "getServerSettings") ) {
-            return -1;
-
-        }
-
+    //サーバー情報の送信
+    socket.on("getInfoServer", () => {
         //セッションが適合か確認
-        serverSettings = db.getServerSettings(dat); //情報収集
+        serverSettings = db.getInfoServer(); //情報収集
+        serverSettings.serverVersion = SERVER_VERSION; //バージョン情報をつける
 
         //情報送信
-        socket.emit("infoServerSettings", serverSettings);
-
-    });
-
-    //初期情報(ログイン前)の送信
-    socket.on("getInitInfo", () => {
-        //let initInfo = db.getInitInfo();
-        let initInfo = {
-            servername: db.dataServer.servername, //サーバー名
-            registerAvailable: db.dataServer.registration.available, //登録可能かどうか
-            inviteOnly: db.dataServer.registration.invite.inviteOnly,
-            serverVersion: SERVER_VERSION //招待制かどうか
-        };
-
-        socket.emit("infoServer", initInfo);
+        socket.emit("infoServer", serverSettings);
 
     });
 

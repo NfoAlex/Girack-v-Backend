@@ -610,20 +610,13 @@ let getModlog = async function getModlog(dat) {
 }
 
 //サーバーの設定情報を取得
-let getServerSettings = function getServerSettings(dat) {
-    let sendersInfo = getInfoUser({
-        targetid: dat.reqSender.userid,
-        reqSender: dat.reqSender
-    });
-
-    //権限チェック
-    if ( sendersInfo.role !== "Admin" ) { return; }
-
-    //情報収集、設定
+let getInfoServer = function getServerSettings(dat) {
+    //サーバー情報を構成
     let ServerSettings = {
         servername: dataServer.servername,
         registration: dataServer.registration,
-        config: dataServer.config
+        config: dataServer.config,
+        serverVersion: ""
     };
 
     return ServerSettings;
@@ -648,7 +641,7 @@ exports.getInfoList = getInfoList; //チャンネルリストの取得
 exports.searchUserDynamic = searchUserDynamic; //ユーザーを検索する関数
 exports.getUserSave = getUserSave; //ユーザーの個人データ(設定や既読状態)を取得
 exports.getModlog = getModlog; //監査ログを取得
-exports.getServerSettings = getServerSettings; //サーバーの詳細設定を取得
+exports.getInfoServer = getInfoServer; //サーバーの詳細設定を取得
 exports.getInitInfo = getInitInfo; //サーバーの初期情報
 
 exports.dataServer = dataServer; //サーバー情報
