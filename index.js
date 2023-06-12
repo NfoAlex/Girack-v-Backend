@@ -404,10 +404,10 @@ io.on("connection", (socket) => {
         //データ型を調べる
         if ( !checkDataIntegrality(dat, paramRequire, "changeProfileIcon") ) return;
 
-        //もしJPEGかGIFじゃないなら拒否
+        //もしJPEGかGIFじゃないなら、またファイルサイズ制限に引っかかったら拒否
         if (
             !["image/jpeg","image/gif","image/png"].includes(dat.fileData.type) ||
-            dat.fileData.size > 3072000
+            dat.fileData.size > db.dataServer.config.MESSAGE.MESSAGE_FILE_MAXSIZE
         ) {
             console.log("このアイコン無理だわ");
             return -1;
