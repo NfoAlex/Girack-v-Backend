@@ -229,16 +229,6 @@ io.on("connection", (socket) => {
 
     });
 
-    //ファイルアップロードデモ
-    socket.on("uploadFile", (files, callback) => {
-        fs.writeFile("./files/"+files.name, files.fileData, (err) => {
-            console.log("error->", err);
-            callback({ message: err ? "failure" : "success" });
-
-        });
-
-    });
-
 // ===========================================================
 // ユーザーとサーバーの情報更新管理
 
