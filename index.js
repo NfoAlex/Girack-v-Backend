@@ -315,7 +315,7 @@ io.on("connection", (socket) => {
         let serverSettings = db.getInfoServer(dat);
 
         //現在のサーバー設定を送信
-        socket.emit("infoServerSettings", serverSettings);
+        io.emit("infoServerSettings", serverSettings);
 
         //現在のサーバー情報を全員に通達
         //io.to("loggedin").emit("infoServer", initInfo);
