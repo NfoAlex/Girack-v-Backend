@@ -312,8 +312,7 @@ io.on("connection", (socket) => {
 
         }
 
-        let initInfo = db.getInitInfo();
-        let serverSettings = db.getServerSettings(dat);
+        let serverSettings = db.getInfoServer(dat);
 
         //現在のサーバー設定を送信
         socket.emit("infoServerSettings", serverSettings);
