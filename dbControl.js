@@ -67,6 +67,16 @@ try { //読み込んでみる
             "inviteCode": ""
         }
     },
+    "config": {
+        "profile": {
+            "PROFILE_ICON_MAXSIZE": "1e6",
+            "PROFILE_USERNAME_MAXLENGTH": "32"
+        },
+        "message": {
+            "MESSAGE_TXT_MAXLENGTH": "250",
+            "MESSAGE_FILE_MAXSIZE": "5e7"
+        }
+    },
     "channels": {
         "0001": {
             "name": "random",
