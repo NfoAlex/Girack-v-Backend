@@ -227,12 +227,9 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
         console.log(e);
         console.log("\n");
 
-        //URLをなかったことにしてフロントで読み込ませない
-        //dataHistory[msgId].hasUrl = false;
+        //エラーがあったと設定
         errorPreviewing = true;
 
-        //書き込み
-        fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
         return -1; //関数を終わらせる
     }
 
