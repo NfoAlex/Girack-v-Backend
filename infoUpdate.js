@@ -191,12 +191,16 @@ let mod = function mod(dat) {
 let changeServerSettings = function changeServerSettings(dat) {
     /*
     dat
+    servername: "aaa",
     registration: {
         available: this.displaySettings.registerAvailable,
         invite: {
             inviteOnly: this.displaySettings.inviteOnly,
             inviteCode: this.displaySettings.inviteCode
         }
+    },
+    config: {
+        ...
     },
     reqSender: {
         userid: Userinfo.userid,
@@ -213,8 +217,12 @@ let changeServerSettings = function changeServerSettings(dat) {
     //権限チェック
     if ( sendersInfo.role !== "Admin" ) { return; }
 
-    //設定更新
+    //インスタンスのアカウント登録設定を更新
     db.dataServer.registration = dat.registration;
+    //インスタンス名の更新
+    db.dataServer.servername = dat.servername;
+    //インスタンス設定をマージ
+    db.dataServer.config = [...db.dataServer.config, ...dat.config];
 
     //監査ログへの記録処理
     recordModeration(
@@ -232,6 +240,7 @@ let changeServerSettings = function changeServerSettings(dat) {
         }
     );
 
+    //書き込み
     fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
 
 }
