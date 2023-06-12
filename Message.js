@@ -43,7 +43,7 @@ let msgMix = function msgMix(m) {
     //メッセージがそもそも有効なものかどうか
     if (
         m.content === undefined ||
-        m.content.length > db.getInfoServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH || //長さがサーバー規定を超えてるなら
+        m.content.length > db.dataServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH || //長さがサーバー規定を超えてるなら
         ( m.content.includes("<img") && m.content.includes("onerror") ) || //XSS避け
         ( m.content.length === 0 && !m.fileData.isAttatched ) || //長さが0だったら
         ( m.content.replace(/　/g,"").length === 0 && !m.fileData.isAttatched ) || //添付ファイルがなく、空白だけのメッセージだった時用
