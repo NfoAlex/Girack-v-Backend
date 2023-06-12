@@ -72,6 +72,10 @@ try { //読み込んでみる
             "PROFILE_ICON_MAXSIZE": "1e6",
             "PROFILE_USERNAME_MAXLENGTH": "32"
         },
+        "channel": {
+            "CHANNEL_CREATE_AVAILABLE": true,
+            "CHANNEL_DELETE_AVAILABLEFORMEMBER": true
+        },
         "message": {
             "MESSAGE_TXT_MAXLENGTH": "250",
             "MESSAGE_FILE_MAXSIZE": "5e7"
