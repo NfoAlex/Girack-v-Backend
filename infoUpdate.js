@@ -301,7 +301,7 @@ let changeChannelSettings = function changeChannelSettings(dat) {
                 messageid: ""
             },
             {
-                actionname: "channelEditScioe",
+                actionname: "channelEditScope",
                 valueBefore: db.dataServer.channels[dat.targetid].scope,
                 valueAfter: dat.scope
             }
@@ -646,7 +646,7 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo) {
         channelに対して
             channelEditName,
             channelEditDesc,
-            channelChangeScope,
+            channelEditScope,
             channelCreate,
             channelDelete
         
