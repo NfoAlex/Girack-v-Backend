@@ -1,6 +1,7 @@
 //メッセージ関連
 
 const fs = require('fs'); //履歴書き込んだり読み込むために
+const db = require("./dbControl.js"); //データベース関連
 const { getLinkPreview } = require("link-preview-js");
 const indexjs = require("./index.js");
 const infoUpdate = require("./infoUpdate.js");
@@ -42,7 +43,7 @@ let msgMix = function msgMix(m) {
     //メッセージがそもそも有効なものかどうか
     if (
         m.content === undefined ||
-        m.content.length > 250 || //長さが250文字を超えてるなら
+        m.content.length > db.dataServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH || //長さがサーバー規定を超えてるなら
         ( m.content.includes("<img") && m.content.includes("onerror") ) || //XSS避け
         ( m.content.length === 0 && !m.fileData.isAttatched ) || //長さが0だったら
         ( m.content.replace(/　/g,"").length === 0 && !m.fileData.isAttatched ) || //添付ファイルがなく、空白だけのメッセージだった時用
@@ -155,7 +156,7 @@ let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePat
     //ファイルの書き込み(複数の書き込み用にfor)
     for ( let index in fileData.attatchmentData ) {
         //ファイルサイズが大きかったら書き込まない
-        if ( fileData.attatchmentData[index].size >= 100000000 ) {
+        if ( fileData.attatchmentData[index].size >= db.dataServer.config.MESSAGE.MESSAGE_FILE_MAXSIZE ) {
             console.log("このファイルのサイズが大きい");
         
         } else {
@@ -181,8 +182,6 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
 
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
     let dataHistory = {};
-
-    //fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
 
     console.log("Message :: addUrlPreview : これからプレビュー生成");
 

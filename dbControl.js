@@ -67,6 +67,20 @@ try { //読み込んでみる
             "inviteCode": ""
         }
     },
+    "config": {
+        "PROFILE": {
+            "PROFILE_ICON_MAXSIZE": "1e6",
+            "PROFILE_USERNAME_MAXLENGTH": "32"
+        },
+        "CHANNEL": {
+            "CHANNEL_CREATE_AVAILABLE": true,
+            "CHANNEL_DELETE_AVAILABLEFORMEMBER": true
+        },
+        "MESSAGE": {
+            "MESSAGE_TXT_MAXLENGTH": "250",
+            "MESSAGE_FILE_MAXSIZE": "5e7"
+        }
+    },
     "channels": {
         "0001": {
             "name": "random",
@@ -596,19 +610,13 @@ let getModlog = async function getModlog(dat) {
 }
 
 //サーバーの設定情報を取得
-let getServerSettings = function getServerSettings(dat) {
-    let sendersInfo = getInfoUser({
-        targetid: dat.reqSender.userid,
-        reqSender: dat.reqSender
-    });
-
-    //権限チェック
-    if ( sendersInfo.role !== "Admin" ) { return; }
-
-    //情報収集、設定
+let getInfoServer = function getServerSettings() {
+    //サーバー情報を構成
     let ServerSettings = {
         servername: dataServer.servername,
-        registration: dataServer.registration
+        registration: dataServer.registration,
+        config: dataServer.config,
+        serverVersion: ""
     };
 
     return ServerSettings;
@@ -633,7 +641,7 @@ exports.getInfoList = getInfoList; //チャンネルリストの取得
 exports.searchUserDynamic = searchUserDynamic; //ユーザーを検索する関数
 exports.getUserSave = getUserSave; //ユーザーの個人データ(設定や既読状態)を取得
 exports.getModlog = getModlog; //監査ログを取得
-exports.getServerSettings = getServerSettings; //サーバーの詳細設定を取得
+exports.getInfoServer = getInfoServer; //サーバーの詳細設定を取得
 exports.getInitInfo = getInitInfo; //サーバーの初期情報
 
 exports.dataServer = dataServer; //サーバー情報

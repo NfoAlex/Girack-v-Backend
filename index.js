@@ -229,16 +229,6 @@ io.on("connection", (socket) => {
 
     });
 
-    //ファイルアップロードデモ
-    socket.on("uploadFile", (files, callback) => {
-        fs.writeFile("./files/"+files.name, files.fileData, (err) => {
-            console.log("error->", err);
-            callback({ message: err ? "failure" : "success" });
-
-        });
-
-    });
-
 // ===========================================================
 // ユーザーとサーバーの情報更新管理
 
@@ -312,14 +302,11 @@ io.on("connection", (socket) => {
 
         }
 
-        let initInfo = db.getInitInfo();
-        let serverSettings = db.getServerSettings(dat);
+        let serverSettings = db.getInfoServer(dat);
+        serverSettings.serverVersion = SERVER_VERSION;
 
-        //現在のサーバー設定を送信
-        socket.emit("infoServerSettings", serverSettings);
-
-        //現在のサーバー情報を全員に通達
-        io.to("loggedin").emit("serverinfo", initInfo);
+        //現在のサーバー設定を全員に送信
+        io.emit("infoServer", serverSettings);
 
     });
 
@@ -417,10 +404,10 @@ io.on("connection", (socket) => {
         //データ型を調べる
         if ( !checkDataIntegrality(dat, paramRequire, "changeProfileIcon") ) return;
 
-        //もしJPEGかGIFじゃないなら拒否
+        //もしJPEGかGIFじゃないなら、またファイルサイズ制限に引っかかったら拒否
         if (
             !["image/jpeg","image/gif","image/png"].includes(dat.fileData.type) ||
-            dat.fileData.size > 3072000
+            dat.fileData.size > db.dataServer.config.MESSAGE.MESSAGE_FILE_MAXSIZE
         ) {
             console.log("このアイコン無理だわ");
             return -1;
@@ -1229,44 +1216,14 @@ io.on("connection", (socket) => {
         
     });
 
-    //サーバー設定の取得
-    socket.on("getServerSettings", (dat) => {
-        /*
-        dat
-        {
-            reqSender: {
-                userid: userid
-                sessionid: sessionid
-            }
-        }
-        */
-
-        let serverSettings = {};
-
-        if ( !checkDataIntegrality(dat, [], "getServerSettings") ) {
-            return -1;
-
-        }
-
+    //サーバー情報の送信
+    socket.on("getInfoServer", () => {
         //セッションが適合か確認
-        serverSettings = db.getServerSettings(dat); //情報収集
+        serverSettings = db.getInfoServer(); //情報収集
+        serverSettings.serverVersion = SERVER_VERSION; //バージョン情報をつける
 
         //情報送信
-        socket.emit("infoServerSettings", serverSettings);
-
-    });
-
-    //初期情報(ログイン前)の送信
-    socket.on("getInitInfo", () => {
-        //let initInfo = db.getInitInfo();
-        let initInfo = {
-            servername: db.dataServer.servername, //サーバー名
-            registerAvailable: db.dataServer.registration.available, //登録可能かどうか
-            inviteOnly: db.dataServer.registration.invite.inviteOnly,
-            serverVersion: SERVER_VERSION //招待制かどうか
-        };
-
-        socket.emit("infoServer", initInfo);
+        socket.emit("infoServer", serverSettings);
 
     });
 
