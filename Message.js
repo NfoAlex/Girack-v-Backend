@@ -396,8 +396,8 @@ let msgDelete = function msgDelete(dat) {
         }
     }
     */
-   console.log("Message :: msgDelete : これから削除");
-   console.log(dat);
+    console.log("Message :: msgDelete : これから削除");
+    console.log(dat);
 
     let t = new Date(); //履歴に時間を追加する用
 
@@ -407,7 +407,7 @@ let msgDelete = function msgDelete(dat) {
     //メッセージを送るチャンネルの履歴データのディレクトリ
     let pathOfJson = "./record/" + dat.channelid + "/" + fulldate + ".json";
     let dataHistory = {};
-    console.log("Message :: msgDelete : 消そうとしているjson -> " + pathOfJson);
+    //console.log("Message :: msgDelete : 消そうとしているjson -> " + pathOfJson);
 
     //データ取り出し
     try{
@@ -416,6 +416,43 @@ let msgDelete = function msgDelete(dat) {
     }
     catch(e) { //エラーなら中止
         return -1;
+    }
+
+    //もし添付ファイルがあればファイルを削除
+    if ( dataHistory[dat.messageid].fileData.isAttatched ) {
+        let fileDatas = []; //ファイルデータ取り込み
+        let fileidPathName = ""; //欲しいファイルインデックスのパス
+        let fileidIndex = {}; //ファイルインデックスのデータ
+
+        //削除処理開始
+        try {
+            fileDatas = dataHistory[dat.messageid].fileData.attatchmentData;
+            console.log("Messages :: msgDelete : fileid->",dataHistory[dat.messageid].fileData.attatchmentData);
+            //ファイルIDからJSON名を取得(日付は複数ファイルでも同じになるはずなのでとりあえず最初を参照)
+            fileidPathName = fileDatas[0].fileid.slice(0,4) + "_" + fileDatas[0].fileid.slice(4,6) + "_" + fileDatas[0].fileid.slice(6,8);
+            //ファイルインデックスを取得
+            fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + dat.channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+
+            //ファイルの数だけ処理
+            for ( let index in fileDatas ) {
+                //ファイル削除
+                fs.unlink(__dirname + "/files/" + dat.channelid + "/" + fileidPathName + "/" + fileidIndex[fileDatas[index].fileid].name, (err) => {
+                    //エラー用
+                    if ( err ) console.log(err);
+                    console.log("file action taken with JPEG");
+
+                });
+                //ファイルインデックスJSONからIDを削除
+                delete fileidIndex[fileDatas[index].fileid];
+
+            }
+
+            //ファイルインデックスを書き込み
+            fs.writeFileSync('./fileidIndex/' + dat.channelid + '/' + fileidPathName + '.json', JSON.stringify(fileidIndex, null, 4));
+        } catch(e) {
+            console.log("Message :: msgDelete : ファイル削除失敗", e);
+        }
+
     }
 
     //送信者と削除する人が同じじゃなければ監査ログへ書き込む
@@ -542,7 +579,6 @@ let msgRecord = function msgRecord(json) {
         fs.writeFileSync(pathOfJson, "{}"); //DBをJSONで保存
 
     }
-
     //ファイルID用JSONにも同じく
     try { //JSONの存在確認
         //ファイルを読み込んでみる(使いはしない、存在を確認するだけ)

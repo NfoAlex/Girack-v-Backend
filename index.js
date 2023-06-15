@@ -1401,5 +1401,6 @@ io.on("connection", (socket) => {
 //サーバーを開く
 server.listen(port, () => {
     console.log("*** ver : " + SERVER_VERSION + " ***");
-    console.log(`Listening on port ${port}`)
+    console.log(`Listening on port ${port}`);
+    
 });
