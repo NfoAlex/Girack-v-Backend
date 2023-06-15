@@ -12,7 +12,7 @@ const e = require("express");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230614";
+const SERVER_VERSION = "alpha_20230615";
 
 const app = express();
 const server = http.createServer(app);
@@ -1402,5 +1402,5 @@ io.on("connection", (socket) => {
 server.listen(port, () => {
     console.log("*** ver : " + SERVER_VERSION + " ***");
     console.log(`Listening on port ${port}`);
-    
+
 });
