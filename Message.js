@@ -439,7 +439,6 @@ let msgDelete = function msgDelete(dat) {
                 fs.unlink(__dirname + "/files/" + dat.channelid + "/" + fileidPathName + "/" + fileidIndex[fileDatas[index].fileid].name, (err) => {
                     //エラー用
                     if ( err ) console.log(err);
-                    console.log("file action taken with JPEG");
 
                 });
                 //ファイルインデックスJSONからIDを削除
