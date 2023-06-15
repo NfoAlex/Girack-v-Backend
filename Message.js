@@ -418,6 +418,32 @@ let msgDelete = function msgDelete(dat) {
         return -1;
     }
 
+    //もし添付ファイルがあればファイルを削除
+    if ( dataHistory.fileData.isAttatched ) {
+        //ファイルIDのインデックスを取り出すためにメッセージIDから日付部分を取得
+        try {
+            let fileid = dataHistory.fileData.attatchmentData.fileid;
+            //ファイルIDからJSON名を取得(日付部分)
+            fileidPathName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
+            //ファイルIDインデックスを取得
+            fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + dat.channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+        } catch(e) {
+            console.log("Message :: msgDelete : ファイル削除失敗", fileid, e);
+        }
+
+        //ファイル削除
+        fs.unlink(__dirname + "/files/" + dat.channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name, (err) => {
+            //エラー用
+            if ( err ) console.log(err);
+            console.log("file action taken with JPEG");
+
+        });
+
+        //ファイルIDインデックスJSONファイルからIDを削除
+        delete fileidIndex[fileid];
+
+    }
+
     //送信者と削除する人が同じじゃなければ監査ログへ書き込む
     if ( dat.reqSender.userid !== dataHistory[dat.messageid].userid ) {
         //記録処理
