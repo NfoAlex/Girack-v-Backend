@@ -1222,7 +1222,7 @@ io.on("connection", (socket) => {
     });
 
     //サーバー情報の送信(ゲスト、一般ユーザー用)
-    socket.on("getInfoServer", (dat) => {
+    socket.on("getInfoServer", () => {
         //サーバー情報格納用
         let serverSettings;
 
@@ -1239,7 +1239,18 @@ io.on("connection", (socket) => {
     });
 
     //サーバー初期情報の送信(管理者用)
-    socket.on("getInfoServerFull", () => {
+    socket.on("getInfoServerFull", (dat) => {
+        try {
+            //権限と整合性チェック
+            if (
+                !checkDataIntegrality(dat, [], "getInfoServerFull") &&
+                db.dataServer.user[dat.reqSender.userid].role !== "Admin"
+            ) {
+                return -1;
+
+            }
+        } catch(e) {}
+
         //セッションが適合か確認
         serverSettings = db.getInfoServer(); //情報収集
         serverSettings.serverVersion = SERVER_VERSION; //バージョン情報をつける
