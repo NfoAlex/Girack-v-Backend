@@ -280,7 +280,8 @@ io.on("connection", (socket) => {
     //サーバー設定の更新
     socket.on("changeServerSettings", (dat) => {
         /*
-        dat
+        servername: "xxx",
+        config: this.displaySettings.config,
         registration: {
             available: this.displaySettings.registerAvailable,
             invite: {
@@ -305,8 +306,15 @@ io.on("connection", (socket) => {
         let serverSettings = db.getInfoServer(dat);
         serverSettings.serverVersion = SERVER_VERSION;
 
-        //現在のサーバー設定を全員に送信
-        io.emit("infoServer", serverSettings);
+        //現在のサーバー設定を更新した人に返す
+        io.to("loggedin").emit("infoServerFull", serverSettings);
+
+        let serverSettingsEdited = structuredClone(serverSettings);
+
+        //ログイン前の人向けに招待コードと設定を削除して全員に送信
+        delete serverSettingsEdited.registration.invite.inviteCode;
+        delete serverSettingsEdited.config;
+        io.emit("infoServer", serverSettingsEdited);
 
     });
 
@@ -876,7 +884,7 @@ io.on("connection", (socket) => {
 
     //新規登録
     socket.on("register", (dat) => {
-        console.log("register :: 登録しようとしてる");
+        console.log("register :: 登録しようとしてる", dat);
         let key = auth.registerUser(dat); //DBにユーザーを登録、パスワードの取得
 
         //返り値が-1じゃないなら
@@ -1216,14 +1224,45 @@ io.on("connection", (socket) => {
         
     });
 
-    //サーバー情報の送信
+    //サーバー情報の送信(ゲスト、一般ユーザー用)
     socket.on("getInfoServer", () => {
+        //サーバー情報格納用
+        let serverSettings = {};
+
+        //あらかじめサーバー情報を取得
+        serverSettings = db.getInfoServer(); //情報収集
+        serverSettings.serverVersion = SERVER_VERSION; //バージョン情報をつける
+
+        //JSONをいじるため完全にコピー
+        let serverSettingsEdited = structuredClone(serverSettings);
+
+        //招待コードと設定データを削除
+        delete serverSettingsEdited.registration.invite.inviteCode;
+
+        //送信
+        socket.emit("infoServer", serverSettingsEdited);
+
+    });
+
+    //サーバー初期情報の送信(管理者用)
+    socket.on("getInfoServerFull", (dat) => {
+        try {
+            //権限と整合性チェック
+            if (
+                !checkDataIntegrality(dat, [], "getInfoServerFull") &&
+                db.dataServer.user[dat.reqSender.userid].role !== "Admin"
+            ) {
+                return -1;
+
+            }
+        } catch(e) {}
+
         //セッションが適合か確認
         serverSettings = db.getInfoServer(); //情報収集
         serverSettings.serverVersion = SERVER_VERSION; //バージョン情報をつける
 
         //情報送信
-        socket.emit("infoServer", serverSettings);
+        socket.emit("infoServerFull", serverSettings);
 
     });
 

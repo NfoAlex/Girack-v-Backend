@@ -190,17 +190,14 @@ let mod = function mod(dat) {
 //サーバーの設定を更新
 let changeServerSettings = function changeServerSettings(dat) {
     /*
-    dat
-    servername: "aaa",
+    servername: "xxx",
+    config: this.displaySettings.config,
     registration: {
         available: this.displaySettings.registerAvailable,
         invite: {
             inviteOnly: this.displaySettings.inviteOnly,
             inviteCode: this.displaySettings.inviteCode
         }
-    },
-    config: {
-        ...
     },
     reqSender: {
         userid: Userinfo.userid,
@@ -225,6 +222,8 @@ let changeServerSettings = function changeServerSettings(dat) {
     //console.log("infoUpdate :: changeServerSettings : これからこれをマージ", db.dataServer.config, "---\nと\n---\n", dat.config);
     //インスタンス設定をマージ
     db.dataServer.config = {...db.dataServer.config, ...dat.config};
+
+    console.log("infoUpdate :: changeServerSettings : マージ元データ->", dat.registration);
 
     //監査ログへの記録処理
     recordModeration(

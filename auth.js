@@ -111,12 +111,13 @@ let authUserByCookie = function authUserByCookie(sessionid) {
 let registerUser = function registerUser(dat) { //dat=[0=>name(名前), 1=>key(招待コード)]
     //招待制だったらコードを確認
     if ( db.dataServer.registration.invite.inviteOnly && db.dataServer.registration.available ) { //招待制かどうか
-        if ( db.dataServer.registration.invite.inviteCode !== dat[1] ) { //招待コードが一致しているかどうか
-            console.log("registerUser :: 招待コード違うわ");
+        //招待コードが一致しているかどうか
+        if ( db.dataServer.registration.invite.inviteCode !== dat[1] ) {
+            console.log("auth :: registerUser : 招待コード違うわ");
             return -1;
 
         }
-        console.log("registerUser :: 招待コード合ってる！");
+        console.log("auth :: registerUser : 招待コード合ってる！");
 
     }
 
