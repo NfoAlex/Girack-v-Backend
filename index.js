@@ -309,10 +309,12 @@ io.on("connection", (socket) => {
         //現在のサーバー設定を更新した人に返す
         io.to("loggedin").emit("infoServerFull", serverSettings);
 
+        let serverSettingsEdited = structuredClone(serverSettings);
+
         //ログイン前の人向けに招待コードと設定を削除して全員に送信
-        delete serverSettings.registration.invite.inviteCode;
-        delete serverSettings.config;
-        io.emit("infoServer", serverSettings);
+        delete serverSettingsEdited.registration.invite.inviteCode;
+        delete serverSettingsEdited.config;
+        io.emit("infoServer", serverSettingsEdited);
 
     });
 
@@ -1225,17 +1227,20 @@ io.on("connection", (socket) => {
     //サーバー情報の送信(ゲスト、一般ユーザー用)
     socket.on("getInfoServer", () => {
         //サーバー情報格納用
-        let serverSettings;
+        let serverSettings = {};
 
         //あらかじめサーバー情報を取得
         serverSettings = db.getInfoServer(); //情報収集
         serverSettings.serverVersion = SERVER_VERSION; //バージョン情報をつける
 
-        //招待コードと設定データを削除
-        delete serverSettings.registration.invite.inviteCode;
-        delete serverSettings.config;
+        //JSONをいじるため完全にコピー
+        let serverSettingsEdited = structuredClone(serverSettings);
 
-        socket.emit("infoServer", serverSettings);
+        //招待コードと設定データを削除
+        delete serverSettingsEdited.registration.invite.inviteCode;
+
+        //送信
+        socket.emit("infoServer", serverSettingsEdited);
 
     });
 
