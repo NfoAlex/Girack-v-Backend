@@ -305,12 +305,13 @@ io.on("connection", (socket) => {
         let serverSettings = db.getInfoServer(dat);
         serverSettings.serverVersion = SERVER_VERSION;
 
-        //現在のサーバー設定を全員に送信
-        io.to("loggedin").emit("infoServer", serverSettings);
+        //現在のサーバー設定を更新した人に返す
+        io.to("loggedin").emit("infoServerFull", serverSettings);
 
-        //ログイン前の人向けに招待コードを隠して全員に送信
-        delete serverSettings.registration.inviteCode;
-        io.emit("infoInitServer", serverSettings);
+        //ログイン前の人向けに招待コードと設定を削除して全員に送信
+        delete serverSettings.registration.invite.inviteCode;
+        delete serverSettings.config;
+        io.emit("infoServer", serverSettings);
 
     });
 
