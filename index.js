@@ -1220,7 +1220,7 @@ io.on("connection", (socket) => {
         
     });
 
-    //サーバー情報の送信(ログイン後用)
+    //サーバー情報の送信(ゲスト、一般ユーザー用)
     socket.on("getInfoServer", (dat) => {
         //サーバー情報格納用
         let serverSettings;
@@ -1229,13 +1229,15 @@ io.on("connection", (socket) => {
         serverSettings = db.getInfoServer(); //情報収集
         serverSettings.serverVersion = SERVER_VERSION; //バージョン情報をつける
 
+        //招待コードと設定データを削除
         delete serverSettings.registration.invite.inviteCode;
+        delete serverSettings.config;
 
         socket.emit("infoServer", serverSettings);
 
     });
 
-    //サーバー初期情報の送信(認証前用)
+    //サーバー初期情報の送信(管理者用)
     socket.on("getInfoServerFull", () => {
         //セッションが適合か確認
         serverSettings = db.getInfoServer(); //情報収集
