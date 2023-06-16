@@ -280,7 +280,8 @@ io.on("connection", (socket) => {
     //サーバー設定の更新
     socket.on("changeServerSettings", (dat) => {
         /*
-        dat
+        servername: "xxx",
+        config: this.displaySettings.config,
         registration: {
             available: this.displaySettings.registerAvailable,
             invite: {
@@ -881,7 +882,7 @@ io.on("connection", (socket) => {
 
     //新規登録
     socket.on("register", (dat) => {
-        console.log("register :: 登録しようとしてる");
+        console.log("register :: 登録しようとしてる", dat);
         let key = auth.registerUser(dat); //DBにユーザーを登録、パスワードの取得
 
         //返り値が-1じゃないなら
