@@ -306,7 +306,11 @@ io.on("connection", (socket) => {
         serverSettings.serverVersion = SERVER_VERSION;
 
         //現在のサーバー設定を全員に送信
-        io.emit("infoServer", serverSettings);
+        io.to("loggedin").emit("infoServer", serverSettings);
+
+        //ログイン前の人向けに招待コードを隠して全員に送信
+        delete serverSettings.registration.inviteCode;
+        io.emit("infoInitServer", serverSettings);
 
     });
 
@@ -1216,7 +1220,7 @@ io.on("connection", (socket) => {
         
     });
 
-    //サーバー情報の送信
+    //サーバー情報の送信(ログイン後用)
     socket.on("getInfoServer", () => {
         //セッションが適合か確認
         serverSettings = db.getInfoServer(); //情報収集
