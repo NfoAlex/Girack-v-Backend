@@ -1221,27 +1221,28 @@ io.on("connection", (socket) => {
     });
 
     //サーバー情報の送信(ログイン後用)
-    socket.on("getInfoServer", () => {
-        //セッションが適合か確認
+    socket.on("getInfoServer", (dat) => {
+        //サーバー情報格納用
+        let serverSettings;
+
+        //あらかじめサーバー情報を取得
         serverSettings = db.getInfoServer(); //情報収集
         serverSettings.serverVersion = SERVER_VERSION; //バージョン情報をつける
 
-        //情報送信
-        io.to("loggedin").emit("infoServer", serverSettings);
+        delete serverSettings.registration.invite.inviteCode;
+
+        socket.emit("infoServer", serverSettings);
 
     });
 
     //サーバー初期情報の送信(認証前用)
-    socket.on("getInfoInitServer", () => {
+    socket.on("getInfoServerFull", () => {
         //セッションが適合か確認
         serverSettings = db.getInfoServer(); //情報収集
         serverSettings.serverVersion = SERVER_VERSION; //バージョン情報をつける
-        
-        //ログイン前なため招待コードを隠す
-        delete serverSettings.registration.inviteCode;;
 
         //情報送信
-        socket.emit("infoInitServer", serverSettings);
+        socket.emit("infoServerFull", serverSettings);
 
     });
 
