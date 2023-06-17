@@ -154,6 +154,7 @@ let registerUser = function registerUser(dat) { //dat=[0=>name(名前), 1=>key(�
     //デフォルトアイコンを新規ユーザー用にクローン
     fs.copyFileSync("./img/default.jpeg", "./img/" + newID + ".jpeg");
 
+    //パスワードを返す
     return db.dataUser.user[newID].pw;
 
 }
