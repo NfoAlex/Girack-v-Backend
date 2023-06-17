@@ -125,7 +125,7 @@ let registerUser = function registerUser(dat) { //dat=[0=>name(名前), 1=>key(�
     let newID = "";
     //ID生成
     for ( let i=0; i<8; i++ ) {
-        newID += parseInt(Math.random() * 9); //乱数を追加
+        newID += Math.trunc(Math.random() * 9); //乱数を追加
 
     }
 
