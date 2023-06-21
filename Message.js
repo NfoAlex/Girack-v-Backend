@@ -131,7 +131,6 @@ let msgMix = function msgMix(m) {
         //データに返信先の文章を追加
         if ( m.replyData.isReplying ) {
             let msg = getMessage(m.channelid, m.replyData.messageid);
-            m.replyData.content = msg.content;
             m.replyData.userid = msg.userid;
 
         }
@@ -342,24 +341,38 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
 
 //指定したチャンネルの最新メッセージを返す(contentではない)
 let getLatestMessage = function latestMessage(channelid) {
+    let messageData = {}; //返すメッセージデータ
     let t = new Date(); //履歴に時間を追加する用
     let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
-
-    //let receivedTime = [time, t.getMilliseconds() ].join("");
 
     //メッセージを送るチャンネルの履歴データのディレクトリ
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
     let dataHistory = {}; //メッセージデータのJSON読み込み
 
     try {
+        //メッセージがあるJSONを取得
         dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8'));
+        //メッセージデータをオブジェクト化して格納
+        messageData = Object.entries(dataHistory)[Object.entries(dataHistory).length-1][1];
+
+        //もし返信しているメッセージなら返信先の内容を取得して追加
+        try {
+            if ( messageData.replyData.isReplying ) {
+                //返信先を取得
+                let messageDataReplied = getMessage(channelid, messageData.replyData.messageid);
+                //返信先の内容を追加
+                messageData.replyData.content = messageDataReplied.content;
+
+            }
+        } catch(e) {}
     }
     catch(e) {
         console.log("getLatestMessage :: ERROR");
         throw e;
     }
     
-    return Object.entries(dataHistory)[Object.entries(dataHistory).length-1][1];
+    //メッセージデータを返す
+    return messageData;
 
 }
 
