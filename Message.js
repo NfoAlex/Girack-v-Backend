@@ -367,8 +367,8 @@ let getLatestMessage = function latestMessage(channelid) {
         } catch(e) {}
     }
     catch(e) {
-        console.log("getLatestMessage :: ERROR");
-        throw e;
+        console.log("getLatestMessage :: ERROR->", e);
+        return -1;
     }
     
     //メッセージデータを返す
