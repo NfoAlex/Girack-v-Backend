@@ -368,7 +368,6 @@ let getMessage = function getMessage(channelid, messageid) {
     //メッセージIDから送信日付を取得
     let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
-    console.log("Message :: getMessage : pathOfJson", pathOfJson);
 
     //データ取り出し
     try{
@@ -771,14 +770,13 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
                 //もし返信しているメッセージなら返信先の内容を取得して追加
                 try {
                     if ( messageData.replyData.isReplying ) {
+                        //返信先を取得
                         let messageDataReplied = getMessage(cid, messageData.replyData.messageid);
-                        console.log("Message :: msgRecordCallNew : メッセージデータ->", messageData, " fetched->", messageDataReplied);
+                        //返信先の内容を追加
                         messageData.replyData.content = messageDataReplied.content;
 
                     }
-                } catch(e) {
-                    console.log('古い奴だ');
-                }
+                } catch(e) {}
 
                 //履歴を配列へ追加
                 dat.push(
