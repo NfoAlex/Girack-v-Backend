@@ -373,7 +373,43 @@ let getMessage = function getMessage(channelid, messageid) {
     //データ取り出し
     try{
         dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
-        return dataHistory[messageid];
+        
+        //もしデータが正常にとれるならそれを返す
+        if ( dataHistory[messageid] !== undefined ) {
+            return dataHistory[messageid];
+
+        } else { //undefinedなら削除された体で返す
+            return {
+                "messageid": messageid,
+                "userid": "xxxxxxxxx",
+                "channelid": channelid,
+                "time": "20010101000000",
+                "content": "消去されたメッセージ",
+                "replyData": {
+                    "isReplying": false,
+                    "messageid": null
+                },
+                "fileData": {
+                    "isAttatched": false,
+                    "attatchmentData": []
+                },
+                "hasUrl": false,
+                "urlData": {
+                    "dataLoaded": false,
+                    "data": [
+                        {
+                            "title": null,
+                            "description": null,
+                            "domain": null,
+                            "img": [],
+                            "favicon": null
+                        }
+                    ]
+                },
+                "reaction": {}
+            };
+
+        }
     }
     catch(e) { //エラーなら中止
         return {
