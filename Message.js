@@ -705,7 +705,6 @@ let msgRecord = function msgRecord(json) {
     try {
         //DBに追加
         dataHistory[[receivedTime,json.messageid].join("")] = { //JSONでの順番はキーでソートされるから時間を最初に挿入している
-            //type: json.type,
             messageid: [receivedTime,json.messageid].join(""), //メッセージID
             userid: json.userid,
             channelid: json.channelid,
@@ -725,12 +724,8 @@ let msgRecord = function msgRecord(json) {
     }
 
     //JSON書き込み保存
-    //console.log("msgRecord :: 4");
-    //fs.writeFileSync(pathOfJson, JSON.stringify(dataHistorySorted, null, 4));
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
     fs.writeFileSync(pathOfJsonFileIndex, JSON.stringify(fileidIndex, null, 4));
-
-    //console.log("msgRecord :: jsonファイルが -> " + isExist + " , " + dataHistory);
 
 }
 
