@@ -764,9 +764,25 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
         for ( let i=1; i<=jsonLength; i++ ) {
             //もし読み込んだ回数がスタート位置以上なら
             if ( readCount >= startLength ) { //比較、最初からならstartLengthは0
+                //メッセージデータ
+                let messageData = Object.entries(dataHistory)[Object.entries(dataHistory).length-i][1];
+                //console.log("Message :: msgRecordCallNew : メッセージデータ->", messageData);
+                
+                //もし返信しているメッセージなら返信先の内容を取得して追加
+                try {
+                    if ( messageData.replyData.isReplying ) {
+                        let messageDataReplied = getMessage(cid, messageData.replyData.messageid);
+                        console.log("Message :: msgRecordCallNew : メッセージデータ->", messageData, " fetched->", messageDataReplied);
+                        messageData.replyData.content = messageDataReplied.content;
+
+                    }
+                } catch(e) {
+                    console.log('古い奴だ');
+                }
+
                 //履歴を配列へ追加
                 dat.push(
-                    Object.entries(dataHistory)[Object.entries(dataHistory).length-i][1]
+                    messageData
                 );
 
                 readLength--; //読み取る履歴の数を減算
