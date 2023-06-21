@@ -131,7 +131,6 @@ let msgMix = function msgMix(m) {
         //データに返信先の文章を追加
         if ( m.replyData.isReplying ) {
             let msg = getMessage(m.channelid, m.replyData.messageid);
-            m.replyData.content = msg.content;
             m.replyData.userid = msg.userid;
 
         }
@@ -342,24 +341,38 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
 
 //指定したチャンネルの最新メッセージを返す(contentではない)
 let getLatestMessage = function latestMessage(channelid) {
+    let messageData = {}; //返すメッセージデータ
     let t = new Date(); //履歴に時間を追加する用
     let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
-
-    //let receivedTime = [time, t.getMilliseconds() ].join("");
 
     //メッセージを送るチャンネルの履歴データのディレクトリ
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
     let dataHistory = {}; //メッセージデータのJSON読み込み
 
     try {
+        //メッセージがあるJSONを取得
         dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8'));
+        //メッセージデータをオブジェクト化して格納
+        messageData = Object.entries(dataHistory)[Object.entries(dataHistory).length-1][1];
+
+        //もし返信しているメッセージなら返信先の内容を取得して追加
+        try {
+            if ( messageData.replyData.isReplying ) {
+                //返信先を取得
+                let messageDataReplied = getMessage(channelid, messageData.replyData.messageid);
+                //返信先の内容を追加
+                messageData.replyData.content = messageDataReplied.content;
+
+            }
+        } catch(e) {}
     }
     catch(e) {
-        console.log("getLatestMessage :: ERROR");
-        throw e;
+        console.log("getLatestMessage :: ERROR->", e);
+        return -1;
     }
     
-    return Object.entries(dataHistory)[Object.entries(dataHistory).length-1][1];
+    //メッセージデータを返す
+    return messageData;
 
 }
 
@@ -368,17 +381,81 @@ let getMessage = function getMessage(channelid, messageid) {
     //メッセージIDから送信日付を取得
     let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
-    console.log("Message :: getMessage : pathOfJson", pathOfJson);
 
     //データ取り出し
     try{
         dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
+        
+        //もしデータが正常にとれるならそれを返す
+        if ( dataHistory[messageid] !== undefined ) {
+            return dataHistory[messageid];
+
+        } else { //undefinedなら削除された体で返す
+            return {
+                "messageid": messageid,
+                "userid": "xxxxxxxxx",
+                "channelid": channelid,
+                "time": "20010101000000",
+                "content": "消去されたメッセージ",
+                "replyData": {
+                    "isReplying": false,
+                    "messageid": null
+                },
+                "fileData": {
+                    "isAttatched": false,
+                    "attatchmentData": []
+                },
+                "hasUrl": false,
+                "urlData": {
+                    "dataLoaded": false,
+                    "data": [
+                        {
+                            "title": null,
+                            "description": null,
+                            "domain": null,
+                            "img": [],
+                            "favicon": null
+                        }
+                    ]
+                },
+                "reaction": {}
+            };
+
+        }
     }
     catch(e) { //エラーなら中止
-        return -1;
+        return {
+            "messageid": messageid,
+            "userid": "xxxxxxxxx",
+            "channelid": channelid,
+            "time": "20010101000000",
+            "content": "消去されたメッセージ",
+            "replyData": {
+                "isReplying": false,
+                "messageid": null
+            },
+            "fileData": {
+                "isAttatched": false,
+                "attatchmentData": []
+            },
+            "hasUrl": false,
+            "urlData": {
+                "dataLoaded": false,
+                "data": [
+                    {
+                        "title": null,
+                        "description": null,
+                        "domain": null,
+                        "img": [],
+                        "favicon": null
+                    }
+                ]
+            },
+            "reaction": {}
+        };
     }
 
-    return dataHistory[messageid];
+    
 
 }
 
@@ -628,7 +705,6 @@ let msgRecord = function msgRecord(json) {
     try {
         //DBに追加
         dataHistory[[receivedTime,json.messageid].join("")] = { //JSONでの順番はキーでソートされるから時間を最初に挿入している
-            //type: json.type,
             messageid: [receivedTime,json.messageid].join(""), //メッセージID
             userid: json.userid,
             channelid: json.channelid,
@@ -648,12 +724,8 @@ let msgRecord = function msgRecord(json) {
     }
 
     //JSON書き込み保存
-    //console.log("msgRecord :: 4");
-    //fs.writeFileSync(pathOfJson, JSON.stringify(dataHistorySorted, null, 4));
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
     fs.writeFileSync(pathOfJsonFileIndex, JSON.stringify(fileidIndex, null, 4));
-
-    //console.log("msgRecord :: jsonファイルが -> " + isExist + " , " + dataHistory);
 
 }
 
@@ -699,9 +771,24 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
         for ( let i=1; i<=jsonLength; i++ ) {
             //もし読み込んだ回数がスタート位置以上なら
             if ( readCount >= startLength ) { //比較、最初からならstartLengthは0
+                //メッセージデータ
+                let messageData = Object.entries(dataHistory)[Object.entries(dataHistory).length-i][1];
+                //console.log("Message :: msgRecordCallNew : メッセージデータ->", messageData);
+                
+                //もし返信しているメッセージなら返信先の内容を取得して追加
+                try {
+                    if ( messageData.replyData.isReplying ) {
+                        //返信先を取得
+                        let messageDataReplied = getMessage(cid, messageData.replyData.messageid);
+                        //返信先の内容を追加
+                        messageData.replyData.content = messageDataReplied.content;
+
+                    }
+                } catch(e) {}
+
                 //履歴を配列へ追加
                 dat.push(
-                    Object.entries(dataHistory)[Object.entries(dataHistory).length-i][1]
+                    messageData
                 );
 
                 readLength--; //読み取る履歴の数を減算
