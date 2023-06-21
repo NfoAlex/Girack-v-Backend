@@ -51,7 +51,7 @@ try{fs.mkdirSync("./modlog/");}catch(e){}
 
 //もしバックエンドに直接アクセスされたら用
 app.get('/', (req, res) => {
-    res.send("<h1 style='width:100vw; text-align:center'><a href='" + frontendURL[2] + "'>😏</a></h1>");
+    res.send("<h1 style='width:100vw; text-align:center'>😏</h1>");
 
 });
 
