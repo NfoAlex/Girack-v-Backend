@@ -109,7 +109,17 @@ app.get('/file/:channelid/:fileid', (req, res) => {
     try {
         //ファイルを返す
         console.log("返すファイルデータ :: ", fileidIndex[fileid]);
-        res.download(__dirname + "/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
+        
+        //もし画像ファイルならダウンロードじゃなく表示させる
+        if ( fileidIndex[fileid].type.includes("image/") ) { //typeにimageが含まれるなら
+            //ブラウザで表示
+            res.sendFile(__dirname + "/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
+
+        } else { //画像じゃないなら
+            //ダウンロードさせる
+            res.download(__dirname + "/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
+
+        }
     } catch(e) {
         console.log("index :: app.get('/file/') : ファイル送信失敗", e);
         res.send("ファイルがねえ");
