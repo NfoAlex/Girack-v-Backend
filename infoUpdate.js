@@ -219,11 +219,8 @@ let changeServerSettings = function changeServerSettings(dat) {
     //インスタンス名の更新
     db.dataServer.servername = dat.servername;
 
-    //console.log("infoUpdate :: changeServerSettings : これからこれをマージ", db.dataServer.config, "---\nと\n---\n", dat.config);
     //インスタンス設定をマージ
     db.dataServer.config = {...db.dataServer.config, ...dat.config};
-
-    console.log("infoUpdate :: changeServerSettings : マージ元データ->", dat.registration);
 
     //監査ログへの記録処理
     recordModeration(

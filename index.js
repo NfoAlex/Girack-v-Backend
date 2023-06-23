@@ -11,7 +11,7 @@ const { config } = require("process");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230621";
+const SERVER_VERSION = "alpha_20230623";
 
 const app = express();
 const server = http.createServer(app);
@@ -308,11 +308,13 @@ io.on("connection", (socket) => {
         //現在のサーバー設定を更新した人に返す
         io.to("loggedin").emit("infoServerFull", serverSettings);
 
+        //JSONを渡すように改変するために一度コピー
         let serverSettingsEdited = structuredClone(serverSettings);
 
         //ログイン前の人向けに招待コードと設定を削除して全員に送信
         delete serverSettingsEdited.registration.invite.inviteCode;
-        delete serverSettingsEdited.config;
+
+        console.log('送るよ', serverSettingsEdited);
         io.emit("infoServer", serverSettingsEdited);
 
     });
