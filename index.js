@@ -606,6 +606,7 @@ io.on("connection", (socket) => {
         let TERM = ""; //システムメッセージのフラグ
         let targetUser = ""; //対象ユーザー
         let triggeredUser = dat.reqSender.userid; //操作を起こしたユーザー
+
         //操作内容でフラグ設定
         if ( dat.action === "join" ) { //参加?
             //起こした人と対象が違うなら"招待された"と書く
@@ -631,6 +632,7 @@ io.on("connection", (socket) => {
 
         }
 
+        //記録するシステムメッセージ
         let SystemMessageLogging = {
             userid: "SYSTEM",
             channelid: dat.channelid,
@@ -643,10 +645,16 @@ io.on("connection", (socket) => {
                 attatchmentData: null
             },
             content: {
-                term: TERM
+                term: TERM,
+                targetUser: targetUser,
+                triggeredUser: triggeredUser
             },
             isSystemMessage: true
         };
+
+        //システムメッセージを記録して送信
+        let SystemMessageResult = msg.msgMix(SystemMessageLogging);
+        io.to("loggedin").emit("messageReceive", SystemMessageResult);
         
     });
 
