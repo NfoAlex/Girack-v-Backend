@@ -364,7 +364,6 @@ io.on("connection", (socket) => {
         }
         //もし標的チャンネルと名前が変わってるなら
         if ( db.dataServer.channels[dat.targetid].name !== dat.channelname ) {
-            console.log("index :: changeChannelSettings : チャンネル名->", db.dataServer.channels[dat.targetid].channelname, dat.channelname);
             nameChanged = true;
 
         }
@@ -436,8 +435,6 @@ io.on("connection", (socket) => {
             io.to("loggedin").emit("messageReceive", SystemMessageResult);
 
         }
-
-        
 
     });
 

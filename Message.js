@@ -31,9 +31,6 @@ let msgMix = function msgMix(m) {
         content: this.txt //メッセージの本文
     }
     */
-    console.log("msgSend :: データ↓");
-    console.log(m);
-
     let t = new Date(); //履歴に時間を追加する用
     let receivedTime = [t.getFullYear(), (t.getMonth()+1).toString().padStart(2,0), t.getDate().toString().padStart(2,0), t.getHours().toString().padStart(2,0), t.getMinutes().toString().padStart(2,0), t.getSeconds().toString().padStart(2,0)].join("");
     //let messageid = [receivedTime, t.getMilliseconds().toString().padStart(6,0) ].join("");
