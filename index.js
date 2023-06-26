@@ -11,7 +11,7 @@ const { config } = require("process");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230623";
+const SERVER_VERSION = "alpha_20230626";
 
 const app = express();
 const server = http.createServer(app);
@@ -350,8 +350,23 @@ io.on("connection", (socket) => {
             sessionid: dat.reqSender.sessionid
         }) ) { return -1; }
 
+        //チャンネル名と概要の長さ制限
         if ( dat.description > 128 ) return -1;
         if ( dat.channelname > 32 ) return -1;
+
+        //システムメッセージに記録するための差異判別
+        let descChanged = false; //概要の変更
+        let nameChanged = false; //名前の変更
+        //もし標的チャンネルと概要が変わってるなら
+        if ( db.dataServer.channels[dat.targetid].description !== dat.description ) {
+            descChanged = true;
+
+        }
+        //もし標的チャンネルと名前が変わってるなら
+        if ( db.dataServer.channels[dat.targetid].name !== dat.channelname ) {
+            nameChanged = true;
+
+        }
 
         //チャンネル設定更新
         infoUpdate.changeChannelSettings(dat);
@@ -362,7 +377,64 @@ io.on("connection", (socket) => {
             reqSender: dat.reqSender
         });
 
+        //送信
         io.to("loggedin").emit("infoChannel", info);
+
+        //もし概要文が変わっていたらシステムメッセージを送信
+        if ( descChanged ) {
+            //記録するシステムメッセージ
+            let SystemMessageLogging = {
+                userid: "SYSTEM",
+                channelid: dat.targetid,
+                replyData: {
+                    isReplying: false,
+                    messageid: "",
+                },
+                fileData: { 
+                    isAttatched: false,
+                    attatchmentData: null
+                },
+                content: {
+                    term: "DESCRIPTION_UPDATED",
+                    targetUser: "",
+                    triggeredUser: dat.reqSender.userid
+                },
+                isSystemMessage: true
+            };
+
+            //システムメッセージを記録して送信
+            let SystemMessageResult = msg.msgMix(SystemMessageLogging);
+            io.to("loggedin").emit("messageReceive", SystemMessageResult);
+
+        }
+
+        //もしチャンネル名が変わっていたらシステムメッセージを送信
+        if ( nameChanged ) {
+            //記録するシステムメッセージ
+            let SystemMessageLogging = {
+                userid: "SYSTEM",
+                channelid: dat.targetid,
+                replyData: {
+                    isReplying: false,
+                    messageid: "",
+                },
+                fileData: { 
+                    isAttatched: false,
+                    attatchmentData: null
+                },
+                content: {
+                    term: "CHANNELNAME_UPDATED",
+                    targetUser: "",
+                    triggeredUser: dat.reqSender.userid
+                },
+                isSystemMessage: true
+            };
+
+            //システムメッセージを記録して送信
+            let SystemMessageResult = msg.msgMix(SystemMessageLogging);
+            io.to("loggedin").emit("messageReceive", SystemMessageResult);
+
+        }
 
     });
 
@@ -600,8 +672,61 @@ io.on("connection", (socket) => {
         //データの整合性を確認
         if ( !checkDataIntegrality(dat, paramRequire, "channelAction") ) { return -1; }
 
-        let result = infoUpdate.channelAction(dat);
+        let result = infoUpdate.channelAction(dat); //操作処理
         io.to("loggedin").emit("infoUser", result); //全員に情報を更新させる
+
+        let TERM = ""; //システムメッセージのフラグ
+        let targetUser = ""; //対象ユーザー
+        let triggeredUser = dat.reqSender.userid; //操作を起こしたユーザー
+
+        //操作内容でフラグ設定
+        if ( dat.action === "join" ) { //参加?
+            //起こした人と対象が違うなら"招待された"と書く
+            if ( dat.userid !== dat.reqSender.userid ) {
+                targetUser = dat.userid;
+                TERM = "INVITED";
+
+            } else { //ユーザーが自分で起こしたものなら
+                TERM = "JOINED";
+
+            }
+
+        } else if ( dat.action === "leave" ) { //退出?
+            //起こした人と対象が違うなら"キックされた"と設定
+            if ( dat.userid !== dat.reqSender.userid ) {
+                targetUser = dat.userid;
+                TERM = "KICKED";
+
+            } else { //ユーザーが自分で起こしたものなら
+                TERM = "LEFT";
+
+            }
+
+        }
+
+        //記録するシステムメッセージ
+        let SystemMessageLogging = {
+            userid: "SYSTEM",
+            channelid: dat.channelid,
+            replyData: {
+                isReplying: false,
+                messageid: "",
+            },
+            fileData: { 
+                isAttatched: false,
+                attatchmentData: null
+            },
+            content: {
+                term: TERM,
+                targetUser: targetUser,
+                triggeredUser: triggeredUser
+            },
+            isSystemMessage: true
+        };
+
+        //システムメッセージを記録して送信
+        let SystemMessageResult = msg.msgMix(SystemMessageLogging);
+        io.to("loggedin").emit("messageReceive", SystemMessageResult);
         
     });
 
