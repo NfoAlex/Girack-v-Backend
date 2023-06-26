@@ -350,8 +350,24 @@ io.on("connection", (socket) => {
             sessionid: dat.reqSender.sessionid
         }) ) { return -1; }
 
+        //チャンネル名と概要の長さ制限
         if ( dat.description > 128 ) return -1;
         if ( dat.channelname > 32 ) return -1;
+
+        //システムメッセージに記録するための差異判別
+        let descChanged = false; //概要の変更
+        let nameChanged = false; //名前の変更
+        //もし標的チャンネルと概要が変わってるなら
+        if ( db.dataServer.channels[dat.targetid].description !== dat.description ) {
+            descChanged = true;
+
+        }
+        //もし標的チャンネルと名前が変わってるなら
+        if ( db.dataServer.channels[dat.targetid].name !== dat.channelname ) {
+            console.log("index :: changeChannelSettings : チャンネル名->", db.dataServer.channels[dat.targetid].channelname, dat.channelname);
+            nameChanged = true;
+
+        }
 
         //チャンネル設定更新
         infoUpdate.changeChannelSettings(dat);
@@ -362,7 +378,66 @@ io.on("connection", (socket) => {
             reqSender: dat.reqSender
         });
 
+        //送信
         io.to("loggedin").emit("infoChannel", info);
+
+        //もし概要文が変わっていたらシステムメッセージを送信
+        if ( descChanged ) {
+            //記録するシステムメッセージ
+            let SystemMessageLogging = {
+                userid: "SYSTEM",
+                channelid: dat.targetid,
+                replyData: {
+                    isReplying: false,
+                    messageid: "",
+                },
+                fileData: { 
+                    isAttatched: false,
+                    attatchmentData: null
+                },
+                content: {
+                    term: "DESCRIPTION_UPDATED",
+                    targetUser: "",
+                    triggeredUser: dat.reqSender.userid
+                },
+                isSystemMessage: true
+            };
+
+            //システムメッセージを記録して送信
+            let SystemMessageResult = msg.msgMix(SystemMessageLogging);
+            io.to("loggedin").emit("messageReceive", SystemMessageResult);
+
+        }
+
+        //もしチャンネル名が変わっていたらシステムメッセージを送信
+        if ( nameChanged ) {
+            //記録するシステムメッセージ
+            let SystemMessageLogging = {
+                userid: "SYSTEM",
+                channelid: dat.targetid,
+                replyData: {
+                    isReplying: false,
+                    messageid: "",
+                },
+                fileData: { 
+                    isAttatched: false,
+                    attatchmentData: null
+                },
+                content: {
+                    term: "CHANNELNAME_UPDATED",
+                    targetUser: "",
+                    triggeredUser: dat.reqSender.userid
+                },
+                isSystemMessage: true
+            };
+
+            //システムメッセージを記録して送信
+            let SystemMessageResult = msg.msgMix(SystemMessageLogging);
+            io.to("loggedin").emit("messageReceive", SystemMessageResult);
+
+        }
+
+        
 
     });
 
