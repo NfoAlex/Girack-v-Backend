@@ -714,6 +714,7 @@ let msgRecord = function msgRecord(json) {
             channelid: json.channelid,
             time: json.time,
             content: json.content,
+            isSystemMessage: json.isSystemMessage,
             replyData: json.replyData,
             fileData: json.fileData,
             hasUrl: json.hasUrl,
