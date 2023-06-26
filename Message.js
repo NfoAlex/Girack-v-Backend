@@ -31,10 +31,6 @@ let msgMix = function msgMix(m) {
         content: this.txt //メッセージの本文
     }
     */
-    let t = new Date(); //履歴に時間を追加する用
-    let receivedTime = [t.getFullYear(), (t.getMonth()+1).toString().padStart(2,0), t.getDate().toString().padStart(2,0), t.getHours().toString().padStart(2,0), t.getMinutes().toString().padStart(2,0), t.getSeconds().toString().padStart(2,0)].join("");
-
-    m.time = receivedTime; //送信時間を受信メッセージに追加
 
     //システムメッセージじゃないなら内容検査
     if ( !m.isSystemMessage ) {
