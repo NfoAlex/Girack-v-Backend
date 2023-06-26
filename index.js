@@ -600,8 +600,53 @@ io.on("connection", (socket) => {
         //データの整合性を確認
         if ( !checkDataIntegrality(dat, paramRequire, "channelAction") ) { return -1; }
 
-        let result = infoUpdate.channelAction(dat);
+        let result = infoUpdate.channelAction(dat); //操作処理
         io.to("loggedin").emit("infoUser", result); //全員に情報を更新させる
+
+        let TERM = ""; //システムメッセージのフラグ
+        let targetUser = ""; //対象ユーザー
+        let triggeredUser = dat.reqSender.userid; //操作を起こしたユーザー
+        //操作内容でフラグ設定
+        if ( dat.action === "join" ) { //参加?
+            //起こした人と対象が違うなら"招待された"と書く
+            if ( dat.userid !== dat.reqSender.userid ) {
+                targetUser = dat.userid;
+                TERM = "INVITED";
+
+            } else { //ユーザーが自分で起こしたものなら
+                TERM = "JOINED";
+
+            }
+
+        } else if ( dat.action === "leave" ) { //退出?
+            //起こした人と対象が違うなら"キックされた"と設定
+            if ( dat.userid !== dat.reqSender.userid ) {
+                targetUser = dat.userid;
+                TERM = "KICKED";
+
+            } else { //ユーザーが自分で起こしたものなら
+                TERM = "LEFT";
+
+            }
+
+        }
+
+        let SystemMessageLogging = {
+            userid: "SYSTEM",
+            channelid: dat.channelid,
+            replyData: {
+                isReplying: false,
+                messageid: "",
+            },
+            fileData: { 
+                isAttatched: false,
+                attatchmentData: null
+            },
+            content: {
+                term: TERM
+            },
+            isSystemMessage: true
+        };
         
     });
 

@@ -40,16 +40,20 @@ let msgMix = function msgMix(m) {
 
     m.time = receivedTime; //送信時間を受信メッセージに追加
 
-    //メッセージがそもそも有効なものかどうか
-    if (
-        m.content === undefined ||
-        m.content.length > db.dataServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH || //長さがサーバー規定を超えてるなら
-        ( m.content.includes("<img") && m.content.includes("onerror") ) || //XSS避け
-        ( m.content.length === 0 && !m.fileData.isAttatched ) || //長さが0だったら
-        ( m.content.replace(/　/g,"").length === 0 && !m.fileData.isAttatched ) || //添付ファイルがなく、空白だけのメッセージだった時用
-        ( m.content.replace(/ /g,"").length === 0 && !m.fileData.isAttatched ) //添付ファイルがなく、半角も同様
-    ) {
-        return -1; //エラーとして返す
+    //システムメッセージじゃないなら内容検査
+    if ( !m.isSystemMessage ) {
+        //メッセージがそもそも有効なものかどうか
+        if (
+            m.content === undefined ||
+            m.content.length > db.dataServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH || //長さがサーバー規定を超えてるなら
+            ( m.content.includes("<img") && m.content.includes("onerror") ) || //XSS避け
+            ( m.content.length === 0 && !m.fileData.isAttatched ) || //長さが0だったら
+            ( m.content.replace(/　/g,"").length === 0 && !m.fileData.isAttatched ) || //添付ファイルがなく、空白だけのメッセージだった時用
+            ( m.content.replace(/ /g,"").length === 0 && !m.fileData.isAttatched ) //添付ファイルがなく、半角も同様
+        ) {
+            return -1; //エラーとして返す
+
+        }
 
     }
 
@@ -339,7 +343,7 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
 
 }
 
-//指定したチャンネルの最新メッセージを返す(contentではない)
+//指定したチャンネルの最新メッセージを返す(contentだけではない)
 let getLatestMessage = function latestMessage(channelid) {
     let messageData = {}; //返すメッセージデータ
     let t = new Date(); //履歴に時間を追加する用
