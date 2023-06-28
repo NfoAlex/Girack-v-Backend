@@ -105,12 +105,8 @@ let msgMix = function msgMix(m) {
     //ファイルが添付されているなら
     if ( m.fileData.isAttatched ) {
         console.log("ファイル処理作業始めるわ");
-        //添付ファイルへID振り分け
-        // for ( let index in m.fileData.attatchmentData ) {
-        //     //IDは日付+チャンネルID+ユーザーID+乱数8桁
-        //     m.fileData.attatchmentData[index].fileid = m.channelid + m.userid + parseInt(Math.random()*99999999);
-
-        // }
+        let t = new Date();
+        
         let receivedDatePath = t.getFullYear() + "_" + (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
         writeUploadedFile(m.fileData, m.channelid, receivedDatePath); //ファイル処理開始
 
