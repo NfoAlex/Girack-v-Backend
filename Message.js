@@ -31,10 +31,6 @@ let msgMix = function msgMix(m) {
         content: this.txt //メッセージの本文
     }
     */
-    let t = new Date(); //履歴に時間を追加する用
-    let receivedTime = [t.getFullYear(), (t.getMonth()+1).toString().padStart(2,0), t.getDate().toString().padStart(2,0), t.getHours().toString().padStart(2,0), t.getMinutes().toString().padStart(2,0), t.getSeconds().toString().padStart(2,0)].join("");
-
-    m.time = receivedTime; //送信時間を受信メッセージに追加
 
     //システムメッセージじゃないなら内容検査
     if ( !m.isSystemMessage ) {
@@ -637,8 +633,18 @@ let msgReaction = function msgReaction(dat) {
 //メッセージの履歴を保存
 let msgRecord = function msgRecord(json) {
     let t = new Date(); //履歴に時間を追加する用
+    //JSONパス用
     let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
-    let receivedTime = [json.time, t.getMilliseconds().toString().padStart(6,0) ].join("");
+    //受信時間
+    let receivedTime = [
+        t.getFullYear(),
+        (t.getMonth()+1).toString().padStart(2,0),
+        t.getDate().toString().padStart(2,0),
+        t.getHours().toString().padStart(2,0),
+        t.getMinutes().toString().padStart(2,0),
+        t.getSeconds().toString().padStart(2,0),
+        t.getMilliseconds().toString().padStart(6,0)
+    ].join("");
 
     //メッセージを送るチャンネルの履歴データのディレクトリ
     let pathOfJson = "./record/" + json.channelid + "/" + fulldate + ".json";
@@ -708,7 +714,7 @@ let msgRecord = function msgRecord(json) {
             messageid: [receivedTime,json.messageid].join(""), //メッセージID
             userid: json.userid,
             channelid: json.channelid,
-            time: json.time,
+            time: receivedTime,
             content: json.content,
             isSystemMessage: json.isSystemMessage,
             replyData: json.replyData,
