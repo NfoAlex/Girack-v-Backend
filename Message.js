@@ -104,9 +104,9 @@ let msgMix = function msgMix(m) {
 
     //ファイルが添付されているなら
     if ( m.fileData.isAttatched ) {
-        console.log("ファイル処理作業始めるわ");
+        //ID振り分け用の時間データ
         let t = new Date();
-        
+
         let receivedDatePath = t.getFullYear() + "_" + (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
         writeUploadedFile(m.fileData, m.channelid, receivedDatePath); //ファイル処理開始
 
@@ -680,7 +680,7 @@ let msgRecord = function msgRecord(json) {
         //ファイルIDの振り分け
         for ( let index in json.fileData.attatchmentData ) {
             //IDは日付+ユーザーID+乱数8桁
-            json.fileData.attatchmentData[index].fileid = json.time + json.userid + parseInt(Math.random()*99999999);
+            json.fileData.attatchmentData[index].fileid = receivedTime + json.userid + parseInt(Math.random()*99999999);
         
         }
         
