@@ -693,8 +693,6 @@ let msgRecord = function msgRecord(json) {
                     size: json.fileData.attatchmentData[index].size,
                     type: json.fileData.attatchmentData[index].type,
                 };
-                //delete json.fileData.attatchmentData[index].name;
-                //delete json.fileData.attatchmentData[index].size;
             } catch(e) {
                 console.log("Message :: msgRecord : ファイルID記録に失敗");
             }
