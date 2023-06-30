@@ -309,6 +309,7 @@ let changeChannelSettings = function changeChannelSettings(dat) {
     db.dataServer.channels[dat.targetid].name = dat.channelname;
     db.dataServer.channels[dat.targetid].description = dat.description;
     db.dataServer.channels[dat.targetid].scope = dat.scope;
+    db.dataServer.channels[dat.targetid].canTalk = dat.canTalk;
 
     //JSONへ書き込み
     fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));

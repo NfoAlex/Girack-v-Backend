@@ -337,6 +337,8 @@ io.on("connection", (socket) => {
             targetid: channelid,
             channelname: this.channelnameText,
             description: this.descriptionText,
+            scope: (this.scopeIsPrivate?"private":"public"),,
+            canSpeak: this.channelCanTalk,
             reqSender: {
                 userid: Userinfo.value.userid,
                 sessionid: Userinfo.value.sessionid
