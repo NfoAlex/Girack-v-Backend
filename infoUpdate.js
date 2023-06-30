@@ -407,10 +407,7 @@ let channelAction = function channelAction(dat) {
     }
     */
 
-    if ( dat.action === "join" ) {
-        //配列へチャンネルIDをプッシュ
-        //db.dataUser.user[dat.userid].channel.push(dat.channelid);
-        
+    if ( dat.action === "join" ) {        
         //送信者の情報取得
         let senderInfo = db.getInfoUser({
             targetid: dat.reqSender.userid,
