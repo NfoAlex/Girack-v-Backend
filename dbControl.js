@@ -415,11 +415,13 @@ let getInfoChannel = function getInfoChannel(dat) {
 
         }
 
+        //チャンネル情報を格納
         infoParsed = {
             channelname: dataServer.channels[dat.targetid].name,
             channelid: dat.targetid,
             description: dataServer.channels[dat.targetid].description,
-            scope: dataServer.channels[dat.targetid].scope
+            scope: dataServer.channels[dat.targetid].scope,
+            canTalk: dataServer.channels[dat.targetid].canTalk
         }
     }
     catch(e) {
