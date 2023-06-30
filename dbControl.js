@@ -404,6 +404,7 @@ let getInfoChannel = function getInfoChannel(dat) {
             !reqSenderInfo.channelJoined.includes(dat.targetid)
         ) {
             infoParsed = {
+                channelid: dat.targetid,
                 channelname: "存在しないチャンネル",
                 channelid: dat.targetid,
                 description: "このチャンネルの情報がありません。これが見えていたらおかしいよ。",
