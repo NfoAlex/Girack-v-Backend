@@ -341,8 +341,9 @@ let getInfoUser = function getInfoUser(dat) {
         //送信者の参加チャンネルリストを取得
         let reqSenderInfoChannelJoined = dataUser.user[dat.reqSender.userid].channel;
 
-        //ターゲットユーザーの参加チャンネルリスト分確認
+        //ターゲットユーザーの参加チャンネルリスト分、送れる情報か確認する
         for ( let index in dataUser.user[dat.targetid].channel ) {
+            //チャンネルIDを取り出す
             let checkingChannelid =  dataUser.user[dat.targetid].channel[index];
 
             //チャンネルがプライベートなら送信者が参加しているかを確認してから追加

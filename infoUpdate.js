@@ -414,7 +414,7 @@ let channelAction = function channelAction(dat) {
             reqSender: dat.reqSender
         });
 
-        //チャンネルがプライベートで参加者が権力者でなく、招待者がそのチャンネルに参加していなら拒否
+        //チャンネルがプライベートで参加者が権力者でなく、また招待者がそのチャンネルに参加していなら拒否
         if (
             db.dataServer.channels[dat.channelid].scope === "private" &&
             senderInfo.role === "Member" &&
