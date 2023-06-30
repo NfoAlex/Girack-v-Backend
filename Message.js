@@ -32,6 +32,26 @@ let msgMix = function msgMix(m) {
     }
     */
 
+    try {
+        //送信者のロールとそのチャンネルで話せるロールを取得
+        let userRole = db.dataUser.user[m.userid].role;
+        let channelCanTalkRole = db.dataServer.channels[m.channelid].canTalk;
+
+        //もし送信者がMemberで話せるロールがMember以外なら処理停止
+        if ( userRole === "Member" && channelCanTalkRole !== "Member" ) {
+            return -1;
+
+        }
+
+        //もし送信者がModeratorで話せるロールがAdminなら処理停止
+        if ( userRole === "Moderator" && channelCanTalkRole === "Admin" ) {
+            return -1;
+
+        }
+    } catch(e) {
+        console.log("Message :: msgMix : 権限エラー->", e);
+    }
+
     //システムメッセージじゃないなら内容検査
     if ( !m.isSystemMessage ) {
         //メッセージがそもそも有効なものかどうか
