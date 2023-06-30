@@ -207,6 +207,9 @@ io.on("connection", (socket) => {
             "sessionid"
         ];
 
+        //なんかSYSTEMを装ってたらここで停止
+        if ( m.userid === "SYSTEM" ) return -1;
+
         //整合性の確認
         if ( !checkDataIntegrality(m, paramsRequire, "msgSend") ) return -1;
         
