@@ -305,6 +305,19 @@ let getInfoUser = function getInfoUser(dat) {
     let infoParsed = {}; //収集した情報を入れる
     let targetChannelJoined = []; //チャンネル参加リスト。プライベートは隠す処理をするため予め変数を設定
 
+    //システムメッセージ用の返答
+    if ( dat.targetid === "SYSTEM" ) {
+        return {
+            username: "SYSTEM", //ユーザーの表示名
+            userid: "SYSTEM",
+            channelJoined: [], //入っているチャンネルリスト(array)
+            role: "SYSTEM", //ユーザーのロール
+            loggedin: false,
+            banned: false //BANされているかどうか
+        };
+
+    }
+
     try{
         dataUser.user[dat.targetid].channel;
         if ( dataUser.user[dat.targetid] === undefined ) throw err;
