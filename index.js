@@ -11,7 +11,7 @@ const { config } = require("process");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230629";
+const SERVER_VERSION = "alpha_20230630";
 
 const app = express();
 const server = http.createServer(app);
@@ -337,6 +337,8 @@ io.on("connection", (socket) => {
             targetid: channelid,
             channelname: this.channelnameText,
             description: this.descriptionText,
+            scope: (this.scopeIsPrivate?"private":"public"),,
+            canSpeak: this.channelCanTalk,
             reqSender: {
                 userid: Userinfo.value.userid,
                 sessionid: Userinfo.value.sessionid

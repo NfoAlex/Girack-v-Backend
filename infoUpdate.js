@@ -309,6 +309,7 @@ let changeChannelSettings = function changeChannelSettings(dat) {
     db.dataServer.channels[dat.targetid].name = dat.channelname;
     db.dataServer.channels[dat.targetid].description = dat.description;
     db.dataServer.channels[dat.targetid].scope = dat.scope;
+    db.dataServer.channels[dat.targetid].canTalk = dat.canTalk;
 
     //JSONへ書き込み
     fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
@@ -406,17 +407,14 @@ let channelAction = function channelAction(dat) {
     }
     */
 
-    if ( dat.action === "join" ) {
-        //配列へチャンネルIDをプッシュ
-        //db.dataUser.user[dat.userid].channel.push(dat.channelid);
-        
+    if ( dat.action === "join" ) {        
         //送信者の情報取得
         let senderInfo = db.getInfoUser({
             targetid: dat.reqSender.userid,
             reqSender: dat.reqSender
         });
 
-        //チャンネルがプライベートで参加者が権力者でなく、招待者がそのチャンネルに参加していなら拒否
+        //チャンネルがプライベートで参加者が権力者でなく、また招待者がそのチャンネルに参加していなら拒否
         if (
             db.dataServer.channels[dat.channelid].scope === "private" &&
             senderInfo.role === "Member" &&

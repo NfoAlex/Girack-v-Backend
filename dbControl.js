@@ -305,6 +305,19 @@ let getInfoUser = function getInfoUser(dat) {
     let infoParsed = {}; //収集した情報を入れる
     let targetChannelJoined = []; //チャンネル参加リスト。プライベートは隠す処理をするため予め変数を設定
 
+    //システムメッセージ用の返答
+    if ( dat.targetid === "SYSTEM" ) {
+        return {
+            username: "SYSTEM", //ユーザーの表示名
+            userid: "SYSTEM",
+            channelJoined: [], //入っているチャンネルリスト(array)
+            role: "SYSTEM", //ユーザーのロール
+            loggedin: false,
+            banned: false //BANされているかどうか
+        };
+
+    }
+
     try{
         dataUser.user[dat.targetid].channel;
         if ( dataUser.user[dat.targetid] === undefined ) throw err;
@@ -328,8 +341,9 @@ let getInfoUser = function getInfoUser(dat) {
         //送信者の参加チャンネルリストを取得
         let reqSenderInfoChannelJoined = dataUser.user[dat.reqSender.userid].channel;
 
-        //ターゲットユーザーの参加チャンネルリスト分確認
+        //ターゲットユーザーの参加チャンネルリスト分、送れる情報か確認する
         for ( let index in dataUser.user[dat.targetid].channel ) {
+            //チャンネルIDを取り出す
             let checkingChannelid =  dataUser.user[dat.targetid].channel[index];
 
             //チャンネルがプライベートなら送信者が参加しているかを確認してから追加
@@ -391,6 +405,7 @@ let getInfoChannel = function getInfoChannel(dat) {
             !reqSenderInfo.channelJoined.includes(dat.targetid)
         ) {
             infoParsed = {
+                channelid: dat.targetid,
                 channelname: "存在しないチャンネル",
                 channelid: dat.targetid,
                 description: "このチャンネルの情報がありません。これが見えていたらおかしいよ。",
@@ -401,11 +416,13 @@ let getInfoChannel = function getInfoChannel(dat) {
 
         }
 
+        //チャンネル情報を格納
         infoParsed = {
             channelname: dataServer.channels[dat.targetid].name,
             channelid: dat.targetid,
             description: dataServer.channels[dat.targetid].description,
-            scope: dataServer.channels[dat.targetid].scope
+            scope: dataServer.channels[dat.targetid].scope,
+            canTalk: dataServer.channels[dat.targetid].canTalk
         }
     }
     catch(e) {
