@@ -74,7 +74,8 @@ try { //読み込んでみる
         },
         "CHANNEL": {
             "CHANNEL_CREATE_AVAILABLE": true,
-            "CHANNEL_DELETE_AVAILABLEFORMEMBER": true
+            "CHANNEL_DELETE_AVAILABLEFORMEMBER": true,
+            "CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER": false
         },
         "MESSAGE": {
             "MESSAGE_TXT_MAXLENGTH": "250",
