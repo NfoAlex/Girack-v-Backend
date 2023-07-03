@@ -697,6 +697,9 @@ io.on("connection", (socket) => {
 
             }
 
+            //Socketチャンネルへ参加させる
+            socket.join(dat.channelid);
+
         } else if ( dat.action === "leave" ) { //退出?
             //起こした人と対象が違うなら"キックされた"と設定
             if ( dat.userid !== dat.reqSender.userid ) {
@@ -707,6 +710,9 @@ io.on("connection", (socket) => {
                 TERM = "LEFT";
 
             }
+
+            //Socketチャンネルから抜けさせる
+            socket.leave(dat.channelid);
 
         }
 
