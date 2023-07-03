@@ -494,7 +494,8 @@ let searchUserDynamic = function searchUserDynamic(dat) {
 
     //検索開始
     for ( index in objUser ) {
-        if ( objUser[index][1].name.includes(dat.query) ) {
+        //名前と検索クエリーを小文字にして判別
+        if ( (objUser[index][1].name.toLowerCase()).includes(dat.query.toLowerCase()) ) {
             searchResult.push({
                 userid: objUser[index][0],
                 username: objUser[index][1].name,
