@@ -342,7 +342,7 @@ io.on("connection", (socket) => {
             channelname: this.channelnameText,
             description: this.descriptionText,
             scope: (this.scopeIsPrivate?"private":"public"),,
-            canSpeak: this.channelCanTalk,
+            canTalk: this.channelCanTalk,
             reqSender: {
                 userid: Userinfo.value.userid,
                 sessionid: Userinfo.value.sessionid
@@ -355,7 +355,7 @@ io.on("connection", (socket) => {
             "channelname",
             "description",
             "scope",
-            "canSpeak"
+            "canTalk"
         ];
 
         //データ整合性の確認
