@@ -350,11 +350,16 @@ io.on("connection", (socket) => {
         }
         */
 
-        //セッションIDの確認
-        if ( !auth.checkUserSession({
-            userid: dat.reqSender.userid,
-            sessionid: dat.reqSender.sessionid
-        }) ) { return -1; }
+        let paramRequire = [
+            "targetid",
+            "channelname",
+            "description",
+            "scope",
+            "canSpeak"
+        ];
+
+        //データ整合性の確認
+        if ( !checkDataIntegrality(dat, paramRequire, "changeChannelSettings") ) return -1;
 
         //チャンネル名と概要の長さ制限
         if ( dat.description > 128 ) return -1;
