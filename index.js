@@ -213,9 +213,6 @@ io.on("connection", (socket) => {
         //整合性の確認
         if ( !checkDataIntegrality(m, paramsRequire, "msgSend") ) return -1;
         
-        //セッションIDの確認
-        //if ( !auth.checkUserSession({userid:m.userid, sessionid:m.sessionid}) ) { return -1; }
-
         let msgCompiled = msg.msgMix(m); //メッセージに情報をつける
         if ( msgCompiled === -1 ) { return; } //処理中にエラーがあったなら止める
 
