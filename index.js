@@ -11,7 +11,7 @@ const { config } = require("process");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230630";
+const SERVER_VERSION = "alpha_20230703";
 
 const app = express();
 const server = http.createServer(app);
@@ -237,7 +237,8 @@ io.on("connection", (socket) => {
         console.log("msgSend :: 送信するデータ ↓");
         console.log(msgCompiled);
         
-        io.to("loggedin").emit("messageReceive", msgCompiled); //全員に送信
+        //チャンネル参加者のみに送信
+        io.to(m.channelid).emit("messageReceive", msgCompiled);
 
     });
 
@@ -696,6 +697,9 @@ io.on("connection", (socket) => {
 
             }
 
+            //Socketチャンネルへ参加させる
+            socket.join(dat.channelid);
+
         } else if ( dat.action === "leave" ) { //退出?
             //起こした人と対象が違うなら"キックされた"と設定
             if ( dat.userid !== dat.reqSender.userid ) {
@@ -706,6 +710,9 @@ io.on("connection", (socket) => {
                 TERM = "LEFT";
 
             }
+
+            //Socketチャンネルから抜けさせる
+            socket.leave(dat.channelid);
 
         }
 
@@ -893,6 +900,13 @@ io.on("connection", (socket) => {
             //認証済みセッションとして登録
             socket.join("loggedin");
 
+            //参加しているチャンネルのSocketチャンネルへ参加
+            for ( let index in loginAttempt.channelJoined ) {
+                socket.join(loginAttempt.channelJoined[index]);
+                console.log("index :: auth : socket参加->", loginAttempt.channelJoined[index]);
+
+            }
+
             //ユーザーのオンライン状態を設定
             db.dataUser.user[loginAttempt.userid].state.loggedin = true;
             //DBをJSONへ保存
@@ -975,6 +989,13 @@ io.on("connection", (socket) => {
 
             //認証済みセッションとして登録
             socket.join("loggedin");
+
+            //参加しているチャンネルのSocketチャンネルへ参加
+            for ( let index in loginAttempt.channelJoined ) {
+                socket.join(loginAttempt.channelJoined[index]);
+                console.log("index :: auth : socket参加->", loginAttempt.channelJoined[index]);
+
+            }
 
             //オンライン人数を更新
             io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);

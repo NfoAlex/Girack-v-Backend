@@ -161,14 +161,14 @@ let msgMix = function msgMix(m) {
 //ファイルが添付されているならいろいろ処理する部分
 let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePath) {
     //ファイル用ディレクトリを作成
-    try{fs.mkdirSync("./files/"+channelid);}catch(e){console.log("なんか怒ってるな1", e);}
-    try{fs.mkdirSync("./files/"+channelid+"/"+receivedDatePath);}catch(e){console.log("なんか怒ってるな2", e);}
+    try{fs.mkdirSync("./files/"+channelid);}catch(e){}
+    try{fs.mkdirSync("./files/"+channelid+"/"+receivedDatePath);}catch(e){}
 
     //ファイルの書き込み(複数の書き込み用にfor)
     for ( let index in fileData.attatchmentData ) {
         //ファイルサイズが大きかったら書き込まない
         if ( fileData.attatchmentData[index].size >= db.dataServer.config.MESSAGE.MESSAGE_FILE_MAXSIZE ) {
-            console.log("このファイルのサイズが大きい");
+            console.log("Message :: writeUploadedFile : このファイルのサイズが大きい");
         
         } else {
             try {
