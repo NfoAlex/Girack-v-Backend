@@ -368,6 +368,7 @@ io.on("connection", (socket) => {
         //システムメッセージに記録するための差異判別
         let descChanged = false; //概要の変更
         let nameChanged = false; //名前の変更
+        let scopeChanged = false; //公開範囲の変更
         //もし標的チャンネルと概要が変わってるなら
         if ( db.dataServer.channels[dat.targetid].description !== dat.description ) {
             descChanged = true;
@@ -376,6 +377,11 @@ io.on("connection", (socket) => {
         //もし標的チャンネルと名前が変わってるなら
         if ( db.dataServer.channels[dat.targetid].name !== dat.channelname ) {
             nameChanged = true;
+
+        }
+        //もし公開範囲が変わってるなら
+        if ( db.dataServer.channels[dat.targetid].scope !== dat.scope ) {
+            scopeChanged = true;
 
         }
 
@@ -435,6 +441,34 @@ io.on("connection", (socket) => {
                 },
                 content: {
                     term: "CHANNELNAME_UPDATED",
+                    targetUser: "",
+                    triggeredUser: dat.reqSender.userid
+                },
+                isSystemMessage: true
+            };
+
+            //システムメッセージを記録して送信
+            let SystemMessageResult = msg.msgMix(SystemMessageLogging);
+            io.to("loggedin").emit("messageReceive", SystemMessageResult);
+
+        }
+
+        //もし公開範囲が変わっていたらシステムメッセージを送信
+        if ( scopeChanged ) {
+            //記録するシステムメッセージ
+            let SystemMessageLogging = {
+                userid: "SYSTEM",
+                channelid: dat.targetid,
+                replyData: {
+                    isReplying: false,
+                    messageid: "",
+                },
+                fileData: { 
+                    isAttatched: false,
+                    attatchmentData: null
+                },
+                content: {
+                    term: "SCOPE_UPDATED",
                     targetUser: "",
                     triggeredUser: dat.reqSender.userid
                 },
