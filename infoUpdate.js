@@ -308,8 +308,16 @@ let changeChannelSettings = function changeChannelSettings(dat) {
     //名前と概要と公開範囲を更新
     db.dataServer.channels[dat.targetid].name = dat.channelname;
     db.dataServer.channels[dat.targetid].description = dat.description;
-    db.dataServer.channels[dat.targetid].scope = dat.scope;
     db.dataServer.channels[dat.targetid].canTalk = dat.canTalk;
+
+    //公開範囲をMemberでも変えられる設定、あるいはMemberじゃないならだったら適用
+    if ( 
+        db.dataUser.user[dat.reqSender.userid].role !== "Member" ||
+        db.dataServer.config.CHANNEL.CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER
+    ) {
+        db.dataServer.channels[dat.targetid].scope = dat.scope;
+
+    }
 
     //JSONへ書き込み
     fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));

@@ -454,7 +454,7 @@ io.on("connection", (socket) => {
         }
 
         //もし公開範囲が変わっていたらシステムメッセージを送信
-        if ( scopeChanged ) {
+        if ( scopeChanged && db.dataServer.config.CHANNEL.CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER ) {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
                 userid: "SYSTEM",
