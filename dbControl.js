@@ -335,7 +335,7 @@ let getInfoUser = function getInfoUser(dat) {
     }
 
     //もし送信者が同じか権限によって渡すチャンネル参加リストを変える
-    if ( dat.reqSender.userid === dat.targetid || dataUser.user[dat.reqSender.userid].role !== "Member" ) {
+    if ( dat.reqSender.userid === dat.targetid || dataUser.user[dat.reqSender.userid].role === "Admin" ) {
         targetChannelJoined = dataUser.user[dat.targetid].channel;
 
     } else { //リクエスト送信者が通常メンバーならプライベートチャンネルを隠す(送信者が参加していた場合をのぞく)
@@ -401,7 +401,7 @@ let getInfoChannel = function getInfoChannel(dat) {
     try {
         //もしユーザーがメンバーなのにプライベートチャンネルを取得しようとしているなら空データを返す
         if (
-            reqSenderInfo.role === "Member" &&
+            reqSenderInfo.role !== "Admin" &&
             dataServer.channels[dat.targetid].scope === "private" &&
             !reqSenderInfo.channelJoined.includes(dat.targetid)
         ) {
