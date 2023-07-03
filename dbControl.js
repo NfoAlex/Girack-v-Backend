@@ -492,12 +492,31 @@ let searchUserDynamic = function searchUserDynamic(dat) {
     let searchResult = []; //検索結果を入れる配列
     let objUser = Object.entries(dataUser.user);
 
-    //検索開始
-    for ( index in objUser ) {
-        if ( objUser[index][1].name.includes(dat.query) ) {
+    //検索クエリーが空じゃないなら検索開始
+    if ( dat.query !== "" ) {
+        //検索開始
+        for ( index in objUser ) {
+            //名前と検索クエリーを小文字にして判別
+            if ( (objUser[index][1].name.toLowerCase()).includes(dat.query.toLowerCase()) ) {
+                searchResult.push({
+                    userid: objUser[index][0],
+                    username: objUser[index][1].name,
+                });
+
+            }
+
+        }
+
+    //空クエリーなら上20個を返す
+    } else {
+        for ( let i=0; i<20; i++ ) {
+            //もしインデックスの範囲が漏れてるなら
+            if ( objUser[i] === undefined ) break;
+            
+            //検索
             searchResult.push({
-                userid: objUser[index][0],
-                username: objUser[index][1].name,
+                userid: objUser[i][0],
+                username: objUser[i][1].name,
             });
 
         }
