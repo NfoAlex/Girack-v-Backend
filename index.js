@@ -342,7 +342,7 @@ io.on("connection", (socket) => {
             channelname: this.channelnameText,
             description: this.descriptionText,
             scope: (this.scopeIsPrivate?"private":"public"),,
-            canSpeak: this.channelCanTalk,
+            canTalk: this.channelCanTalk,
             reqSender: {
                 userid: Userinfo.value.userid,
                 sessionid: Userinfo.value.sessionid
@@ -350,11 +350,16 @@ io.on("connection", (socket) => {
         }
         */
 
-        //セッションIDの確認
-        if ( !auth.checkUserSession({
-            userid: dat.reqSender.userid,
-            sessionid: dat.reqSender.sessionid
-        }) ) { return -1; }
+        let paramRequire = [
+            "targetid",
+            "channelname",
+            "description",
+            "scope",
+            "canTalk"
+        ];
+
+        //データ整合性の確認
+        if ( !checkDataIntegrality(dat, paramRequire, "changeChannelSettings") ) return -1;
 
         //チャンネル名と概要の長さ制限
         if ( dat.description > 128 ) return -1;
@@ -363,6 +368,7 @@ io.on("connection", (socket) => {
         //システムメッセージに記録するための差異判別
         let descChanged = false; //概要の変更
         let nameChanged = false; //名前の変更
+        let scopeChanged = false; //公開範囲の変更
         //もし標的チャンネルと概要が変わってるなら
         if ( db.dataServer.channels[dat.targetid].description !== dat.description ) {
             descChanged = true;
@@ -371,6 +377,11 @@ io.on("connection", (socket) => {
         //もし標的チャンネルと名前が変わってるなら
         if ( db.dataServer.channels[dat.targetid].name !== dat.channelname ) {
             nameChanged = true;
+
+        }
+        //もし公開範囲が変わってるなら
+        if ( db.dataServer.channels[dat.targetid].scope !== dat.scope ) {
+            scopeChanged = true;
 
         }
 
@@ -430,6 +441,34 @@ io.on("connection", (socket) => {
                 },
                 content: {
                     term: "CHANNELNAME_UPDATED",
+                    targetUser: "",
+                    triggeredUser: dat.reqSender.userid
+                },
+                isSystemMessage: true
+            };
+
+            //システムメッセージを記録して送信
+            let SystemMessageResult = msg.msgMix(SystemMessageLogging);
+            io.to("loggedin").emit("messageReceive", SystemMessageResult);
+
+        }
+
+        //もし公開範囲が変わっていたらシステムメッセージを送信
+        if ( scopeChanged && db.dataServer.config.CHANNEL.CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER ) {
+            //記録するシステムメッセージ
+            let SystemMessageLogging = {
+                userid: "SYSTEM",
+                channelid: dat.targetid,
+                replyData: {
+                    isReplying: false,
+                    messageid: "",
+                },
+                fileData: { 
+                    isAttatched: false,
+                    attatchmentData: null
+                },
+                content: {
+                    term: "SCOPE_UPDATED",
                     targetUser: "",
                     triggeredUser: dat.reqSender.userid
                 },
