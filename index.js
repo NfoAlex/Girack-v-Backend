@@ -237,7 +237,8 @@ io.on("connection", (socket) => {
         console.log("msgSend :: 送信するデータ ↓");
         console.log(msgCompiled);
         
-        io.to("loggedin").emit("messageReceive", msgCompiled); //全員に送信
+        //io.to("loggedin").emit("messageReceive", msgCompiled); //全員に送信
+        io.to(m.channelid).emit("messageReceive", msgCompiled); //チャンネル参加者のみに送信
 
     });
 
@@ -893,6 +894,13 @@ io.on("connection", (socket) => {
             //認証済みセッションとして登録
             socket.join("loggedin");
 
+            //参加しているチャンネルのSocketチャンネルへ参加
+            for ( let index in loginAttempt.channelJoined ) {
+                socket.join(loginAttempt.channelJoined[index]);
+                console.log("index :: auth : socket参加->", loginAttempt.channelJoined[index]);
+
+            }
+
             //ユーザーのオンライン状態を設定
             db.dataUser.user[loginAttempt.userid].state.loggedin = true;
             //DBをJSONへ保存
@@ -975,6 +983,13 @@ io.on("connection", (socket) => {
 
             //認証済みセッションとして登録
             socket.join("loggedin");
+
+            //参加しているチャンネルのSocketチャンネルへ参加
+            for ( let index in loginAttempt.channelJoined ) {
+                socket.join(loginAttempt.channelJoined[index]);
+                console.log("index :: auth : socket参加->", loginAttempt.channelJoined[index]);
+
+            }
 
             //オンライン人数を更新
             io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
