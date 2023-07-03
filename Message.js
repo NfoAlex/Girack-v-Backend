@@ -168,7 +168,7 @@ let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePat
     for ( let index in fileData.attatchmentData ) {
         //ファイルサイズが大きかったら書き込まない
         if ( fileData.attatchmentData[index].size >= db.dataServer.config.MESSAGE.MESSAGE_FILE_MAXSIZE ) {
-            console.log("このファイルのサイズが大きい");
+            console.log("Message :: writeUploadedFile : このファイルのサイズが大きい");
         
         } else {
             try {
