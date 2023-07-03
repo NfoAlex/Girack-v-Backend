@@ -237,8 +237,8 @@ io.on("connection", (socket) => {
         console.log("msgSend :: 送信するデータ ↓");
         console.log(msgCompiled);
         
-        //io.to("loggedin").emit("messageReceive", msgCompiled); //全員に送信
-        io.to(m.channelid).emit("messageReceive", msgCompiled); //チャンネル参加者のみに送信
+        //チャンネル参加者のみに送信
+        io.to(m.channelid).emit("messageReceive", msgCompiled);
 
     });
 
