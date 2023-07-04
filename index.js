@@ -883,7 +883,7 @@ io.on("connection", (socket) => {
 // 認証関連
 
     //認証
-    socket.on("auth", (key, CLIENT_VERSION) => { //key = "パスワード"
+    socket.on("auth", async (key, CLIENT_VERSION) => { //key = "パスワード"
         console.log("auth :: 受信 ↓");
         console.log(key);
 
@@ -894,7 +894,7 @@ io.on("connection", (socket) => {
 
         }
 
-        let loginAttempt = auth.authUser(key); //ログイン結果
+        let loginAttempt = await auth.authUser(key); //ログイン結果
 
         //認証結果を元にユーザーをオンラインとして記録する
         if ( loginAttempt.result ) {
@@ -950,7 +950,7 @@ io.on("connection", (socket) => {
     });
 
     //パスワードを変更する
-    socket.on("changePassword", (dat) => {
+    socket.on("changePassword", async (dat) => {
         /*
         dat
         {
@@ -967,9 +967,9 @@ io.on("connection", (socket) => {
             "newPassword"
         ];
 
-        if ( !checkDataIntegrality(dat, paramRequire, "changeProfileSecurity") ) return -1
+        if ( !checkDataIntegrality(dat, paramRequire, "changePassword") ) return -1
 
-        let result = auth.changePassword(dat);
+        let result = await auth.changePassword(dat);
 
         //パスワードの変更結果を送信
         socket.emit("changePasswordResult", result);
@@ -1047,9 +1047,6 @@ io.on("connection", (socket) => {
 
         }
 
-        //このsocketのIDのユーザーIDを空に
-        //socketOnline[socket.id] = "";
-
         //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
         if ( userOnline[dat.reqSender.userid] >= 2 ) {
             userOnline[dat.reqSender.userid] -= 1;
@@ -1070,9 +1067,9 @@ io.on("connection", (socket) => {
     });
 
     //新規登録
-    socket.on("register", (dat) => {
+    socket.on("register", async (dat) => {
         console.log("register :: 登録しようとしてる", dat);
-        let key = auth.registerUser(dat); //DBにユーザーを登録、パスワードの取得
+        let key = await auth.registerUser(dat); //DBにユーザーを登録、パスワードの取得
 
         //返り値が-1じゃないなら
         if ( key !== -1 ) {

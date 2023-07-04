@@ -1,13 +1,14 @@
 //auth.js
 
 const fs = require('fs'); //履歴書き込むため
+const bcrypt = require("bcrypt"); //ハッシュ化用
 let db = require("./dbControl.js");
 
 //ユーザー認証
-let authUser = function authUser(cred) {
+let authUser = async function authUser(cred) {
     console.log("authUser :: これから確認...");
 
-    //データからユーザー名とパスワードを抽出
+    //データからユーザー名とパスワード(ハッシュ化)を抽出
     let username = cred.username;
     let password = cred.password;
 
@@ -19,8 +20,12 @@ let authUser = function authUser(cred) {
         //ユーザー名とパスワードの一致を確認してセッションIDを生成する
         if (
             db.dataUser.user[index].name === username &&
-            db.dataUser.user[index].pw === password
+            (
+                bcrypt.compare(password, db.dataUser.user[index].pw) || //ハッシュ化とパスワード比較
+                db.dataUser.user[index].pw === password //一応平文前提でも、そしてハッシュ化する(次期ビルドで削除)
+            )
         ) {
+            //セッションID入れるよう
             let _session = "";
 
             //BANされているならそう結果を返す
@@ -36,8 +41,14 @@ let authUser = function authUser(cred) {
             }
 
             let username = db.dataUser.user[index].name; //ユーザー名取得
+            db.dataUser.user[index].state.session_id = _session; //セッションコードを設定
 
-            db.dataUser.user[index].state.session_id = _session; //セッションコードを取得
+            // !!!! ↓↓次期ビルドで削除↓↓ !!!!
+            //パスワードが平文保存されているならハッシュ化して保存
+            if ( db.dataUser.user[index].pw === password ) {
+                db.dataUser.user[index].pw = await bcrypt.hash(cred.password, 10);
+
+            }
             
             //サーバーのJSONファイルを更新
             fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
@@ -62,12 +73,19 @@ let authUser = function authUser(cred) {
 }
 
 //パスワードを変更
-let changePassword = function changePassword(dat) {
+let changePassword = async function changePassword(dat) {
     //今のパスワードが一致しないならここで停止
-    if ( db.dataUser.user[dat.reqSender.userid].pw !== dat.currentPassword ) return -1;
+    if ( 
+        db.dataUser.user[dat.reqSender.userid].pw !== dat.currentPassword && //平文でも比較　次期ビルドで削除
+        !bcrypt.compare(dat.currentPassword, db.dataUser.user[dat.reqSender.userid].pw)
+    ) {
+        return -1;
+    }
+
+    let newPassword = await bcrypt.hash(dat.newPassword, 10);
 
     //パスワード変更
-    db.dataUser.user[dat.reqSender.userid].pw = dat.newPassword;
+    db.dataUser.user[dat.reqSender.userid].pw = newPassword;
     fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
     return 1;
@@ -108,7 +126,7 @@ let authUserBySession = function authUserBySession(cred) {
 }
 
 //ユーザーの新規登録、そしてパスワードを返す
-let registerUser = function registerUser(dat) { //dat=[0=>name(名前), 1=>key(招待コード)]
+let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=>key(招待コード)]
     //招待制だったらコードを確認
     if ( db.dataServer.registration.invite.inviteOnly && db.dataServer.registration.available ) { //招待制かどうか
         //招待コードが一致しているかどうか
@@ -129,11 +147,16 @@ let registerUser = function registerUser(dat) { //dat=[0=>name(名前), 1=>key(�
 
     }
 
+    //パスワードを生成
+    const pwGenerated = generateKey();
+    //DBに書くためにハッシュ化する
+    const pwHashed = await bcrypt.hash(pwGenerated, 10);
+
     //DBに登録
     db.dataUser.user[newID] = {
         "name": dat[0],
         "role": "Member",
-        "pw": generateKey(),
+        "pw": pwHashed,
         "icon": "",
         "state": {
             "loggedin": false,
@@ -155,7 +178,7 @@ let registerUser = function registerUser(dat) { //dat=[0=>name(名前), 1=>key(�
     fs.copyFileSync("./img/default.jpeg", "./img/" + newID + ".jpeg");
 
     //パスワードを返す
-    return db.dataUser.user[newID].pw;
+    return pwGenerated;
 
 }
 
