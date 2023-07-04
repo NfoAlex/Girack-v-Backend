@@ -606,10 +606,6 @@ io.on("connection", (socket) => {
 
         });
 
-        fs.statSync("./img/"+dat.reqSender.userid+iconExtension, (err) => {
-            console.log("index :: changeProfileIcon : 画像がない？->", err);
-        });
-
     });
 
     //ユーザーの個人用データで設定情報を上書き保存
