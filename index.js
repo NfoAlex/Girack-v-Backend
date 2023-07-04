@@ -548,44 +548,29 @@ io.on("connection", (socket) => {
 
         }
 
-        //もしJPEGが先に存在しているなら削除しておく
-        fs.access("./img/"+dat.reqSender.userid+".jpeg", (err) => {
-            if ( !err ) {
-                fs.unlink("./img/"+dat.reqSender.userid+".jpeg", (err) => {
-                    if ( err ) console.log(err);
-                    console.log("file action taken with JPEG");
+        // もしJPEGが先に存在しているなら削除しておく
+        try {
+            await fsPromise.unlink("./img/" + dat.reqSender.userid + ".jpeg");
+            console.log("file action taken with JPEG");
+        } catch (err) {
+            console.log("index :: changeProfileIcon : JPEGナシ");
+        }
 
-                });
+        // もしGIFが先に存在しているなら削除しておく
+        try {
+            await fsPromise.unlink("./img/" + dat.reqSender.userid + ".gif");
+            console.log("file action taken with GIF");
+        } catch (err) {
+            console.log("index :: changeProfileIcon : GIFナシ");
+        }
 
-            }
-
-        });
-
-        //もしGIFが先に存在しているなら削除しておく
-        fs.access("./img/"+dat.reqSender.userid+".gif", (err) => {
-            if ( !err ) {
-                fs.unlink("./img/"+dat.reqSender.userid+".gif", (err) => {
-                    if ( err ) console.log(err);
-                    console.log("file action taken with GIF");
-
-                });
-
-            }
-
-        });
-
-        //もしPNGが先に存在しているなら削除しておく
-        fs.access("./img/"+dat.reqSender.userid+".png", (err) => {
-            if ( !err ) {
-                fs.unlink("./img/"+dat.reqSender.userid+".png", (err) => {
-                    if ( err ) console.log(err);
-                    console.log("index :: changeProfileIcon : PNGアイコンを削除しました");
-
-                });
-
-            }
-
-        });
+        // もしPNGが先に存在しているなら削除しておく
+        try {
+            await fsPromise.unlink("./img/" + dat.reqSender.userid + ".png");
+            console.log("index :: changeProfileIcon : PNGアイコンを削除しました");
+        } catch (err) {
+            console.log("index :: changeProfileIcon : PNGナシ");
+        }
 
         let iconExtension = "";
         //拡張子を判別して設定
@@ -601,10 +586,13 @@ io.on("connection", (socket) => {
         }
 
         //アイコン画像書き込み
-        await fsPromise.writeFile("./img/"+dat.reqSender.userid+iconExtension, dat.fileData.buffer, (err) => {
-            console.log("result->", err);
+        try {
+            await fsPromise.writeFile("./img/" + dat.reqSender.userid + iconExtension, dat.fileData.buffer);
+        } catch (e) {
+            console.log(e);
+        }
 
-        });
+        console.log("index :: changeProfileIcon : アイコン変更処理完了");
 
     });
 
