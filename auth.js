@@ -45,7 +45,7 @@ let authUser = async function authUser(cred) {
 
             // !!!! ↓↓次期ビルドで削除↓↓ !!!!
             //パスワードが平文保存されているならハッシュ化して保存
-            if ( db.dataUser.user[index].pw === cred.password ) {
+            if ( db.dataUser.user[index].pw === password ) {
                 db.dataUser.user[index].pw = await bcrypt.hash(cred.password, 10);
 
             }
