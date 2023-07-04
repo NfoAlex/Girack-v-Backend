@@ -3,7 +3,8 @@ const msg = require("./Message.js"); //メッセージの処理関連
 const auth = require("./auth.js"); //認証関連
 const infoUpdate = require("./infoUpdate.js");
 
-const fs = require('fs');
+const fs = require("fs");
+const fsPromise = require("fs").promises;
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
@@ -513,7 +514,7 @@ io.on("connection", (socket) => {
     });
 
     //プロフィールアイコンの更新
-    socket.on("changeProfileIcon", (dat) => {
+    socket.on("changeProfileIcon", async (dat) => {
         /*
         dat
         {
@@ -534,7 +535,7 @@ io.on("connection", (socket) => {
             "fileData"
         ];
 
-        //データ型を調べる
+        //データの整合性を調べる
         if ( !checkDataIntegrality(dat, paramRequire, "changeProfileIcon") ) return;
 
         //もしJPEGかGIFじゃないなら、またファイルサイズ制限に引っかかったら拒否
@@ -548,7 +549,7 @@ io.on("connection", (socket) => {
         }
 
         //もしJPEGが先に存在しているなら削除しておく
-        fs.access("./img/"+dat.reqSender.userid+".jpeg", (err) => {
+        await fsPromise.access("./img/"+dat.reqSender.userid+".jpeg", (err) => {
             if ( !err ) {
                 fs.unlink("./img/"+dat.reqSender.userid+".jpeg", (err) => {
                     if ( err ) console.log(err);
@@ -561,7 +562,7 @@ io.on("connection", (socket) => {
         });
 
         //もしGIFが先に存在しているなら削除しておく
-        fs.access("./img/"+dat.reqSender.userid+".gif", (err) => {
+        await fsPromise.access("./img/"+dat.reqSender.userid+".gif", (err) => {
             if ( !err ) {
                 fs.unlink("./img/"+dat.reqSender.userid+".gif", (err) => {
                     if ( err ) console.log(err);
@@ -574,11 +575,11 @@ io.on("connection", (socket) => {
         });
 
         //もしPNGが先に存在しているなら削除しておく
-        fs.access("./img/"+dat.reqSender.userid+".png", (err) => {
+        await fsPromise.access("./img/"+dat.reqSender.userid+".png", (err) => {
             if ( !err ) {
-                fs.unlink("./img/"+dat.reqSender.userid+".png", (err) => {
+                fsPromise.unlink("./img/"+dat.reqSender.userid+".png", (err) => {
                     if ( err ) console.log(err);
-                    console.log("file action taken with PNG");
+                    console.log("index :: changeProfileIcon : PNGアイコンを削除しました");
 
                 });
 
@@ -586,7 +587,7 @@ io.on("connection", (socket) => {
 
         });
 
-        let iconExtension;
+        let iconExtension = "";
         //拡張子を判別して設定
         if ( dat.fileData.type === "image/jpeg" ) {
             iconExtension = ".jpeg";
@@ -600,9 +601,13 @@ io.on("connection", (socket) => {
         }
 
         //アイコン画像書き込み
-        fs.writeFile("./img/"+dat.reqSender.userid+iconExtension, dat.fileData.buffer, (err) => {
+        await fsPromise.writeFile("./img/"+dat.reqSender.userid+iconExtension, dat.fileData.buffer, (err) => {
             console.log("result->", err);
 
+        });
+
+        fs.statSync("./img/"+dat.reqSender.userid+iconExtension, (err) => {
+            console.log("index :: changeProfileIcon : 画像がない？->", err);
         });
 
     });
