@@ -5,12 +5,14 @@ const bcrypt = require("bcrypt"); //ハッシュ化用
 let db = require("./dbControl.js");
 
 //ユーザー認証
-let authUser = function authUser(cred) {
+let authUser = async function authUser(cred) {
     console.log("authUser :: これから確認...");
 
-    //データからユーザー名とパスワードを抽出
+    //データからユーザー名とパスワード(ハッシュ化)を抽出
     let username = cred.username;
-    let password = cred.password;
+    let password = await bcrypt.hash(cred.password,10);
+
+    console.log("auth :: authUser : ハッシュ化したpw->", password);
 
     //それぞれのユーザーリストの中でパスワードが一致しているやつを探す
     for (let i=0; i<Object.keys(db.dataUser.user).length; i++ ) {
@@ -20,7 +22,10 @@ let authUser = function authUser(cred) {
         //ユーザー名とパスワードの一致を確認してセッションIDを生成する
         if (
             db.dataUser.user[index].name === username &&
-            db.dataUser.user[index].pw === password
+            (
+                db.dataUser.user[index].pw === password ||
+                db.dataUser.user[index].pw === cred.password //ハッシュ化前のも調べる、そしてハッシュ化する(次期ビルドで削除)
+            )
         ) {
             let _session = "";
 
@@ -39,6 +44,13 @@ let authUser = function authUser(cred) {
             let username = db.dataUser.user[index].name; //ユーザー名取得
 
             db.dataUser.user[index].state.session_id = _session; //セッションコードを取得
+
+            // !!!! ↓↓次期ビルドで削除↓↓ !!!!
+            //パスワードが平文保存されているならハッシュ化して保存
+            if ( db.dataUser.user[index].pw === cred.password ) {
+                db.dataUser.user[index].pw = await bcrypt.hash(cred.password, 10);
+
+            }
             
             //サーバーのJSONファイルを更新
             fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));

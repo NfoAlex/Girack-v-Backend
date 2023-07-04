@@ -883,7 +883,7 @@ io.on("connection", (socket) => {
 // 認証関連
 
     //認証
-    socket.on("auth", (key, CLIENT_VERSION) => { //key = "パスワード"
+    socket.on("auth", async (key, CLIENT_VERSION) => { //key = "パスワード"
         console.log("auth :: 受信 ↓");
         console.log(key);
 
@@ -894,7 +894,7 @@ io.on("connection", (socket) => {
 
         }
 
-        let loginAttempt = auth.authUser(key); //ログイン結果
+        let loginAttempt = await auth.authUser(key); //ログイン結果
 
         //認証結果を元にユーザーをオンラインとして記録する
         if ( loginAttempt.result ) {
