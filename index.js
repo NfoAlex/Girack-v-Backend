@@ -549,7 +549,7 @@ io.on("connection", (socket) => {
         }
 
         //もしJPEGが先に存在しているなら削除しておく
-        await fsPromise.access("./img/"+dat.reqSender.userid+".jpeg", (err) => {
+        fs.access("./img/"+dat.reqSender.userid+".jpeg", (err) => {
             if ( !err ) {
                 fs.unlink("./img/"+dat.reqSender.userid+".jpeg", (err) => {
                     if ( err ) console.log(err);
@@ -562,7 +562,7 @@ io.on("connection", (socket) => {
         });
 
         //もしGIFが先に存在しているなら削除しておく
-        await fsPromise.access("./img/"+dat.reqSender.userid+".gif", (err) => {
+        fs.access("./img/"+dat.reqSender.userid+".gif", (err) => {
             if ( !err ) {
                 fs.unlink("./img/"+dat.reqSender.userid+".gif", (err) => {
                     if ( err ) console.log(err);
@@ -575,9 +575,9 @@ io.on("connection", (socket) => {
         });
 
         //もしPNGが先に存在しているなら削除しておく
-        await fsPromise.access("./img/"+dat.reqSender.userid+".png", (err) => {
+        fs.access("./img/"+dat.reqSender.userid+".png", (err) => {
             if ( !err ) {
-                fsPromise.unlink("./img/"+dat.reqSender.userid+".png", (err) => {
+                fs.unlink("./img/"+dat.reqSender.userid+".png", (err) => {
                     if ( err ) console.log(err);
                     console.log("index :: changeProfileIcon : PNGアイコンを削除しました");
 
