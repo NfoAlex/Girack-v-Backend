@@ -4,16 +4,23 @@ const fs = require('fs'); //履歴書き込むため
 let db = require("./dbControl.js");
 
 //ユーザー認証
-let authUser = function authUser(key) {
+let authUser = function authUser(cred) {
     console.log("authUser :: これから確認...");
+    
+    //データからユーザー名とパスワードを抽出
+    let username = cred.username;
+    let password = cred.password;
+
     //それぞれのユーザーリストの中でパスワードが一致しているやつを探す
     for (let i=0; i<Object.keys(db.dataUser.user).length; i++ ) {
         //ユーザーIDを巡回
         let index = Object.keys(db.dataUser.user)[i];
-        
-        //パスワードを確認してデータを返す
-        if ( db.dataUser.user[index].pw == key ) {
-            console.log("authUser :: " + db.dataUser.user[index].name + "としてユーザー認証");
+
+        //ユーザー名とパスワードの一致を確認してセッションIDを生成する
+        if (
+            db.dataUser.user[index].name === username &&
+            db.dataUser.user[index].pw === password
+        ) {
             let _session = "";
 
             //BANされているならそう結果を返す
