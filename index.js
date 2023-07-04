@@ -950,7 +950,7 @@ io.on("connection", (socket) => {
     });
 
     //パスワードを変更する
-    socket.on("changePassword", (dat) => {
+    socket.on("changePassword", async (dat) => {
         /*
         dat
         {
@@ -967,9 +967,9 @@ io.on("connection", (socket) => {
             "newPassword"
         ];
 
-        if ( !checkDataIntegrality(dat, paramRequire, "changeProfileSecurity") ) return -1
+        if ( !checkDataIntegrality(dat, paramRequire, "changePassword") ) return -1
 
-        let result = auth.changePassword(dat);
+        let result = await auth.changePassword(dat);
 
         //パスワードの変更結果を送信
         socket.emit("changePasswordResult", result);

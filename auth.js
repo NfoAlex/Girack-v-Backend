@@ -73,12 +73,19 @@ let authUser = async function authUser(cred) {
 }
 
 //パスワードを変更
-let changePassword = function changePassword(dat) {
+let changePassword = async function changePassword(dat) {
     //今のパスワードが一致しないならここで停止
-    if ( db.dataUser.user[dat.reqSender.userid].pw !== dat.currentPassword ) return -1;
+    if ( 
+        db.dataUser.user[dat.reqSender.userid].pw !== dat.currentPassword && //平文でも比較　次期ビルドで削除
+        !bcrypt.compare(dat.currentPassword, db.dataUser.user[dat.reqSender.userid].pw)
+    ) {
+        return -1;
+    }
+
+    let newPassword = await bcrypt.hash(dat.newPassword, 10);
 
     //パスワード変更
-    db.dataUser.user[dat.reqSender.userid].pw = dat.newPassword;
+    db.dataUser.user[dat.reqSender.userid].pw = newPassword;
     fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
     return 1;
