@@ -1,6 +1,7 @@
 //auth.js
 
 const fs = require('fs'); //履歴書き込むため
+const bcrypt = require("bcrypt"); //ハッシュ化用
 let db = require("./dbControl.js");
 
 //ユーザー認証
@@ -108,7 +109,7 @@ let authUserBySession = function authUserBySession(cred) {
 }
 
 //ユーザーの新規登録、そしてパスワードを返す
-let registerUser = function registerUser(dat) { //dat=[0=>name(名前), 1=>key(招待コード)]
+let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=>key(招待コード)]
     //招待制だったらコードを確認
     if ( db.dataServer.registration.invite.inviteOnly && db.dataServer.registration.available ) { //招待制かどうか
         //招待コードが一致しているかどうか
@@ -129,11 +130,16 @@ let registerUser = function registerUser(dat) { //dat=[0=>name(名前), 1=>key(�
 
     }
 
+    //パスワードを生成
+    const pwGenerated = generateKey();
+    //DBに書くためにハッシュ化する
+    const pwHashed = await bcrypt.hash(pwGenerated, 10);
+
     //DBに登録
     db.dataUser.user[newID] = {
         "name": dat[0],
         "role": "Member",
-        "pw": generateKey(),
+        "pw": pwHashed,
         "icon": "",
         "state": {
             "loggedin": false,
@@ -155,7 +161,7 @@ let registerUser = function registerUser(dat) { //dat=[0=>name(名前), 1=>key(�
     fs.copyFileSync("./img/default.jpeg", "./img/" + newID + ".jpeg");
 
     //パスワードを返す
-    return db.dataUser.user[newID].pw;
+    return pwGenerated;
 
 }
 

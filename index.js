@@ -1070,9 +1070,9 @@ io.on("connection", (socket) => {
     });
 
     //新規登録
-    socket.on("register", (dat) => {
+    socket.on("register", async (dat) => {
         console.log("register :: 登録しようとしてる", dat);
-        let key = auth.registerUser(dat); //DBにユーザーを登録、パスワードの取得
+        let key = await auth.registerUser(dat); //DBにユーザーを登録、パスワードの取得
 
         //返り値が-1じゃないなら
         if ( key !== -1 ) {
