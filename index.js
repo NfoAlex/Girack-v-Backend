@@ -999,7 +999,7 @@ io.on("connection", (socket) => {
         }
         
         //ログイン結果
-        let loginAttempt = auth.authUserByCookie(cred);
+        let loginAttempt = auth.authUserBySession(cred);
 
         //認証に成功したら
         if ( loginAttempt.result ) {

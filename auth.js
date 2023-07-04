@@ -6,7 +6,7 @@ let db = require("./dbControl.js");
 //ユーザー認証
 let authUser = function authUser(cred) {
     console.log("authUser :: これから確認...");
-    
+
     //データからユーザー名とパスワードを抽出
     let username = cred.username;
     let password = cred.password;
@@ -75,42 +75,35 @@ let changePassword = function changePassword(dat) {
 }
 
 //クッキーを使ったユーザー認証
-let authUserByCookie = function authUserByCookie(sessionid) {
-    console.log("authUserByCookie :: これから確認... -> " + sessionid);
-    //ユーザーDBから検索
-    for (let i=0; i<Object.keys(db.dataUser.user).length; i++ ) {
-        let index = Object.keys(db.dataUser.user)[i];
-        
-        //パスワードを確認してデータを返す
-        try {
-            if ( db.dataUser.user[index].state.session_id === sessionid ) {
-                console.log("authUserByCookie :: " + db.dataUser.user[index].name + "としてユーザー認証");
+let authUserBySession = function authUserBySession(cred) {
+    console.log("authUserBySession :: これから確認... -> ", cred);
+    let userid = cred.userid;
+    let sessionid = cred.sessionid;
 
-                //BANされているなら-1を返す
-                if ( db.dataUser.user[index].state.banned ) {
-                    return {result: false};
+    //セッションIDが一致してるなら
+    if ( db.dataUser.user[userid].state.session_id === sessionid ) {
+        //BANされているなら-1を返す
+        if ( db.dataUser.user[userid].state.banned ) {
+            return {result: false};
 
-                }
-                let username = db.dataUser.user[index].name; //ユーザー名取得
-
-                return {
-                    result: true, //ログイン成功の印
-                    userid: index, //ユーザーID
-                    username: username, //ユーザー名
-                    sessionid: sessionid, //セッションコード
-                    role: db.dataUser.user[index].role, //ロール
-                    channelJoined: db.dataUser.user[index].channel //参加しているチャンネル
-                }; //ユーザーの情報を送信
-
-            }
         }
-        catch (e) {}
+
+        let username = db.dataUser.user[userid].name; //ユーザー名取得
+
+        return {
+            result: true, //ログイン成功の印
+            userid: userid, //ユーザーID
+            username: username, //ユーザー名
+            sessionid: sessionid, //セッションコード
+            role: db.dataUser.user[userid].role, //ロール
+            channelJoined: db.dataUser.user[userid].channel //参加しているチャンネル
+        }; //ユーザーの情報を送信
 
     }
 
     console.log("authUserByCookie :: ユーザー認証できなかった");
     //ユーザーが見つからなければ
-    return { result:false, userid:null, username:null, id:null };
+    return { result:false, userid:userid, username:null };
 
 }
 
@@ -210,7 +203,7 @@ function generateKey(){
 
 exports.authUser = authUser; //ユーザーの認証
 exports.changePassword = changePassword; //パスワード変更
-exports.authUserByCookie = authUserByCookie; //クッキーによる認証
+exports.authUserBySession = authUserBySession; //クッキーによる認証
 exports.checkUserSession = checkUserSession; //セッションIDの確認をするだけの関数
 exports.registerUser = registerUser; //ユーザーの新規登録
 
