@@ -10,9 +10,7 @@ let authUser = async function authUser(cred) {
 
     //データからユーザー名とパスワード(ハッシュ化)を抽出
     let username = cred.username;
-    let password = await bcrypt.hash(cred.password,10);
-
-    console.log("auth :: authUser : ハッシュ化したpw->", password);
+    let password = cred.password;
 
     //それぞれのユーザーリストの中でパスワードが一致しているやつを探す
     for (let i=0; i<Object.keys(db.dataUser.user).length; i++ ) {
@@ -23,10 +21,11 @@ let authUser = async function authUser(cred) {
         if (
             db.dataUser.user[index].name === username &&
             (
-                db.dataUser.user[index].pw === password ||
-                db.dataUser.user[index].pw === cred.password //ハッシュ化前のも調べる、そしてハッシュ化する(次期ビルドで削除)
+                bcrypt.compare(password, db.dataUser.user[index].pw) || //ハッシュ化とパスワード比較
+                db.dataUser.user[index].pw === password //一応平文前提でも、そしてハッシュ化する(次期ビルドで削除)
             )
         ) {
+            //セッションID入れるよう
             let _session = "";
 
             //BANされているならそう結果を返す
@@ -42,8 +41,7 @@ let authUser = async function authUser(cred) {
             }
 
             let username = db.dataUser.user[index].name; //ユーザー名取得
-
-            db.dataUser.user[index].state.session_id = _session; //セッションコードを取得
+            db.dataUser.user[index].state.session_id = _session; //セッションコードを設定
 
             // !!!! ↓↓次期ビルドで削除↓↓ !!!!
             //パスワードが平文保存されているならハッシュ化して保存
