@@ -987,8 +987,8 @@ io.on("connection", (socket) => {
 
     });
 
-    //クッキーによる認証
-    socket.on("authByCookie", (sessionid, CLIENT_VERSION) => {
+    //sessionidによる認証
+    socket.on("authBySession", (cred, CLIENT_VERSION) => {
         console.log("index :: authByCookie : 認証time");
         
         //バージョンチェック
@@ -999,7 +999,7 @@ io.on("connection", (socket) => {
         }
         
         //ログイン結果
-        let loginAttempt = auth.authUserByCookie(sessionid);
+        let loginAttempt = auth.authUserByCookie(cred);
 
         //認証に成功したら
         if ( loginAttempt.result ) {
