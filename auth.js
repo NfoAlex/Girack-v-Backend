@@ -48,6 +48,7 @@ let authUser = async function authUser(cred) {
             try {
                 //セッションコードとデバイスを設定
                 db.dataUser.user[index].state.sessions[_session] = {
+                    sessionName: "とあるデバイス",
                     loggedinTime: _loginTime,
                     loggedinTimeFirst: _loginTime
                 };
@@ -55,6 +56,7 @@ let authUser = async function authUser(cred) {
                 //セッションいれるところすらないなら作る
                 db.dataUser.user[index].state.sessions = {};
                 db.dataUser.user[index].state.sessions[_session] = {
+                    sessionName: "とあるデバイス",
                     loggedinTime: _loginTime,
                     loggedinTimeFirst: _loginTime
                 };
