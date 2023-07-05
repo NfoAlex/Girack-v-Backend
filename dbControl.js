@@ -398,7 +398,7 @@ let getInfoSessions = function getInfoSessions(dat) {
     }
     */
 
-    return dataUser.user[dat.reqSender.userid].sessions;
+    return dataUser.user[dat.reqSender.userid].state.sessions;
 
 }
 
