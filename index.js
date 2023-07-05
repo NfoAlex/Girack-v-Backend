@@ -662,6 +662,13 @@ io.on("connection", (socket) => {
         //セッション名を更新
         db.dataUser.user[dat.reqSender.userid].state.sessions[dat.targetSessionid].sessionName = dat.sessionName;
 
+        //ユーザーデータをJSON書き込み
+        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+
+        //セッションデータを取得して送信
+        let dataSession = db.dataUser.user[dat.reqSender.userid].state.sessions;
+        socket.emit("infoSessions", dataSession);
+
     });
 
     //ユーザーの管理、監視
