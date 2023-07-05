@@ -1145,8 +1145,15 @@ io.on("connection", (socket) => {
             //DBをJSONへ保存
             fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
-            //認証済みセッションとして登録
+            //認証済みセッションとしてSocketチャンネルへ登録
             socket.join("loggedin");
+
+            //参加しているチャンネルのSocketチャンネルへ参加
+            for ( let index in db.dataUser.user[dat.reqSender.userid].channel ) {
+                socket.join(db.dataUser.user[dat.reqSender.userid].channel[index]);
+                console.log("index :: countmeAsOnline : socket参加->", db.dataUser.user[dat.reqSender.userid].channel[index]);
+
+            }
 
             //オンライン数を通知
             io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
