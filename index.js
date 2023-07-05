@@ -783,7 +783,9 @@ io.on("connection", (socket) => {
                 let objsocketOnline =  Object.entries(socketOnline);
                 //Socket主がオンラインなら探してSocketチャンネルに参加させる
                 if ( db.dataUser.user[targetUser].state.loggedin ) {
+                    //人海戦術
                     for ( let index in objsocketOnline ) {
+                        //もしオンラインSocketリストでユーザーIDが一致したら
                         if ( objsocketOnline[index][1] === targetUser ) {
                             //SocketIDで参加させる
                             try {
