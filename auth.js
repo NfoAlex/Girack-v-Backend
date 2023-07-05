@@ -47,7 +47,8 @@ let authUser = async function authUser(cred) {
             let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
             //セッションコードとデバイスを設定
             db.dataUser.user[index].state.sessions[_session] = {
-                loggedinTime: _loginTime
+                loggedinTime: _loginTime,
+                loggedinTimeFirst: _loginTime
             };
 
             // !!!! ↓↓次期ビルドで削除↓↓ !!!!
