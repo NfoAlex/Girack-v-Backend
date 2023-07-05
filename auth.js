@@ -40,7 +40,15 @@ let authUser = async function authUser(cred) {
             _session = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
 
             let username = db.dataUser.user[index].name; //ユーザー名取得
-            db.dataUser.user[index].state.session_id = _session; //セッションコードを設定
+            
+            //ログイン時間を記録する用
+            let t = new Date();
+            //ログイン時間(分まで)を変数へ格納
+            let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
+            //セッションコードとデバイスを設定
+            db.dataUser.user[index].state.sessions[_session] = {
+                loggedinTime: _loginTime
+            };
 
             // !!!! ↓↓次期ビルドで削除↓↓ !!!!
             //パスワードが平文保存されているならハッシュ化して保存
@@ -98,19 +106,30 @@ let authUserBySession = function authUserBySession(cred) {
     let sessionid = cred.sessionid;
 
     //セッションIDが一致してるなら
-    if ( db.dataUser.user[userid].state.session_id === sessionid ) {
+    //if ( db.dataUser.user[userid].state.session_id === sessionid ) {
+    if ( sessionid in db.dataUser.user[userid].state.sessions ) {
         //BANされているなら-1を返す
         if ( db.dataUser.user[userid].state.banned ) {
             return {result: false};
 
         }
 
+        delete db.dataUser.user[userid].state.sessions[sessionid];
+
         //セッションID用に24文字のコードを生成
         let sessionidCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; //セッションIDに使う英数字
         let sessionidLength = 24; //文字数
         let _session = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
+
+        //ログイン時間を記録する用
+        let t = new Date();
+        //ログイン時間(分まで)を変数へ格納
+        let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
         //セッションIDを適用
-        db.dataUser.user[userid].state.session_id = _session;
+        //db.dataUser.user[userid].state.session_id = _session;
+        db.dataUser.user[userid].state.sessions[_session] = {
+            loginTime: _loginTime
+        };
 
         let username = db.dataUser.user[userid].name; //ユーザー名取得
 
@@ -167,13 +186,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
         "state": {
             "loggedin": false,
             "session_id": "",
-            "sessions": [
-                {
-                    "sessionid": "",
-                    "deviceid": "",
-                    "loggedinTime": ""
-                }
-            ],
+            "sessions": {},
             "banned": false
         },
         "channel": [
@@ -197,10 +210,9 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
 
 //セッションが適切かどうかを確認するだけの関数
 let checkUserSession = function checkUserSession(dat) { //{userid="ユーザーID", sessionid="セッションのID"}
-    //console.log("checkUserSession :: dat->" + dat.sessionid + "; DBsession_id->" + dataUser.user[dat.userid].state.session_id);
     try {
         if (
-            db.dataUser.user[dat.userid].state.session_id === dat.sessionid && //セッションIDが一致していて
+            dat.sessionid in db.dataUser.user[dat.userid].state.sessions && //セッションIDがあって
             db.dataUser.user[dat.userid].state.banned === false //BANされていない
         ) { //IDが合ってる
             //console.log("checkUserSession :: !!!TRUE!!! dat->" + dat.sessionid + "; DBsession_id->" + db.dataUser.user[dat.userid].state.session_id);
