@@ -644,6 +644,26 @@ io.on("connection", (socket) => {
 
     });
 
+    //ユーザーのセッション名を変更
+    socket.on("updateUserSessionName", (dat) => {
+        /*
+        dat
+        {
+            targetSessionid: asdffdsa123,
+            sessionName: "俺",
+            reqSender: {...}
+        }
+        */
+
+        //整合性確認
+        let paramRequire = ["targetSessionid", "sessionName"];
+        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSessionName") ) return -1;
+
+        //セッション名を更新
+        db.dataUser.user[dat.reqSender.userid].state.sessions[dat.targetSessionid].sessionName = dat.sessionName;
+
+    });
+
     //ユーザーの管理、監視
     socket.on("mod", (dat) => {
         /*
