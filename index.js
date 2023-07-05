@@ -1036,11 +1036,12 @@ io.on("connection", (socket) => {
         /*
         dat
         {
+            targetSessionid: "",
             reqSender: { ... }
         }
         */
 
-        let paramRequire = [];
+        let paramRequire = ["targetSessionid"];
 
         if ( !checkDataIntegrality(dat, paramRequire, "logout") ) {
             return -1
@@ -1058,7 +1059,7 @@ io.on("connection", (socket) => {
 
         //対象のセッションを削除
         try {
-            delete db.dataUser.user[dat.reqSender.userid].state.sessions[dat.reqSender.sessionid];
+            delete db.dataUser.user[dat.reqSender.userid].state.sessions[dat.targetSessionid];
         } catch(e) {}
 
         //ユーザーのオンライン状態をオフラインとして設定
