@@ -389,6 +389,19 @@ let getInfoUser = function getInfoUser(dat) {
 
 }
 
+//ユーザー本人のセッションデータを取得
+let getInfoSessions = function getInfoSessions(dat) {
+    /*
+    dat
+    {
+        reqSenderだけ
+    }
+    */
+
+    return dataUser.user[dat.reqSender.userid].state.sessions;
+
+}
+
 //チャンネル情報の取得
 let getInfoChannel = function getInfoChannel(dat) {
     let infoParsed = {};
@@ -674,6 +687,7 @@ let getInitInfo = function getInitInfo() {
 
 exports.parseInfos = parseInfos; //IDで情報を取得(ToDo削除)
 exports.getInfoUser = getInfoUser; //ユーザー情報を取得
+exports.getInfoSessions = getInfoSessions; //ユーザーのセッションデータを返す
 exports.getInfoChannel = getInfoChannel; //チャンネル情報を取得
 exports.getInfoChannelJoinedUserList = getInfoChannelJoinedUserList; //チャンネルに参加したユーザーのリスト取得
 exports.getInfoList = getInfoList; //チャンネルリストの取得

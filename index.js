@@ -157,7 +157,7 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
             if ( dat[paramRequire[termIndex]] === undefined ) {
                 console.log("-------------------------------");
                 console.log("ERROR IN ", dat);
-                throw new Error("does not have enough parameter > " + paramRequire[termIndex]);
+                console.log("does not have enough parameter > " + paramRequire[termIndex]);
                 console.log("-------------------------------");
 
             }
@@ -644,6 +644,35 @@ io.on("connection", (socket) => {
 
     });
 
+    //ユーザーのセッション名を変更
+    socket.on("updateUserSessionName", (dat) => {
+        /*
+        dat
+        {
+            targetSessionid: asdffdsa123,
+            sessionName: "俺",
+            reqSender: {...}
+        }
+        */
+
+        //整合性確認
+        let paramRequire = ["targetSessionid", "sessionName"];
+        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSessionName") ) return -1;
+
+        //セッション名を更新(無理だったらここで処理停止)
+        try {
+            db.dataUser.user[dat.reqSender.userid].state.sessions[dat.targetSessionid].sessionName = dat.sessionName;
+        } catch(e) { return -1; }
+
+        //ユーザーデータをJSON書き込み
+        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+
+        //セッションデータを取得して送信
+        let dataSession = db.dataUser.user[dat.reqSender.userid].state.sessions;
+        socket.emit("infoSessions", dataSession);
+
+    });
+
     //ユーザーの管理、監視
     socket.on("mod", (dat) => {
         /*
@@ -1036,11 +1065,12 @@ io.on("connection", (socket) => {
         /*
         dat
         {
+            targetSessionid: "",
             reqSender: { ... }
         }
         */
 
-        let paramRequire = [];
+        let paramRequire = ["targetSessionid"];
 
         if ( !checkDataIntegrality(dat, paramRequire, "logout") ) {
             return -1
@@ -1055,6 +1085,11 @@ io.on("connection", (socket) => {
             delete userOnline[dat.reqSender.userid];
 
         }
+
+        //対象のセッションを削除
+        try {
+            delete db.dataUser.user[dat.reqSender.userid].state.sessions[dat.targetSessionid];
+        } catch(e) {}
 
         //ユーザーのオンライン状態をオフラインとして設定
         db.dataUser.user[dat.reqSender.userid].state.loggedin = false;
@@ -1205,6 +1240,20 @@ io.on("connection", (socket) => {
         info = db.getInfoUser(dat); //情報収集
 
         socket.emit("infoUser", info);
+
+    });
+
+    //セッションデータの取得
+    socket.on("getInfoSessions", (dat) => {
+        //整合性確認
+        if ( !checkDataIntegrality(dat, [], "getInfoSessions") ) return -1;
+        //セッションデータの取得
+        let infoSessions = db.getInfoSessions(dat);
+
+        console.log("index :: getInfoSessions : 渡すデータ->", infoSessions);
+
+        //データを送る
+        socket.emit("infoSessions", infoSessions);
 
     });
 
