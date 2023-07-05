@@ -1214,9 +1214,11 @@ io.on("connection", (socket) => {
     //セッションデータの取得
     socket.on("getInfoSessions", (dat) => {
         //整合性確認
-        if ( !checkDataIntegrality(dat, [], "getInfoSession") ) return -1;
+        if ( !checkDataIntegrality(dat, [], "getInfoSessions") ) return -1;
         //セッションデータの取得
-        let infoSessions = db.getInfoSessions;
+        let infoSessions = db.getInfoSessions(dat);
+
+        console.log("index :: getInfoSessions : 渡すデータ->", infoSessions);
 
         //データを送る
         socket.emit("infoSessions", infoSessions);
