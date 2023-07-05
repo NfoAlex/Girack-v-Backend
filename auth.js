@@ -34,11 +34,10 @@ let authUser = async function authUser(cred) {
 
             }
 
-            //セッションID用に８桁のコードを生成
-            for ( let i=0; i<8; i++ ) {
-                _session += parseInt(Math.random() * 9); //乱数を追加
-
-            }
+            //セッションID用に24文字のコードを生成
+            let sessionidCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; //セッションIDに使う英数字
+            let sessionidLength = 24; //文字数
+            _session = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
 
             let username = db.dataUser.user[index].name; //ユーザー名取得
             db.dataUser.user[index].state.session_id = _session; //セッションコードを設定
@@ -106,13 +105,20 @@ let authUserBySession = function authUserBySession(cred) {
 
         }
 
+        //セッションID用に24文字のコードを生成
+        let sessionidCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; //セッションIDに使う英数字
+        let sessionidLength = 24; //文字数
+        let _session = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
+        //セッションIDを適用
+        db.dataUser.user[userid].state.session_id = _session;
+
         let username = db.dataUser.user[userid].name; //ユーザー名取得
 
         return {
             result: true, //ログイン成功の印
             userid: userid, //ユーザーID
             username: username, //ユーザー名
-            sessionid: sessionid, //セッションコード
+            sessionid: _session, //セッションコード
             role: db.dataUser.user[userid].role, //ロール
             channelJoined: db.dataUser.user[userid].channel //参加しているチャンネル
         }; //ユーザーの情報を送信
