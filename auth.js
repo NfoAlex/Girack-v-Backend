@@ -167,6 +167,12 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
         "state": {
             "loggedin": false,
             "session_id": "",
+            "sessions": [
+                {
+                    "sessionid": "",
+                    "deviceid": ""
+                }
+            ],
             "banned": false
         },
         "channel": [
