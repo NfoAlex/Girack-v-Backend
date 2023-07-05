@@ -105,13 +105,20 @@ let authUserBySession = function authUserBySession(cred) {
 
         }
 
+        //セッションID用に24文字のコードを生成
+        let sessionidCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; //セッションIDに使う英数字
+        let sessionidLength = 24; //文字数
+        let _session = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
+        //セッションIDを適用
+        db.dataUser.user[userid].state.session_id = _session;
+
         let username = db.dataUser.user[userid].name; //ユーザー名取得
 
         return {
             result: true, //ログイン成功の印
             userid: userid, //ユーザーID
             username: username, //ユーザー名
-            sessionid: sessionid, //セッションコード
+            sessionid: _session, //セッションコード
             role: db.dataUser.user[userid].role, //ロール
             channelJoined: db.dataUser.user[userid].channel //参加しているチャンネル
         }; //ユーザーの情報を送信
