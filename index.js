@@ -1057,7 +1057,9 @@ io.on("connection", (socket) => {
         }
 
         //対象のセッションを削除
-        delete db.dataUser.user[dat.reqSender.userid].state.sessions[dat.reqSender.sessionid];
+        try {
+            delete db.dataUser.user[dat.reqSender.userid].state.sessions[dat.reqSender.sessionid];
+        } catch(e) {}
 
         //ユーザーのオンライン状態をオフラインとして設定
         db.dataUser.user[dat.reqSender.userid].state.loggedin = false;
