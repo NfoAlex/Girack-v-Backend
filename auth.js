@@ -128,9 +128,12 @@ let authUserBySession = function authUserBySession(cred) {
         let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
         //セッションIDを適用
         //db.dataUser.user[userid].state.session_id = _session;
-        db.dataUser.user[userid].state.sessions[_session] = {
-            loginTime: _loginTime
-        };
+        try {
+            db.dataUser.user[userid].state.sessions[_session].loggedinTime = _loginTime;
+        } catch (e) {
+            console.log("auth :: authUserBySession : 記録エラー->", e);
+            return {result: false};
+        }
 
         let username = db.dataUser.user[userid].name; //ユーザー名取得
 
