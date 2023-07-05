@@ -659,8 +659,10 @@ io.on("connection", (socket) => {
         let paramRequire = ["targetSessionid", "sessionName"];
         if ( !checkDataIntegrality(dat, paramRequire, "updateUserSessionName") ) return -1;
 
-        //セッション名を更新
-        db.dataUser.user[dat.reqSender.userid].state.sessions[dat.targetSessionid].sessionName = dat.sessionName;
+        //セッション名を更新(無理だったらここで処理停止)
+        try {
+            db.dataUser.user[dat.reqSender.userid].state.sessions[dat.targetSessionid].sessionName = dat.sessionName;
+        } catch(e) { return -1; }
 
         //ユーザーデータをJSON書き込み
         fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
