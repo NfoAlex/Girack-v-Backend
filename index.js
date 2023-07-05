@@ -745,14 +745,33 @@ io.on("connection", (socket) => {
             if ( dat.userid !== dat.reqSender.userid ) {
                 targetUser = dat.userid;
                 TERM = "INVITED";
+                
+                //オンラインのSocketJSONを配列化
+                let objsocketOnline =  Object.entries(socketOnline);
+                //Socket主がオンラインなら探してSocketチャンネルに参加させる
+                if ( db.dataUser.user[targetUser].state.loggedin ) {
+                    for ( let index in objsocketOnline ) {
+                        if ( objsocketOnline[index][1] === targetUser ) {
+                            //SocketIDで参加させる
+                            try {
+                                io.sockets.sockets.get(objsocketOnline[index][0]).join(dat.channelid);
+                            } catch(e) {
+                                console.log(e);
+                            }
+
+                        }
+
+                    }
+
+                }
 
             } else { //ユーザーが自分で起こしたものなら
                 TERM = "JOINED";
+                
+                //Socketチャンネルへ参加させる
+                socket.join(dat.channelid);
 
             }
-
-            //Socketチャンネルへ参加させる
-            socket.join(dat.channelid);
 
         } else if ( dat.action === "leave" ) { //退出?
             //起こした人と対象が違うなら"キックされた"と設定
@@ -760,13 +779,32 @@ io.on("connection", (socket) => {
                 targetUser = dat.userid;
                 TERM = "KICKED";
 
+                //オンラインのSocketJSONを配列化
+                let objsocketOnline =  Object.entries(socketOnline);
+                //Socket主がオンラインなら探してSocketチャンネルに参加させる
+                if ( db.dataUser.user[targetUser].state.loggedin ) {
+                    for ( let index in objsocketOnline ) {
+                        if ( objsocketOnline[index][1] === targetUser ) {
+                            //SocketIDで参加させる
+                            try {
+                                io.sockets.sockets.get(objsocketOnline[index][0]).leave(dat.channelid);
+                            } catch(e) {
+                                console.log(e);
+                            }
+
+                        }
+
+                    }
+
+                }
+
             } else { //ユーザーが自分で起こしたものなら
                 TERM = "LEFT";
 
-            }
+                //Socketチャンネルから抜けさせる
+                socket.leave(dat.channelid);
 
-            //Socketチャンネルから抜けさせる
-            socket.leave(dat.channelid);
+            }
 
         }
 
