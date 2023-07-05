@@ -739,8 +739,8 @@ io.on("connection", (socket) => {
         let SocketIsOnline = false; //影響を受けるユーザーがオンラインかどうか
         let SocketIDTarget = ""; //影響を受けるユーザーのSocketID
 
-        //標的のユーザーがオンラインなら情報を更新させる
-        if ( db.dataUser.user[dat.userid].state.loggedin ) {
+        //操作者と標的ユーザーが同じでなく、標的のユーザーがオンラインなら本人に対して情報を更新させる
+        if ( dat.userid !== dat.reqSender.userid && db.dataUser.user[dat.userid].state.loggedin ) {
             //対象のユーザーはオンラインと設定
             SocketIsOnline = true;
             //オンラインのSocketJSONを配列化
