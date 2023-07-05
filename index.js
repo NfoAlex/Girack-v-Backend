@@ -157,7 +157,7 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
             if ( dat[paramRequire[termIndex]] === undefined ) {
                 console.log("-------------------------------");
                 console.log("ERROR IN ", dat);
-                throw new Error("does not have enough parameter > " + paramRequire[termIndex]);
+                console.log("does not have enough parameter > " + paramRequire[termIndex]);
                 console.log("-------------------------------");
 
             }
