@@ -211,11 +211,11 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
 //セッションが適切かどうかを確認するだけの関数
 let checkUserSession = function checkUserSession(dat) { //{userid="ユーザーID", sessionid="セッションのID"}
     try {
+        //ID確認
         if (
             dat.sessionid in db.dataUser.user[dat.userid].state.sessions && //セッションIDがあって
             db.dataUser.user[dat.userid].state.banned === false //BANされていない
-        ) { //IDが合ってる
-            //console.log("checkUserSession :: !!!TRUE!!! dat->" + dat.sessionid + "; DBsession_id->" + db.dataUser.user[dat.userid].state.session_id);
+        ) {
             return true;
 
         } else { //IDが違う
