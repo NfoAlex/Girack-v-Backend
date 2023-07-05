@@ -732,8 +732,45 @@ io.on("connection", (socket) => {
         //データの整合性を確認
         if ( !checkDataIntegrality(dat, paramRequire, "channelAction") ) { return -1; }
 
-        let result = infoUpdate.channelAction(dat); //操作処理
-        io.to("loggedin").emit("infoUser", result); //全員に情報を更新させる
+        //操作して更新されたデータを操作者が受け取る
+        let result = infoUpdate.channelAction(dat);
+        socket.emit("infoUser", result);
+
+        let SocketIsOnline = false; //影響を受けるユーザーがオンラインかどうか
+        let SocketIDTarget = ""; //影響を受けるユーザーのSocketID
+
+        //操作者と標的ユーザーが同じでなく、標的のユーザーがオンラインなら本人に対して情報を更新させる
+        if ( dat.userid !== dat.reqSender.userid && db.dataUser.user[dat.userid].state.loggedin ) {
+            //対象のユーザーはオンラインと設定
+            SocketIsOnline = true;
+            //オンラインのSocketJSONを配列化
+            let objsocketOnline =  Object.entries(socketOnline);
+            //ループしてSocketIDが一致した項目を探す
+            for ( let index in objsocketOnline ) {
+                if ( objsocketOnline[index][1] === dat.userid ) {
+                    //SocketIDを格納
+                    SocketIDTarget = objsocketOnline[index][0];
+                    //ユーザーの情報を無理やり取得
+                    let resultForPersonal = {
+                        username: db.dataUser.user[dat.userid].name, //ユーザーの表示名
+                        userid: dat.userid, //ユーザーID
+                        channelJoined: db.dataUser.user[dat.userid].channel, //入っているチャンネルリスト(array)
+                        role: db.dataUser.user[dat.userid].role, //ユーザーのロール
+                        loggedin: db.dataUser.user[dat.userid].state.loggedin, //ユーザーがログインしている状態かどうか
+                        banned: db.dataUser.user[dat.userid].state.banned //BANされているかどうか
+                    };
+                    //SocketIDで参加させる
+                    try {
+                        io.to(objsocketOnline[index][0]).emit("infoUser", resultForPersonal);
+                    } catch(e) {
+                        console.log(e);
+                    }
+
+                }
+
+            }
+
+        }
 
         let TERM = ""; //システムメッセージのフラグ
         let targetUser = ""; //対象ユーザー
@@ -746,13 +783,23 @@ io.on("connection", (socket) => {
                 targetUser = dat.userid;
                 TERM = "INVITED";
 
+                //Socket主がオンラインならSocketチャンネルに参加させる
+                if ( SocketIsOnline ) {
+                    try {
+                        io.sockets.sockets.get(SocketIDTarget).join(dat.channelid);
+                    } catch(e) {
+                        console.log(e);
+                    }
+
+                }
+
             } else { //ユーザーが自分で起こしたものなら
                 TERM = "JOINED";
+                
+                //Socketチャンネルへ参加させる
+                socket.join(dat.channelid);
 
             }
-
-            //Socketチャンネルへ参加させる
-            socket.join(dat.channelid);
 
         } else if ( dat.action === "leave" ) { //退出?
             //起こした人と対象が違うなら"キックされた"と設定
@@ -760,13 +807,23 @@ io.on("connection", (socket) => {
                 targetUser = dat.userid;
                 TERM = "KICKED";
 
+                //Socket主がオンラインならSocketチャンネルから退出させる
+                if ( SocketIsOnline ) {
+                    try {
+                        io.sockets.sockets.get(SocketIDTarget).leave(dat.channelid);
+                    } catch(e) {
+                        console.log(e);
+                    }
+
+                }
+
             } else { //ユーザーが自分で起こしたものなら
                 TERM = "LEFT";
 
-            }
+                //Socketチャンネルから抜けさせる
+                socket.leave(dat.channelid);
 
-            //Socketチャンネルから抜けさせる
-            socket.leave(dat.channelid);
+            }
 
         }
 
