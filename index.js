@@ -1211,6 +1211,18 @@ io.on("connection", (socket) => {
 
     });
 
+    //セッションデータの取得
+    socket.on("getInfoSessions", (dat) => {
+        //整合性確認
+        if ( !checkDataIntegrality(dat, [], "getInfoSession") ) return -1;
+        //セッションデータの取得
+        let infoSessions = db.getInfoSessions;
+
+        //データを送る
+        socket.emit("infoSessions", infoSessions);
+
+    });
+
     //オンラインのユーザーリストを返す
     socket.on("getSessionOnline", (dat) => {
         /*
