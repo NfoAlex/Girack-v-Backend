@@ -130,22 +130,17 @@ let authUserBySession = function authUserBySession(cred) {
 
             }
 
-            delete db.dataUser.user[userid].state.sessions[sessionid];
-
-            //セッションID用に24文字のコードを生成
-            let sessionidCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; //セッションIDに使う英数字
-            let sessionidLength = 24; //文字数
-            let _session = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
-
             //ログイン時間を記録する用
             let t = new Date();
             //ログイン時間(分まで)を変数へ格納
             let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
             //セッションIDを適用
             try {
-                db.dataUser.user[userid].state.sessions[_session].loggedinTime = _loginTime;
+                db.dataUser.user[userid].state.sessions[sessionid].loggedinTime = _loginTime;
             } catch (e) {
-                console.log("auth :: authUserBySession : 記録エラー->", e);
+                console.log("auth :: authUserBySession : 記録エラー ユーザーセッションデータ->", db.dataUser.user[userid].state.sessions);
+                console.log("auth :: authUserBySession : 記録エラー詳細->", e);
+                
                 return {result: false};
             }
 
@@ -155,7 +150,7 @@ let authUserBySession = function authUserBySession(cred) {
                 result: true, //ログイン成功の印
                 userid: userid, //ユーザーID
                 username: username, //ユーザー名
-                sessionid: _session, //セッションコード
+                sessionid: sessionid, //セッションコード
                 role: db.dataUser.user[userid].role, //ロール
                 channelJoined: db.dataUser.user[userid].channel //参加しているチャンネル
             }; //ユーザーの情報を送信
