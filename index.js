@@ -218,8 +218,8 @@ io.on("connection", (socket) => {
         if ( msgCompiled === -1 ) { return; } //処理中にエラーがあったなら止める
 
         //メッセージにURLが含まれるのではあれば
-        for ( let index in msgCompiled.urlData.data ) {
-            if ( msgCompiled.hasUrl ) {
+        if ( msgCompiled.hasUrl ) {
+            for ( let index in msgCompiled.urlData.data ) {
                 //URLプレビューを生成してデータへ追加させる
                 msg.addUrlPreview(
                     msgCompiled.urlData.data[index].url,
@@ -1624,7 +1624,7 @@ io.on("connection", (socket) => {
         /*
         dat
         {
-            action: "delete",
+            action: ("delete"|"reaction"),
             channelid: channelid,
             messageid: msgId,
             reqSender: {
@@ -1662,7 +1662,29 @@ io.on("connection", (socket) => {
 
         console.log(result);
         /*  ToDo : messageUpdateで更新するようにする  */
-        io.to("loggedin").emit("messageUpdate", result); //履歴を返す
+        io.to(dat.channelid).emit("messageUpdate", result); //履歴を返す
+
+    });
+
+    //メッセージの編集
+    socket.on("editMessage", (dat) => {
+        /*
+        dat
+        {
+            channelid: "0001",
+            messageid: "20230101010101010101",
+            textEditing: "asdf",
+            reqSender: {...}
+        }
+        */
+
+        let paramRequire = ["textEditing", "messageid", "channelid"];
+        if ( !checkDataIntegrality(dat, paramRequire, "editMessage") ) return -1;
+
+        //処理を適用してデータ送信
+        let contentEdited = msg.msgEdit(dat);
+        contentEdited.action = "edit";
+        io.to(dat.channelid).emit("messageUpdate", contentEdited)
 
     });
 

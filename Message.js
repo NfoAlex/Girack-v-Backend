@@ -467,8 +467,6 @@ let getMessage = function getMessage(channelid, messageid) {
         };
     }
 
-    
-
 }
 
 //メッセージの削除
@@ -643,6 +641,60 @@ let msgReaction = function msgReaction(dat) {
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
 
     return result;
+
+}
+
+//メッセージの編集
+let msgEdit = function msgEdit(dat) {
+    /*
+    dat
+    {
+        channelid: "0001",
+        messageid: "20230101010101010101",
+        textEditing: "asdf",
+        reqSender: {...}
+    }
+    */
+
+    //もじサーバー設定の最大文字数よりも多ければ処理を停止
+    if ( 
+        db.dataServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH
+        <
+        dat.textEditing.length
+    ) { return -1; }
+
+    //メッセージIDとチャンネルIDを抽出
+    let messageid = dat.messageid;
+    let channelid = dat.channelid;
+
+    //メッセージIDから送信日付を取得してパスを割り出す
+    let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
+    let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
+
+    //データ取り出し
+    try{
+        dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
+        
+        //もしデータが正常にとれるならそのデータのコンテンツ部分を更新して返す
+        if ( dataHistory[messageid] !== undefined ) {
+            //コンテンツ上書き
+            dataHistory[messageid].content = dat.textEditing;
+            //メッセージを編集したと設定
+            dataHistory[messageid].isEdited = true;
+            //JSONに書き込み保存
+            fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
+
+            //返す
+            return {messageData: dataHistory[messageid]};
+
+        } else { //undefinedなら削除された体で返す
+            return -1;
+
+        }
+    }
+    catch(e) { //エラーなら中止
+        return -1;
+    }
 
 }
 
@@ -835,6 +887,7 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
 exports.msgMix = msgMix; //メッセージ送受信
 exports.addUrlPreview = addUrlPreview; //URLプレビュー設定
 exports.msgRecord = msgRecord; //履歴に記録
-exports.msgRecordCallNew = msgRecordCallNew; //履歴呼び出し(新しいほう)
 exports.msgDelete = msgDelete; //メッセージ削除
 exports.msgReaction = msgReaction; //メッセージにリアクションする
+exports.msgEdit = msgEdit; //メッセージの編集
+exports.msgRecordCallNew = msgRecordCallNew; //履歴呼び出し(新しいほう)
