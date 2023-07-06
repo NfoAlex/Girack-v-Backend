@@ -1682,9 +1682,9 @@ io.on("connection", (socket) => {
         if ( !checkDataIntegrality(dat, paramRequire, "editMessage") ) return -1;
 
         //処理を適用してデータ送信
-        let msgResult = msg.msgEdit(dat);
-        msgResult.action = "edit";
-        io.to(dat.channelid).emit("messageUpdate", msgResult)
+        let contentEdited = msg.msgEdit(dat);
+        contentEdited.action = "edit";
+        io.to(dat.channelid).emit("messageUpdate", contentEdited)
 
     });
 

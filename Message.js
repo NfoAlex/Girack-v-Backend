@@ -671,8 +671,11 @@ let msgEdit = function msgEdit(dat) {
         if ( dataHistory[messageid] !== undefined ) {
             //コンテンツ上書き
             dataHistory[messageid].content = dat.textEditing;
+            //JSONに書き込み保存
+            fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
+            
             //返す
-            return dataHistory[messageid];
+            return {messageData: dataHistory[messageid]};
 
         } else { //undefinedなら削除された体で返す
             return -1;
