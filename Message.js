@@ -656,6 +656,13 @@ let msgEdit = function msgEdit(dat) {
     }
     */
 
+    //もじサーバー設定の最大文字数よりも多ければ処理を停止
+    if ( 
+        db.dataServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH
+        <
+        dat.textEditing
+    ) { return -1; }
+
     let messageid = dat.messageid;
     let channelid = dat.channelid;
 
