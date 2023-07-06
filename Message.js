@@ -660,7 +660,7 @@ let msgEdit = function msgEdit(dat) {
     if ( 
         db.dataServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH
         <
-        dat.textEditing
+        dat.textEditing.length
     ) { return -1; }
 
     let messageid = dat.messageid;
