@@ -218,8 +218,8 @@ io.on("connection", (socket) => {
         if ( msgCompiled === -1 ) { return; } //処理中にエラーがあったなら止める
 
         //メッセージにURLが含まれるのではあれば
-        for ( let index in msgCompiled.urlData.data ) {
-            if ( msgCompiled.hasUrl ) {
+        if ( msgCompiled.hasUrl ) {
+            for ( let index in msgCompiled.urlData.data ) {
                 //URLプレビューを生成してデータへ追加させる
                 msg.addUrlPreview(
                     msgCompiled.urlData.data[index].url,
