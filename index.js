@@ -1624,7 +1624,7 @@ io.on("connection", (socket) => {
         /*
         dat
         {
-            action: "delete",
+            action: ("delete"|"reaction"),
             channelid: channelid,
             messageid: msgId,
             reqSender: {
@@ -1662,7 +1662,29 @@ io.on("connection", (socket) => {
 
         console.log(result);
         /*  ToDo : messageUpdateで更新するようにする  */
-        io.to("loggedin").emit("messageUpdate", result); //履歴を返す
+        io.to(dat.channelid).emit("messageUpdate", result); //履歴を返す
+
+    });
+
+    //メッセージの編集
+    socket.on("editMessage", (dat) => {
+        /*
+        dat
+        {
+            channelid: "0001",
+            messageid: "20230101010101010101",
+            textEditing: "asdf",
+            reqSender: {...}
+        }
+        */
+
+        let paramRequire = ["textEditing", "messageid", "channelid"];
+        if ( !checkDataIntegrality(dat, paramRequire, "editMessage") ) return -1;
+
+        //処理を適用してデータ送信
+        let msgResult = msg.msgEdit(dat);
+        msgResult.mode = "edit";
+        io.to(dat.channelid).emit("messageUpdate", msgResult)
 
     });
 
