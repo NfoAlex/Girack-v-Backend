@@ -663,10 +663,11 @@ let msgEdit = function msgEdit(dat) {
         dat.textEditing.length
     ) { return -1; }
 
+    //メッセージIDとチャンネルIDを抽出
     let messageid = dat.messageid;
     let channelid = dat.channelid;
 
-    //メッセージIDから送信日付を取得
+    //メッセージIDから送信日付を取得してパスを割り出す
     let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
 
