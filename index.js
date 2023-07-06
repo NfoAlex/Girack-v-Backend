@@ -1683,7 +1683,7 @@ io.on("connection", (socket) => {
 
         //処理を適用してデータ送信
         let msgResult = msg.msgEdit(dat);
-        msgResult.mode = "edit";
+        msgResult.action = "edit";
         io.to(dat.channelid).emit("messageUpdate", msgResult)
 
     });
