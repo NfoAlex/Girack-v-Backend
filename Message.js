@@ -674,6 +674,9 @@ let msgEdit = function msgEdit(dat) {
     //データ取り出し
     try{
         dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
+
+        //もし編集対象のユーザーIDが送信者と違うなら停止
+        if ( dataHistory[messageid].userid !== dat.reqSender.userid ) return -1;
         
         //もしデータが正常にとれるならそのデータのコンテンツ部分を更新して返す
         if ( dataHistory[messageid] !== undefined ) {
