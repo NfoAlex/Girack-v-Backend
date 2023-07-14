@@ -553,7 +553,7 @@ let channelCreate = async function channelCreate(dat) {
         //サーバー情報をファイルへ書き込み
         fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
         
-        return true;
+        return {result:true, channelid:newChannelId};
 
     });
     
