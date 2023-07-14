@@ -1672,7 +1672,7 @@ io.on("connection", (socket) => {
         dat
         {
             channelid: "0001",
-            messageid: "20230101010101010101",
+            messageid: "202301010101010101",
             textEditing: "asdf",
             reqSender: {...}
         }
@@ -1684,7 +1684,13 @@ io.on("connection", (socket) => {
         //処理を適用してデータ送信
         let contentEdited = msg.msgEdit(dat);
         contentEdited.action = "edit";
-        io.to(dat.channelid).emit("messageUpdate", contentEdited)
+        io.to(dat.channelid).emit("messageUpdate", contentEdited);
+
+        //URLが変わったならURLプレビューを再取得
+        if ( (/((https|http)?:\/\/[^\s]+)/g).test(m.content) ) {
+
+
+        }
 
     });
 

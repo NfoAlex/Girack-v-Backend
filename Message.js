@@ -134,7 +134,7 @@ let msgMix = function msgMix(m) {
 
         }
         /*************************************/
-        
+
         //ID振り分け用の時間データ
         let t = new Date();
         //ディレクトリ
@@ -361,6 +361,7 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
     //書き込み
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
 
+    //ToDo :: 送信して更新する
     indexjs.sendUrlPreview(dataHistory[msgId].urlData.data[urlIndex], channelid, msgId, urlIndex);
 
 }
