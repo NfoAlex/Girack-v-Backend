@@ -124,9 +124,20 @@ let msgMix = function msgMix(m) {
 
     //ファイルが添付されているなら
     if ( m.fileData.isAttatched ) {
+        /*************************************/
+        //ファイル名被り防止(一時的)
+        for ( let index in m.fileData.attatchmentData ) {
+            //先頭につけるための乱数4桁
+            let fileNameAdding = parseInt(Math.random() * 9999).toString().padStart(4,0);
+            //ファイル名の先頭に生成した乱数を追加
+            m.fileData.attatchmentData[index].name = fileNameAdding + "_" + m.fileData.attatchmentData[index].name
+
+        }
+        /*************************************/
+        
         //ID振り分け用の時間データ
         let t = new Date();
-
+        //ディレクトリ
         let receivedDatePath = t.getFullYear() + "_" + (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
         writeUploadedFile(m.fileData, m.channelid, receivedDatePath); //ファイル処理開始
 
@@ -173,10 +184,13 @@ let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePat
         } else {
             try {
                 //ファイルを書き込み
-                fs.writeFile("./files/"+channelid+"/"+receivedDatePath+"/"+fileData.attatchmentData[index].name, fileData.attatchmentData[index].buffer, (err) => {
-                    console.log("Message :: uploadFile : アップロード結果 -> ", err);
-
-                });
+                fs.writeFile(
+                    "./files/"+channelid+"/"+receivedDatePath+"/"+fileData.attatchmentData[index].name,
+                    fileData.attatchmentData[index].buffer,
+                    (err) => {
+                        console.log("Message :: uploadFile : アップロード結果 -> ", err);
+                    }
+                );
             } catch(e) {
                 console.log("Message :: uploadFIle : ファイル書き込みできなかった?");
             }
