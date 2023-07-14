@@ -218,11 +218,30 @@ io.on("connection", (socket) => {
         if ( msgCompiled === -1 ) { return; } //処理中にエラーがあったなら止める
 
         //メッセージにURLが含まれるのではあれば
+        // if ( msgCompiled.hasUrl ) {
+        //     for ( let index in msgCompiled.urlData.data ) {
+        //         //URLプレビューを生成してデータへ追加させる
+        //         msg.addUrlPreview(
+        //             msgCompiled.urlData.data[index].url,
+        //             msgCompiled.channelid,
+        //             msgCompiled.messageid,
+        //             index
+        //         );
+
+        //     }
+
+        // }
+
+        //メッセージにURLが含まれるのではあれば
         if ( msgCompiled.hasUrl ) {
-            for ( let index in msgCompiled.urlData.data ) {
+            //URLの抽出
+            let URLinContent = (msgCompiled.content).match(/((https|http)?:\/\/[^\s]+)/g);
+            //含んだURL分プレビュー要請
+            for ( let index in URLinContent ) {
+                console.log("index :: msgSend : URLプレビューしたいやつ->", URLinContent[index]);
                 //URLプレビューを生成してデータへ追加させる
                 msg.addUrlPreview(
-                    msgCompiled.urlData.data[index].url,
+                    URLinContent[index],
                     msgCompiled.channelid,
                     msgCompiled.messageid,
                     index
@@ -1685,12 +1704,6 @@ io.on("connection", (socket) => {
         let contentEdited = msg.msgEdit(dat);
         contentEdited.action = "edit";
         io.to(dat.channelid).emit("messageUpdate", contentEdited);
-
-        //URLが変わったならURLプレビューを再取得
-        if ( (/((https|http)?:\/\/[^\s]+)/g).test(m.content) ) {
-
-
-        }
 
     });
 

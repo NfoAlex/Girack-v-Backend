@@ -69,6 +69,7 @@ let msgMix = function msgMix(m) {
 
     }
 
+    /*
     //もしメッセージにURLが含まれるのであれば
     if ( (urlRegex).test(m.content) ) {
         //URL取り出し
@@ -90,7 +91,7 @@ let msgMix = function msgMix(m) {
             ]
         };
 
-        //URLを追加
+        //URLデータホルダーを追加
         for ( let index in urlInText ) {
             //URLデータの部分へデータ追加
             m.urlData.data.push({
@@ -119,6 +120,22 @@ let msgMix = function msgMix(m) {
                 }
             ]
         };
+
+    }
+    */
+
+    //URLデータホルダーを追加
+    m.urlData = {
+        dataLoaded: false,
+        data: []
+    };
+
+    //もしURLがあるようならそうデータに設定
+    if ( (urlRegex).test(m.content) ) {
+        m.hasUrl = true;
+
+    } else {
+        m.hasUrl = false;
 
     }
 
@@ -295,6 +312,24 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
         return -1; //関数を終わらせる
 
     }
+
+    //URLデータを入れる準備
+    dataHistory[msgId].hasUrl = true;
+    //メッセージデータにURLデータ部分を新しく追加
+    dataHistory[msgId].urlData = {
+        dataLoaded: true,
+        data: [
+            // {
+            //     link: "https://example.com/?q=asdf&id=asdf4321",
+            //     title: "...",
+            //     description: "...",
+            //     domain: "https://example.com",
+            //     img: "...",
+            //     favicon: "...",
+            // }
+        ]
+    };
+
 
     //データ更新
     switch( previewData.mediaType ) {
@@ -703,6 +738,23 @@ let msgEdit = function msgEdit(dat) {
             dataHistory[messageid].isEdited = true;
             //JSONに書き込み保存
             fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
+            
+            //URLが変わったならURLプレビューを再取得
+            if ( (/((https|http)?:\/\/[^\s]+)/g).test(dataHistory[messageid].content) ) {
+                let URLinContent = (dataHistory[messageid].content).match(urlRegex);
+                //含んだURL分プレビュー要請
+                for ( let index in URLinContent ) {
+                    //URLプレビューを生成してデータへ追加させる
+                    addUrlPreview(
+                        URLinContent[index],
+                        dat.channelid,
+                        dat.messageid,
+                        index
+                    );
+
+                }
+
+            }
 
             //返す
             return {messageData: dataHistory[messageid]};
@@ -713,6 +765,7 @@ let msgEdit = function msgEdit(dat) {
         }
     }
     catch(e) { //エラーなら中止
+        console.log("Message :: msgEdit : エラー->", e);
         return -1;
     }
 
