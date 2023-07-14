@@ -69,61 +69,6 @@ let msgMix = function msgMix(m) {
 
     }
 
-    /*
-    //もしメッセージにURLが含まれるのであれば
-    if ( (urlRegex).test(m.content) ) {
-        //URL取り出し
-        let urlInText = (m.content).match(urlRegex);
-
-        //メッセージデータに新しく追加
-        m.hasUrl = true;
-        m.urlData = {
-            dataLoaded: false,
-            data: [
-                // {
-                //     link: "https://example.com/?q=asdf&id=asdf4321",
-                //     title: "...",
-                //     description: "...",
-                //     domain: "https://example.com",
-                //     img: "...",
-                //     favicon: "...",
-                // }
-            ]
-        };
-
-        //URLデータホルダーを追加
-        for ( let index in urlInText ) {
-            //URLデータの部分へデータ追加
-            m.urlData.data.push({
-                url: urlInText[index],
-                title: "",
-                description: "...",
-                domain: "https://example.com",
-                img: [],
-                favicon: "...",
-            });
-
-        }
-
-    } else {
-        //メッセージデータに新しく追加
-        m.hasUrl = false;
-        m.urlData = {
-            dataLoaded: false,
-            data: [
-                {
-                    title: null,
-                    description: null,
-                    domain: null,
-                    img: [],
-                    favicon: null
-                }
-            ]
-        };
-
-    }
-    */
-
     //URLデータホルダーを追加
     m.urlData = {
         dataLoaded: false,
