@@ -218,21 +218,6 @@ io.on("connection", (socket) => {
         if ( msgCompiled === -1 ) { return; } //処理中にエラーがあったなら止める
 
         //メッセージにURLが含まれるのではあれば
-        // if ( msgCompiled.hasUrl ) {
-        //     for ( let index in msgCompiled.urlData.data ) {
-        //         //URLプレビューを生成してデータへ追加させる
-        //         msg.addUrlPreview(
-        //             msgCompiled.urlData.data[index].url,
-        //             msgCompiled.channelid,
-        //             msgCompiled.messageid,
-        //             index
-        //         );
-
-        //     }
-
-        // }
-
-        //メッセージにURLが含まれるのではあれば
         if ( msgCompiled.hasUrl ) {
             //URLの抽出
             let URLinContent = (msgCompiled.content).match(/((https|http)?:\/\/[^\s]+)/g);
