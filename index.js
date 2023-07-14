@@ -864,7 +864,7 @@ io.on("connection", (socket) => {
     });
 
     //チャンネル作成
-    socket.on("channelCreate", (dat) => {
+    socket.on("channelCreate", async (dat) => {
         /*
         dat
         {
@@ -875,53 +875,38 @@ io.on("connection", (socket) => {
             },
         }
         */
+        //必要パラメータ
+        let paramRequire = ["channelname"];
+        //整合性確認
+        if ( !checkDataIntegrality(dat, paramRequire, "channelCreate") ) return -1;
 
-        //セッションが適合か確認
-        if ( auth.checkUserSession(dat.reqSender) ) {
-
-            //結果を受け取るまで待機してから情報を送信する
-            new Promise((resolve) => {
-                let ans = infoUpdate.channelCreate(dat);
-                let retryCount = 0;
-                let checkAns = setTimeout(() => {
-                    if ( ans ) {
-                        clearInterval(ans);
-                        resolve(); //次の処理へ
-
-                    }
-
-                    //もし１０回以上試してためだったら
-                    if ( retryCount > 10 ) {
-                        //ToDo:結果通知
-                        return -1; //キャンセルさせる
-
-                    }
-
-                    retryCount++;
-
-                }, 100);
-                
-
-            }).then(() => {
-                //現在のチャンネルリストを取得
-                let channelList = db.getInfoList({
-                    target: "channel",
-                    reqSender: dat.reqSender
-                });
-
-                let userinfoNew = db.getInfoUser({
-                    targetid: dat.reqSender.userid,
-                    reqSender: dat.reqSender
-                });
-
-                //作ったチャンネルを加えてチャンネルリストを送信
-                io.to("loggedin").emit("infoList", channelList);
-                //チャンネル参加もさせたのでユーザー情報も更新させる
-                socket.emit("infoUser",userinfoNew);
-
-            });
+        //チャンネル作成をする
+        let ans = await infoUpdate.channelCreate(dat);
+        //失敗したなら止める
+        if ( !ans.result ) {
+            console.log("index :: channelCreate : チャンネル作成に失敗しました");
+            return -1;
 
         }
+
+        //現在のチャンネルリストを取得
+        let channelList = db.getInfoList({
+            target: "channel",
+            reqSender: dat.reqSender
+        });
+        //現時点のユーザー情報を取得する
+        let userinfoNew = db.getInfoUser({
+            targetid: dat.reqSender.userid,
+            reqSender: dat.reqSender
+        });
+
+        //Socketチャンネルに参加させる
+        socket.join(ans.channelid);
+
+        //作ったチャンネルを加えてチャンネルリストを送信
+        io.to("loggedin").emit("infoList", channelList);
+        //チャンネル参加もさせたのでユーザー情報も更新させる
+        socket.emit("infoUser",userinfoNew);
 
     });
 
