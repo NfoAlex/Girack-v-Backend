@@ -173,7 +173,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
         //招待コードが一致しているかどうか
         if ( db.dataServer.registration.invite.inviteCode !== dat[1] ) {
             console.log("auth :: registerUser : 招待コード違うわ");
-            return -1;
+            return {key:-1, userid:-1};
 
         }
         console.log("auth :: registerUser : 招待コード合ってる！");
@@ -220,7 +220,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
     fs.copyFileSync("./img/default.jpeg", "./img/" + newID + ".jpeg");
 
     //パスワードを返す
-    return pwGenerated;
+    return {key:pwGenerated, userid:newID};
 
 }
 
