@@ -56,6 +56,8 @@ let dataServer = {};
 let dataServerInitText = `
 {
     "servername": "Girack",
+    "registerAnnounceChannel": "0001",
+    "defaultJoinChannels": ["0001"],
     "registration": {
         "available": false,
         "invite": {
