@@ -69,56 +69,18 @@ let msgMix = function msgMix(m) {
 
     }
 
-    //もしメッセージにURLが含まれるのであれば
+    //URLデータホルダーを追加
+    m.urlData = {
+        dataLoaded: false,
+        data: []
+    };
+
+    //もしURLがあるようならそうデータに設定
     if ( (urlRegex).test(m.content) ) {
-        //URL取り出し
-        let urlInText = (m.content).match(urlRegex);
-
-        //メッセージデータに新しく追加
         m.hasUrl = true;
-        m.urlData = {
-            dataLoaded: false,
-            data: [
-                // {
-                //     link: "https://example.com/?q=asdf&id=asdf4321",
-                //     title: "...",
-                //     description: "...",
-                //     domain: "https://example.com",
-                //     img: "...",
-                //     favicon: "...",
-                // }
-            ]
-        };
-
-        //URLを追加
-        for ( let index in urlInText ) {
-            //URLデータの部分へデータ追加
-            m.urlData.data.push({
-                url: urlInText[index],
-                title: "",
-                description: "...",
-                domain: "https://example.com",
-                img: [],
-                favicon: "...",
-            });
-
-        }
 
     } else {
-        //メッセージデータに新しく追加
         m.hasUrl = false;
-        m.urlData = {
-            dataLoaded: false,
-            data: [
-                {
-                    title: null,
-                    description: null,
-                    domain: null,
-                    img: [],
-                    favicon: null
-                }
-            ]
-        };
 
     }
 
@@ -134,7 +96,7 @@ let msgMix = function msgMix(m) {
 
         }
         /*************************************/
-        
+
         //ID振り分け用の時間データ
         let t = new Date();
         //ディレクトリ
@@ -296,6 +258,26 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
 
     }
 
+    //URLデータを入れる準備
+    dataHistory[msgId].hasUrl = true;
+    //まだ無いのならメッセージデータにURLデータ部分を新しく追加
+    if ( dataHistory[msgId].urlData.data === undefined ) {
+        dataHistory[msgId].urlData = {
+            data: [
+                // {
+                //     link: "https://example.com/?q=asdf&id=asdf4321",
+                //     title: "...",
+                //     description: "...",
+                //     domain: "https://example.com",
+                //     img: "...",
+                //     favicon: "...",
+                // }
+            ]
+        };
+
+    }
+
+
     //データ更新
     switch( previewData.mediaType ) {
         case "website":
@@ -358,10 +340,11 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
     console.log("Message :: addUrlPreview : これから書き込むメッセージデータのURL部分");
     console.log(dataHistory[msgId].urlData.data);
 
-    //書き込み
+    //JSONファイルへ書き込み保存
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
 
-    indexjs.sendUrlPreview(dataHistory[msgId].urlData.data[urlIndex], channelid, msgId, urlIndex);
+    //ToDo :: 現時点のこのメッセージのURLデータをすべて送信して更新させる
+    indexjs.sendUrlPreview(dataHistory[msgId].urlData.data, channelid, msgId);
 
 }
 
@@ -700,8 +683,42 @@ let msgEdit = function msgEdit(dat) {
             dataHistory[messageid].content = dat.textEditing;
             //メッセージを編集したと設定
             dataHistory[messageid].isEdited = true;
-            //JSONに書き込み保存
-            fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
+            
+            //URLが変わったならURLプレビューを再取得しながらURLデータを初期化してJSON書き込み保存
+            if ( (/((https|http)?:\/\/[^\s]+)/g).test(dataHistory[messageid].content) ) {
+                //元のURLデータを初期化
+                dataHistory[messageid].urlData = [];
+                //URLが含まれると設定
+                dataHistory[messageid].hasUrl = true;
+
+                //JSONに書き込み保存
+                fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
+
+                //URL部分を抽出
+                let URLinContent = (dataHistory[messageid].content).match(urlRegex);
+
+                //含んだURL分プレビュー要請
+                for ( let index in URLinContent ) {
+                    //URLプレビューを生成してデータへ追加させる
+                    addUrlPreview(
+                        URLinContent[index],
+                        dat.channelid,
+                        dat.messageid,
+                        index
+                    );
+
+                }
+
+            } else {
+                //元のURLデータを初期化
+                dataHistory[messageid].urlData = [];
+                //URLが含まれると設定
+                dataHistory[messageid].hasUrl = false;
+
+                //JSONに書き込み保存するだけ
+                fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
+
+            }
 
             //返す
             return {messageData: dataHistory[messageid]};
@@ -712,6 +729,7 @@ let msgEdit = function msgEdit(dat) {
         }
     }
     catch(e) { //エラーなら中止
+        console.log("Message :: msgEdit : エラー->", e);
         return -1;
     }
 

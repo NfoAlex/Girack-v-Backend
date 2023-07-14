@@ -131,13 +131,19 @@ app.get('/file/:channelid/:fileid', (req, res) => {
 ////////////////////////////////////////////////////////////////
 
 //URLデータを更新させる
-let sendUrlPreview = function sendUrlPreview(urlDataItem, channelid, msgId, urlIndex) {
+let sendUrlPreview = function sendUrlPreview(urlDataItem, channelid, msgId) {
+    // let dat = {
+    //     action: "urlData",
+    //     channelid: channelid,
+    //     messageid: msgId,
+    //     urlDataItem: urlDataItem,
+    // };
+
     let dat = {
         action: "urlData",
         channelid: channelid,
         messageid: msgId,
         urlDataItem: urlDataItem,
-        urlIndex: urlIndex
     };
 
     io.to("loggedin").emit("messageUpdate", dat); //履歴を返す
@@ -219,10 +225,14 @@ io.on("connection", (socket) => {
 
         //メッセージにURLが含まれるのではあれば
         if ( msgCompiled.hasUrl ) {
-            for ( let index in msgCompiled.urlData.data ) {
+            //URLの抽出
+            let URLinContent = (msgCompiled.content).match(/((https|http)?:\/\/[^\s]+)/g);
+            //含んだURL分プレビュー要請
+            for ( let index in URLinContent ) {
+                console.log("index :: msgSend : URLプレビューしたいやつ->", URLinContent[index]);
                 //URLプレビューを生成してデータへ追加させる
                 msg.addUrlPreview(
-                    msgCompiled.urlData.data[index].url,
+                    URLinContent[index],
                     msgCompiled.channelid,
                     msgCompiled.messageid,
                     index
@@ -1672,7 +1682,7 @@ io.on("connection", (socket) => {
         dat
         {
             channelid: "0001",
-            messageid: "20230101010101010101",
+            messageid: "202301010101010101",
             textEditing: "asdf",
             reqSender: {...}
         }
@@ -1684,7 +1694,7 @@ io.on("connection", (socket) => {
         //処理を適用してデータ送信
         let contentEdited = msg.msgEdit(dat);
         contentEdited.action = "edit";
-        io.to(dat.channelid).emit("messageUpdate", contentEdited)
+        io.to(dat.channelid).emit("messageUpdate", contentEdited);
 
     });
 
