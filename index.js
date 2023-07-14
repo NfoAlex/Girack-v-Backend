@@ -1155,12 +1155,36 @@ io.on("connection", (socket) => {
 
     //新規登録
     socket.on("register", async (dat) => {
-        console.log("register :: 登録しようとしてる", dat);
-        let key = await auth.registerUser(dat); //DBにユーザーを登録、パスワードの取得
+        //DBにユーザーを登録、パスワードとユーザーIDの取得
+        let createdUserAuth = await auth.registerUser(dat);
 
         //返り値が-1じゃないなら
-        if ( key !== -1 ) {
-            socket.emit("registerEnd", key); //パスワードを送信
+        if ( createdUserAuth.key !== -1 ) {
+            socket.emit("registerEnd", createdUserAuth.key); //パスワードを送信
+
+            //記録するシステムメッセージ
+            let SystemMessageLogging = {
+                userid: "SYSTEM",
+                channelid: "0001",
+                replyData: {
+                    isReplying: false,
+                    messageid: "",
+                },
+                fileData: { 
+                    isAttatched: false,
+                    attatchmentData: null
+                },
+                content: {
+                    term: "WELCOME",
+                    targetUser: "",
+                    triggeredUser: createdUserAuth.userid
+                },
+                isSystemMessage: true
+            };
+
+            //システムメッセージを記録して送信
+            let SystemMessageResult = msg.msgMix(SystemMessageLogging);
+            io.to("loggedin").emit("messageReceive", SystemMessageResult);
         
         } else {
             socket.emit("registerEnd", -1);
