@@ -710,6 +710,11 @@ let msgEdit = function msgEdit(dat) {
                 }
 
             } else {
+                //元のURLデータを初期化
+                dataHistory[messageid].urlData = [];
+                //URLが含まれると設定
+                dataHistory[messageid].hasUrl = false;
+
                 //JSONに書き込み保存するだけ
                 fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
 
