@@ -131,13 +131,19 @@ app.get('/file/:channelid/:fileid', (req, res) => {
 ////////////////////////////////////////////////////////////////
 
 //URLデータを更新させる
-let sendUrlPreview = function sendUrlPreview(urlDataItem, channelid, msgId, urlIndex) {
+let sendUrlPreview = function sendUrlPreview(urlDataItem, channelid, msgId) {
+    // let dat = {
+    //     action: "urlData",
+    //     channelid: channelid,
+    //     messageid: msgId,
+    //     urlDataItem: urlDataItem,
+    // };
+
     let dat = {
         action: "urlData",
         channelid: channelid,
         messageid: msgId,
         urlDataItem: urlDataItem,
-        urlIndex: urlIndex
     };
 
     io.to("loggedin").emit("messageUpdate", dat); //履歴を返す
