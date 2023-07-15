@@ -76,7 +76,8 @@ let msgMix = async function msgMix(m) {
     };
 
     //もしURLがあるようならそうデータに設定
-    if ( (urlRegex).test(m.content) ) {
+    let hasUrl = (/((https|http)?:\/\/[^\s]+)/g).test(m.content);
+    if ( hasUrl ) {
         m.hasUrl = true;
         
     } else {
