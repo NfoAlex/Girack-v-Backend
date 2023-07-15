@@ -93,6 +93,8 @@ try { //読み込んでみる
     let dataServerLoaded = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
     //テンプレに上書きする感じでサーバー情報を取り込む
     dataServer = {...JSON.parse(dataServerInitText), ...dataServerLoaded};
+    //この時点で一度書き込み保存
+    fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
 } catch(e) {
     //初期のサーバー情報
     fs.writeFileSync("./server.json", dataServerInitText); //JSONファイルを作成
