@@ -56,8 +56,6 @@ let dataServer = {};
 let dataServerInitText = `
 {
     "servername": "Girack",
-    "registerAnnounceChannel": "0001",
-    "defaultJoinChannels": ["0001"],
     "registration": {
         "available": false,
         "invite": {
@@ -71,6 +69,8 @@ let dataServerInitText = `
             "PROFILE_USERNAME_MAXLENGTH": "32"
         },
         "CHANNEL": {
+            "CHANNEL_DEFAULT_REGISTERANNOUNCE": "0001",
+            "CHANNEL_DEFAULT_JOINONREGISTER": ["0001"],
             "CHANNEL_CREATE_AVAILABLE": true,
             "CHANNEL_DELETE_AVAILABLEFORMEMBER": true,
             "CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER": false
