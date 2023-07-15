@@ -17,9 +17,6 @@ const blackRedirectUrls = [
 
 ];
 
-//URL検知用
-let urlRegex = /((https|http)?:\/\/[^\s]+)/g;
-
 //メッセージを処理して送れる形にする
 let msgMix = async function msgMix(m) {
     /*
@@ -76,13 +73,12 @@ let msgMix = async function msgMix(m) {
     };
 
     //もしURLがあるようならそうデータに設定
-    if ( (urlRegex).test(m.content) ) {
+    let hasUrl = (/((https|http)?:\/\/[^\s]+)/g).test(m.content);
+    if ( hasUrl ) {
         m.hasUrl = true;
-        console.log("Message :: msgMix : hasUrlをtrueにした->", m.content, (urlRegex).test(m.content));
-
+        
     } else {
         m.hasUrl = false;
-        console.log("Message :: msgMix : これはfalse->", m.content, (urlRegex).test(m.content));
 
     }
 
@@ -172,8 +168,6 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
     let dataHistory = {};
 
-    console.log("Message :: addUrlPreview : これからプレビュー生成");
-
     //URLプレビュー用JSON変数
     let previewData = {};
     //URlプレビューがエラーだったかどうか
@@ -220,9 +214,6 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
 
         return -1; //関数を終わらせる
     }
-
-    console.log("Message :: addUrlPreview : 生成した↓");
-    console.log(previewData);
 
     /*
 
@@ -338,9 +329,6 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
             break;
 
     }
-
-    console.log("Message :: addUrlPreview : これから書き込むメッセージデータのURL部分");
-    console.log(dataHistory[msgId].urlData.data);
 
     //JSONファイルへ書き込み保存
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
@@ -482,8 +470,6 @@ let msgDelete = function msgDelete(dat) {
         }
     }
     */
-    console.log("Message :: msgDelete : これから削除");
-    console.log(dat);
 
     let t = new Date(); //履歴に時間を追加する用
 
@@ -594,9 +580,6 @@ let msgReaction = function msgReaction(dat) {
     }
     */
 
-    console.log("Message :: msgReaction : これからリアクション");
-    console.log(dat);
-
     let t = new Date(); //履歴に時間を追加する用
     //let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
     //メッセージIDから送信日付を取得
@@ -697,7 +680,7 @@ let msgEdit = function msgEdit(dat) {
                 fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
 
                 //URL部分を抽出
-                let URLinContent = (dataHistory[messageid].content).match(urlRegex);
+                let URLinContent = (dataHistory[messageid].content).match(/((https|http)?:\/\/[^\s]+)/g);
 
                 //含んだURL分プレビュー要請
                 for ( let index in URLinContent ) {

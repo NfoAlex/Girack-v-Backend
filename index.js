@@ -229,7 +229,6 @@ io.on("connection", (socket) => {
             let URLinContent = (msgCompiled.content).match(/((https|http)?:\/\/[^\s]+)/g);
             //含んだURL分プレビュー要請
             for ( let index in URLinContent ) {
-                console.log("index :: msgSend : URLプレビューしたいやつ->", URLinContent[index]);
                 //URLプレビューを生成してデータへ追加させる
                 msg.addUrlPreview(
                     URLinContent[index],
