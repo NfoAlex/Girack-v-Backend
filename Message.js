@@ -17,9 +17,6 @@ const blackRedirectUrls = [
 
 ];
 
-//URL検知用
-let urlRegex = /((https|http)?:\/\/[^\s]+)/g;
-
 //メッセージを処理して送れる形にする
 let msgMix = async function msgMix(m) {
     /*
@@ -683,7 +680,7 @@ let msgEdit = function msgEdit(dat) {
                 fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
 
                 //URL部分を抽出
-                let URLinContent = (dataHistory[messageid].content).match(urlRegex);
+                let URLinContent = (dataHistory[messageid].content).match(/((https|http)?:\/\/[^\s]+)/g);
 
                 //含んだURL分プレビュー要請
                 for ( let index in URLinContent ) {
