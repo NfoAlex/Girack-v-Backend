@@ -218,10 +218,29 @@ let changeServerSettings = function changeServerSettings(dat) {
     db.dataServer.registration = dat.registration;
     //インスタンス名の更新
     db.dataServer.servername = dat.servername;
-    //ユーザーの登録を通知するチャンネルを設定
-    db.dataServer.registerAnnounceChannel = dat.registerAnnounceChannel;
-    //ユーザー登録時に自動的に参加するチャンネル配列を設定
-    db.dataServer.defaultJoinChannels = dat.defaultJoinChannels;
+    //登録通知用チャンネルの存在を確認して設定、なければとりあえず最初のやつに
+    if ( dat.registerAnnounceChannel in db.dataServer.channels ) {
+        //ユーザーの登録を通知するチャンネルを設定
+        db.dataServer.registerAnnounceChannel = dat.registerAnnounceChannel;
+    
+    } else {
+        //最初のチャンネルを取得してそれに設定
+        db.dataServer.registerAnnounceChannel = Object.keys(db.dataServer.channels)[0];
+
+    }
+    //ユーザーが自動参加するチャンネル配列を設定    
+      //まず初期化
+    db.dataServer.defaultJoinChannels = [];
+      //それぞれのチャンネルが存在するか確認しながら設定する
+    for ( let index in dat.defaultJoinChannels ) {
+        //存在を確認、配列へ追加
+        if ( dat.defaultJoinChannels[index] in db.dataServer.channels ) {
+            db.dataServer.defaultJoinChannels.push(dat.defaultJoinChannels);
+
+        }
+
+    }
+    
 
     //インスタンス設定をマージ
     db.dataServer.config = {...db.dataServer.config, ...dat.config};
