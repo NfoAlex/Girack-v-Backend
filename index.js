@@ -1175,7 +1175,7 @@ io.on("connection", (socket) => {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
                 userid: "SYSTEM",
-                channelid: db.dataServer.config.CHANNEL_DEFAULT_REGISTERANNOUNCE,
+                channelid: db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE,
                 replyData: {
                     isReplying: false,
                     messageid: "",

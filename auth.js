@@ -205,7 +205,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
             "sessions": {},
             "banned": false
         },
-        "channel": db.dataServer.config.CHANNEL_DEFAULT_JOINONREGISTER
+        "channel": db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER
     };
 
     console.log("registerUser :: 登録結果 ↓");
