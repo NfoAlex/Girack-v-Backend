@@ -302,6 +302,8 @@ io.on("connection", (socket) => {
     socket.on("changeServerSettings", (dat) => {
         /*
         servername: "xxx",
+        registerAnnounceChannel: "0001",
+        defaultJoinChannels: ["0001"],
         config: this.displaySettings.config,
         registration: {
             available: this.displaySettings.registerAvailable,
@@ -315,8 +317,16 @@ io.on("connection", (socket) => {
             sessionid: Userinfo.sessionid
         }
         */
-        //セッション認証
-        if ( auth.checkUserSession(dat.reqSender) ) {
+
+        //セッションと整合性確認
+        let paramRequire = [
+            "servername",
+            "config",
+            "registration",
+            "registerAnnounceChannel",
+            "defaultJoinChannels"
+        ];
+        if ( checkDataIntegrality(dat, paramRequire, "changeServerSettings") ) {
             infoUpdate.changeServerSettings(dat); //設定更新
 
         } else {
@@ -1165,7 +1175,7 @@ io.on("connection", (socket) => {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
                 userid: "SYSTEM",
-                channelid: "0001",
+                channelid: db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE,
                 replyData: {
                     isReplying: false,
                     messageid: "",

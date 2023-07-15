@@ -589,6 +589,23 @@ let channelRemove = function channelRemove(dat) {
 
     }
 
+    //もし登録通知用チャンネルに設定されていたら書き換え
+    if ( db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE === dat.channelid ) {
+        //チャンネルIDの最初をとりあえず取り出す
+        let channelIdFallback = Object.keys(db.dataServer.channels)[0];
+        //設定
+        db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE = channelIdFallback;
+
+    }
+    //登録時の自動参加チャンネルに設定されていたら
+    if ( db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER.indexOf(dat.channelid) !== -1 ) {
+        //そのチャンネルIDのインデックス番号を取得
+        let index = db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER.indexOf(dat.channelid);
+        //そのチャンネルIDを削除
+        db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER.splice(index, 1);
+
+    }
+
     
     //監査ログへの記録処理
     recordModeration(

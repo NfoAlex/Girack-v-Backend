@@ -69,6 +69,8 @@ let dataServerInitText = `
             "PROFILE_USERNAME_MAXLENGTH": "32"
         },
         "CHANNEL": {
+            "CHANNEL_DEFAULT_REGISTERANNOUNCE": "0001",
+            "CHANNEL_DEFAULT_JOINONREGISTER": ["0001"],
             "CHANNEL_CREATE_AVAILABLE": true,
             "CHANNEL_DELETE_AVAILABLEFORMEMBER": true,
             "CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER": false
@@ -91,6 +93,8 @@ try { //読み込んでみる
     let dataServerLoaded = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
     //テンプレに上書きする感じでサーバー情報を取り込む
     dataServer = {...JSON.parse(dataServerInitText), ...dataServerLoaded};
+    //この時点で一度書き込み保存
+    fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
 } catch(e) {
     //初期のサーバー情報
     fs.writeFileSync("./server.json", dataServerInitText); //JSONファイルを作成
@@ -471,21 +475,25 @@ let getInfoChannelJoinedUserList = function getInfoChannelJoinedUserList(dat) {
     let channelJoinedUserList = []; //送信予定の配列
     let objUser = Object.entries(dataUser.user); //JSONをオブジェクト化
 
-    //情報収集
-    for ( index in objUser ) {
-        //ユーザー情報の中で指定のチャンネルに参加しているなら配列追加
-        if ( objUser[index][1].channel.includes(dat.targetid) ) {
-            //配列追加
-            channelJoinedUserList.push({
-                userid: objUser[index][0],
-                username: objUser[index][1].name,
-                role: objUser[index][1].role,
-                loggedin : objUser[index][1].state.loggedin,
-                banned: objUser[index][1].state.banned
-            });
+    try {
+        //情報収集
+        for ( index in objUser ) {
+            //ユーザー情報の中で指定のチャンネルに参加しているなら配列追加
+            if ( objUser[index][1].channel.includes(dat.targetid) ) {
+                //配列追加
+                channelJoinedUserList.push({
+                    userid: objUser[index][0],
+                    username: objUser[index][1].name,
+                    role: objUser[index][1].role,
+                    loggedin : objUser[index][1].state.loggedin,
+                    banned: objUser[index][1].state.banned
+                });
+
+            }
 
         }
-
+    } catch(e) {
+        console.log("dbControl :: getInfoChannelJoinedUserList : エラー", e);
     }
 
     return channelJoinedUserList;
