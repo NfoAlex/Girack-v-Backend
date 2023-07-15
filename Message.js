@@ -21,7 +21,7 @@ const blackRedirectUrls = [
 let urlRegex = /((https|http)?:\/\/[^\s]+)/g;
 
 //メッセージを処理して送れる形にする
-let msgMix = function msgMix(m) {
+let msgMix = async function msgMix(m) {
     /*
     m
     {
@@ -78,9 +78,11 @@ let msgMix = function msgMix(m) {
     //もしURLがあるようならそうデータに設定
     if ( (urlRegex).test(m.content) ) {
         m.hasUrl = true;
+        console.log("Message :: msgMix : hasUrlをtrueにした->", m.content, (urlRegex).test(m.content));
 
     } else {
         m.hasUrl = false;
+        console.log("Message :: msgMix : これはfalse->", m.content, (urlRegex).test(m.content));
 
     }
 

@@ -192,7 +192,7 @@ io.on("connection", (socket) => {
     console.log("-- 新規接続 --");
 
     //メッセージ処理
-    socket.on("msgSend", (m) => {
+    socket.on("msgSend", async (m) => {
         /*
         メッセージのデータ型
         m {
@@ -220,7 +220,7 @@ io.on("connection", (socket) => {
         //整合性の確認
         if ( !checkDataIntegrality(m, paramsRequire, "msgSend") ) return -1;
         
-        let msgCompiled = msg.msgMix(m); //メッセージに情報をつける
+        let msgCompiled = await msg.msgMix(m); //メッセージに情報をつける
         if ( msgCompiled === -1 ) { return; } //処理中にエラーがあったなら止める
 
         //メッセージにURLが含まれるのではあれば
