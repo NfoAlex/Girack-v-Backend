@@ -78,11 +78,9 @@ let msgMix = async function msgMix(m) {
     //もしURLがあるようならそうデータに設定
     if ( (urlRegex).test(m.content) ) {
         m.hasUrl = true;
-        console.log("Message :: msgMix : hasUrlをtrueにした->", m.content, (urlRegex).test(m.content));
-
+        
     } else {
         m.hasUrl = false;
-        console.log("Message :: msgMix : これはfalse->", m.content, (urlRegex).test(m.content));
 
     }
 
@@ -171,8 +169,6 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
 
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
     let dataHistory = {};
-
-    console.log("Message :: addUrlPreview : これからプレビュー生成");
 
     //URLプレビュー用JSON変数
     let previewData = {};
