@@ -217,9 +217,6 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
         return -1; //関数を終わらせる
     }
 
-    console.log("Message :: addUrlPreview : 生成した↓");
-    console.log(previewData);
-
     /*
 
          プレビューの前に履歴を読み込むと複数のURLを処理する際に
@@ -334,9 +331,6 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
             break;
 
     }
-
-    console.log("Message :: addUrlPreview : これから書き込むメッセージデータのURL部分");
-    console.log(dataHistory[msgId].urlData.data);
 
     //JSONファイルへ書き込み保存
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
@@ -478,8 +472,6 @@ let msgDelete = function msgDelete(dat) {
         }
     }
     */
-    console.log("Message :: msgDelete : これから削除");
-    console.log(dat);
 
     let t = new Date(); //履歴に時間を追加する用
 
@@ -589,9 +581,6 @@ let msgReaction = function msgReaction(dat) {
         }
     }
     */
-
-    console.log("Message :: msgReaction : これからリアクション");
-    console.log(dat);
 
     let t = new Date(); //履歴に時間を追加する用
     //let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
