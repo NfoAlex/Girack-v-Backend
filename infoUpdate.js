@@ -425,6 +425,7 @@ let channelAction = function channelAction(dat) {
         //チャンネルがプライベートで参加者が権力者でなく、また招待者がそのチャンネルに参加していなら拒否
         if (
             db.dataServer.channels[dat.channelid].scope === "private" &&
+            db.dataUser.user[dat.userid].role !== Admin &&
             !senderInfo.channelJoined.includes(dat.channelid)
         ) {
             return -1;
