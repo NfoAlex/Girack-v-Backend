@@ -693,6 +693,32 @@ let getInitInfo = function getInitInfo() {
     };
 }
 
+
+//JSONをマージするだけの関数 (https://qiita.com/riversun/items/60307d58f9b2f461082a)
+function mergeDeeply(target, source, opts) {
+    const isObject = obj => obj && typeof obj === 'object' && !Array.isArray(obj);
+    const isConcatArray = opts && opts.concatArray;
+    let result = Object.assign({}, target);
+    //ここからメイン（型を調べてから）
+    if (isObject(target) && isObject(source)) {
+        //一つ一つを調べて追加していく感じ
+        for (const [sourceKey, sourceValue] of Object.entries(source)) {
+            const targetValue = target[sourceKey];
+            if (isConcatArray && Array.isArray(sourceValue) && Array.isArray(targetValue)) {
+                result[sourceKey] = targetValue.concat(...sourceValue);
+            }
+            else if (isObject(sourceValue) && target.hasOwnProperty(sourceKey)) {
+                result[sourceKey] = mergeDeeply(targetValue, sourceValue, opts);
+            }
+            else {
+                Object.assign(result, {[sourceKey]: sourceValue});
+            }
+        }
+    }
+    return result;
+}
+
+
 exports.parseInfos = parseInfos; //IDで情報を取得(ToDo削除)
 exports.getInfoUser = getInfoUser; //ユーザー情報を取得
 exports.getInfoSessions = getInfoSessions; //ユーザーのセッションデータを返す
