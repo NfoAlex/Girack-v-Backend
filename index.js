@@ -755,6 +755,9 @@ io.on("connection", (socket) => {
         let result = infoUpdate.channelAction(dat);
         socket.emit("infoUser", result);
 
+        //もし参加、退出に失敗したならここで停止
+        if ( result === -1 ) return;
+
         let SocketIsOnline = false; //影響を受けるユーザーがオンラインかどうか
         let SocketIDTarget = ""; //影響を受けるユーザーのSocketID
 
