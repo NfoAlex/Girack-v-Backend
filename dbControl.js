@@ -112,115 +112,6 @@ console.log("=========================");
 console.log("DB認識!");
 console.log("=========================");
 
-//TODO : これを削除
-//DBから必要な情報を用意
-let parseInfos = function parseInfos(dat) { //i => {target, id}
-    /*
-        dat
-        {
-            target: (user | channel | List),
-            targetid: "ほしい情報のID",
-            reqSender: {
-                userid: "このリクエストを送っているユーザーのID",
-                sessionid: "セッションID"
-            },
-            [Listだったら] //(そのターゲットの一覧をとる)
-            targetlist: (user | channel)
-        }
-    */
-    console.log("parseInfos :: 情報 ↓")
-    console.log(dat);
-
-    let infoParsed;
-
-    //情報追加しまくり(user.jsonから)
-    try {
-        switch( dat.target ) {
-            case "user":
-                try{
-                    //送信者自身の情報がほしかったら
-                    if ( dat.targetid === dat.reqSender.userid ) {
-                        infoParsed = {
-                            type: "user",
-                            username: dataUser.user[dat.targetid].name, //ユーザーの表示名
-                            userid: dat.targetid,
-                            channelJoined: dataUser.user[dat.targetid].channel, //入っているチャンネルリスト(array)
-                            role: dataUser.user[dat.targetid].role, //ユーザーのロール
-                            banned: dataUser.user[dat.targetid].state.banned //BANされているかどうか
-                        }
-
-                    } else { //他人の情報
-                        infoParsed = {
-                            type: "user",
-                            username: dataUser.user[dat.targetid].name, //ユーザーの表示名
-                            userid: dat.targetid,
-                            role: dataUser.user[dat.targetid].role, //ユーザーのロール
-                        }
-
-                    }
-
-                }
-                catch(e) {
-                    infoParsed = {
-                        type: "user",
-                        username: "存在しないユーザー", //ユーザーの表示名
-                        userid: dat.targetid,
-                        channelJoined: [], //入っているチャンネルリスト(array)
-                        role: "Deleted", //ユーザーのロール
-                        banned: false //BANされているかどうか
-                    }
-                }
-                break;
-
-            case "channel":
-                infoParsed = {
-                    type: "channel",
-                    channelname: dataServer.channels[dat.targetid].name,
-                    channelid: dat.targetid,
-                    description: dataServer.channels[dat.targetid].description,
-                    scope: dataServer.channels[dat.targetid].scope
-                }
-                break;
-
-            case "list":
-                if ( dat.targetlist === "channel" ) {
-                    let cl = {};
-                    let objServer = Object.entries(dataServer.channels)
-                    for ( let i in objServer ) {
-                        cl[objServer[i][0]] = objServer[i][1];
-
-                    }
-
-                    infoParsed = {
-                        type: "list",
-                        channelList: cl
-                        
-                    }
-                
-                }
-
-                break;
-
-            default:
-                console.log("dbControl :: 何かあった...?");
-                return -1;
-
-        }
-    }
-    catch(e) {
-        console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-        console.log("   ERROR");
-        console.log(e);
-        console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-
-        return -1;
-
-    }
-
-    return infoParsed;
-
-}
-
 //チャンネルリストの取得
 let getInfoList = function getInfoList(dat) {
     /*
@@ -717,8 +608,6 @@ function mergeDeeply(target, source, opts) {
     return result;
 }
 
-
-exports.parseInfos = parseInfos; //IDで情報を取得(ToDo削除)
 exports.getInfoUser = getInfoUser; //ユーザー情報を取得
 exports.getInfoSessions = getInfoSessions; //ユーザーのセッションデータを返す
 exports.getInfoChannel = getInfoChannel; //チャンネル情報を取得

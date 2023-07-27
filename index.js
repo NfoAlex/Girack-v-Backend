@@ -1245,39 +1245,6 @@ io.on("connection", (socket) => {
 // ===========================================================
 // 情報取得系
 
-    //TODO : これを削除
-    //情報だけの取得
-    socket.on("getInfo", (dat) => {
-        /*
-        dat
-        {
-            target: (user | channel | List),
-            targetid: "ほしい情報のID",
-            reqSender: {
-                userid: "このリクエストを送っているユーザーのID",
-                sessionid: "セッションID"
-            },
-            [Listだったら] //(そのターゲットの一覧をとる)
-            targetlist: (user | channel)
-        }
-        */
-        let info = 0; //返す情報用
-        
-        console.log("index :: getInfo : getInfoが使われています...");
-        console.log("getInfoを使っているdat -> ");
-        console.log(dat);
-
-        //セッションが適合か確認
-        if ( auth.checkUserSession({userid:dat.reqSender.userid, sessionid:dat.reqSender.sessionid}) ) {
-            info = db.parseInfos(dat); //情報収集
-
-        }
-
-        io.to("loggedin").emit("updatePersonal");
-        socket.emit("infoResult", info); //情報を返す
-
-    });
-
     //リスト情報を返す
     socket.on("getInfoList", (dat) => {
         /*
