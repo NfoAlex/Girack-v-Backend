@@ -102,15 +102,11 @@ app.get('/file/:channelid/:fileid', (req, res) => {
         //ファイルIDインデックスを取得
         fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
     } catch(e) {
-        console.log("index :: app.get('/file/') : ファイル送信失敗", fileid, e);
-        res.send("内部エラー");
+        res.send("内部エラー", e);
     }
 
     //JSONから添付ファイルを探して返す
-    try {
-        //ファイルを返す
-        console.log("返すファイルデータ :: ", fileidIndex[fileid]);
-        
+    try {        
         //もし画像ファイルならダウンロードじゃなく表示させる
         if ( fileidIndex[fileid].type.includes("image/") ) { //typeにimageが含まれるなら
             //ブラウザで表示
@@ -122,8 +118,7 @@ app.get('/file/:channelid/:fileid', (req, res) => {
 
         }
     } catch(e) {
-        console.log("index :: app.get('/file/') : ファイル送信失敗", e);
-        res.send("ファイルがねえ");
+        res.send("ファイルがねえ", e);
     }
 
 });
@@ -240,9 +235,6 @@ io.on("connection", (socket) => {
             }
 
         }
-
-        console.log("msgSend :: 送信するデータ ↓");
-        console.log(msgCompiled);
         
         //チャンネル参加者のみに送信
         io.to(m.channelid).emit("messageReceive", msgCompiled);
@@ -1344,8 +1336,6 @@ io.on("connection", (socket) => {
         if ( !checkDataIntegrality(dat, [], "getInfoSessions") ) return -1;
         //セッションデータの取得
         let infoSessions = db.getInfoSessions(dat);
-
-        console.log("index :: getInfoSessions : 渡すデータ->", infoSessions);
 
         //データを送る
         socket.emit("infoSessions", infoSessions);
