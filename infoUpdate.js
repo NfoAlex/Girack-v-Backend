@@ -326,10 +326,28 @@ let changeChannelSettings = function changeChannelSettings(dat) {
 
 //プロフィール変更
 let changeProfile = function changeProfile(dat) {
-    db.dataUser.user[dat.reqSender.userid].name = dat.name; //DB更新
+    //ユーザー名被ってるフラグ
+    let usernameAlreadyUsedFlag = false;
+    //ユーザーデータを配列化
+    let objUser = Object.entries(db.dataUser.user);
+    for ( let index in objUser ) {
+        if ( objUser[index][1].name === dat.name ) {
+            //ユーザー名がすでに使われていると設定
+            usernameAlreadyUsedFlag = true;
+            break;
+
+        }
+
+    }
+
+    //もしユーザー名があいているなら
+    if ( !usernameAlreadyUsedFlag ) {
+        db.dataUser.user[dat.reqSender.userid].name = dat.name; //DB更新
     
-    //DBをJSONへ保存
-    fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+        //DBをJSONへ保存
+        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+
+    }
     
     //更新したデータを収集
     //let answer = db.parseInfos({target:"user", targetid:dat.targetid});
