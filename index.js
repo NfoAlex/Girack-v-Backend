@@ -498,18 +498,21 @@ io.on("connection", (socket) => {
         dat
         {
             name: "変えたい先の名前",
+            targetid: "ユーザーID",
             reqSender: {
                 userid: userinfo.userid,
                 sessionid: userinfo.sessionid
             }
         }
         */
-        
-        //セッションIDの確認
-        if ( !auth.checkUserSession({
-            userid: dat.reqSender.userid,
-            sessionid: dat.reqSender.sessionid
-        }) ) { return -1; }
+
+        let paramRequire = ["name", "targetid"];
+
+        //整合性確認
+        if ( !checkDataIntegrality(dat, paramRequire, "changeProfile") ) {
+            return -1;
+
+        }
 
         if ( dat.name > 32 ) return -1;
 

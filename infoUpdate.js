@@ -326,6 +326,16 @@ let changeChannelSettings = function changeChannelSettings(dat) {
 
 //プロフィール変更
 let changeProfile = function changeProfile(dat) {
+    //変えるユーザーと送信者が違うなら権限チェック
+    if ( dat.reqSender.userid !== dat.targetid ) {
+        //Adminじゃないならキャンセル
+        if ( db.dataUser.user[dat.reqSender.userid].role !== "Admin" ) {
+            return -1;
+
+        }
+
+    }
+
     //ユーザー名被ってるフラグ
     let usernameAlreadyUsedFlag = false;
     //ユーザーデータを配列化
