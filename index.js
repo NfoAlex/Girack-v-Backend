@@ -8,7 +8,6 @@ const fsPromise = require("fs").promises;
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
-const { config } = require("process");
 
 const port = process.env.PORT || 33333;
 
