@@ -352,7 +352,7 @@ let changeProfile = function changeProfile(dat) {
 
     //もしユーザー名があいているなら
     if ( !usernameAlreadyUsedFlag ) {
-        db.dataUser.user[dat.reqSender.userid].name = dat.name; //DB更新
+        db.dataUser.user[dat.targetid].name = dat.name; //DB更新
     
         //DBをJSONへ保存
         fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
