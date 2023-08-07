@@ -404,7 +404,7 @@ let searchUserDynamic = function searchUserDynamic(dat) {
     */
 
     let searchResult = []; //検索結果を入れる配列
-    let objUser = Object.entries(dataUser.user);
+    let objUser = Object.entries(dataUser.user); //ユーザー名を配列化
 
     //検索クエリーが空じゃないなら検索開始
     if ( dat.query !== "" ) {

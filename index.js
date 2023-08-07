@@ -498,20 +498,24 @@ io.on("connection", (socket) => {
         dat
         {
             name: "変えたい先の名前",
+            targetid: "ユーザーID",
             reqSender: {
                 userid: userinfo.userid,
                 sessionid: userinfo.sessionid
             }
         }
         */
-        
-        //セッションIDの確認
-        if ( !auth.checkUserSession({
-            userid: dat.reqSender.userid,
-            sessionid: dat.reqSender.sessionid
-        }) ) { return -1; }
 
-        if ( dat.name > 32 ) return -1;
+        let paramRequire = ["name", "targetid"];
+
+        //整合性確認
+        if ( !checkDataIntegrality(dat, paramRequire, "changeProfile") ) {
+            return -1;
+
+        }
+
+        //名前の長さを32文字未満、2文字以上限定に
+        if ( dat.name.length > 32 && dat.name.length < 2 ) return -1;
 
         //プロフィールを更新してからの情報を取得
         let answer = infoUpdate.changeProfile(dat);
@@ -1417,10 +1421,10 @@ io.on("connection", (socket) => {
         }
         */
 
+        //整合性確認
         let paramRequire = [
             "query"
         ];
-
         if ( !checkDataIntegrality(dat, paramRequire, "searchUserDynamic") ) {
             return -1;
 
