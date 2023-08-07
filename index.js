@@ -514,7 +514,8 @@ io.on("connection", (socket) => {
 
         }
 
-        if ( dat.name > 32 ) return -1;
+        //名前の長さを32文字未満、2文字以上限定に
+        if ( dat.name.length > 32 && dat.name.length < 2 ) return -1;
 
         //プロフィールを更新してからの情報を取得
         let answer = infoUpdate.changeProfile(dat);
@@ -1420,10 +1421,10 @@ io.on("connection", (socket) => {
         }
         */
 
+        //整合性確認
         let paramRequire = [
             "query"
         ];
-
         if ( !checkDataIntegrality(dat, paramRequire, "searchUserDynamic") ) {
             return -1;
 
