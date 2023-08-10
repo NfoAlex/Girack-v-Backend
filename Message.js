@@ -270,8 +270,6 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
 
     }
 
-    console.log("Message :: addUrlPreview : previewData->", previewData);
-
     //データ更新
     switch( previewData.mediaType ) {
         case "website":
