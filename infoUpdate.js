@@ -334,6 +334,22 @@ let changeProfile = function changeProfile(dat) {
 
         }
 
+        //監査ログへの記録処理
+        recordModeration(
+            dat.reqSender.userid,
+            {
+                type: "user",
+                userid: dat.targetid,
+                channelid: null,
+                messageid: null
+            },
+            {
+                actionname: "userChangeName",
+                valueBefore: db.dataUser.user[dat.targetid].name,
+                valueAfter: dat.name
+            }
+        );
+
     }
 
     //ユーザー名被ってるフラグ
@@ -688,6 +704,7 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo) {
             userPardon,
             userDelete,
             userChangeRole,
+            userChangeName,
             userKickFromChannel
         
         channelに対して
