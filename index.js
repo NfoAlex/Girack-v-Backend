@@ -656,6 +656,34 @@ io.on("connection", (socket) => {
         //ユーザーの個人用データ保存
         infoUpdate.updateUserSaveMsgReadState(dat);
 
+        //もし複数端末でログインしているなら更新させる
+        if ( userOnline[dat.reqSender.userid] >= 2 ) {
+            //オンラインのSocketJSONを配列化
+            let objsocketOnline =  Object.entries(socketOnline);
+            //ループしてSocketIDが一致した項目を探す
+            for ( let index in objsocketOnline ) {
+                if ( objsocketOnline[index][1] === dat.reqSender.userid ) {                    
+                    //SocketIDで参加させる
+                    try {
+                        //io.to(objsocketOnline[index][0]).emit("infoUser", resultForPersonal);
+                        //ユーザーの個人用データ取得
+                        let userSave = db.getUserSave(dat);
+
+                        //データ送信
+                        io.to(objsocketOnline[index][0]).emit("infoUserSaveMsgReadState", {
+                            msgReadStateAvailable: userSave.msgReadStateAvailable,
+                            msgReadState: userSave.msgReadState
+                        });
+                    } catch(e) {
+                        console.log("index :: updateUserSaveMsgReadState : err->", e);
+                    }
+
+                }
+
+            }
+
+        }
+
     });
 
     //ユーザーのセッション名を変更
