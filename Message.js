@@ -270,6 +270,7 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
 
     }
 
+    console.log("Message :: addUrlPreview : previewData->", previewData);
 
     //データ更新
     switch( previewData.mediaType ) {
@@ -280,6 +281,7 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
                 title: previewData.title,
                 description: previewData.description,
                 img: previewData.images,
+                video: previewData.videos,
                 favicon: previewData.favicons[0]
             };
             break;
@@ -291,6 +293,7 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
                 title: previewData.title,
                 description: previewData.description,
                 img: previewData.images,
+                video: previewData.videos,
                 favicon: previewData.favicons[0]
             };
             break;
@@ -302,6 +305,7 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
                 title: previewData.title,
                 description: previewData.description,
                 img: url,
+                video: [],
             };
             break;
 
@@ -313,6 +317,7 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
                     title: previewData.title,
                     description: previewData.description,
                     img: previewData.images,
+                    video: [],
                     favicon: previewData.favicons[0]
                 };
             }
@@ -323,6 +328,7 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
                     title: "",
                     description: "",
                     img: null,
+                    video: null,
                     favicon: null
                 };
             }
