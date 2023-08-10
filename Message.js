@@ -309,6 +309,17 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
             };
             break;
 
+        case "video":
+            dataHistory[msgId].urlData.data[urlIndex] = {
+                url: url,
+                mediaType: previewData.mediaType,
+                title: previewData.title,
+                description: previewData.description,
+                img: [],
+                video: url,
+            };
+            break;
+
         default:
             try {
                 dataHistory[msgId].urlData.data[urlIndex] = {
