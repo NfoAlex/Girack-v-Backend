@@ -143,7 +143,7 @@ let sendUrlPreview = function sendUrlPreview(urlDataItem, channelid, msgId) {
     io.to("loggedin").emit("messageUpdate", dat); //履歴を返す
 
 }
-
+//外部スクリプトで使う用
 exports.sendUrlPreview = sendUrlPreview;
 
 ////////////////////////////////////////////////////////////////
