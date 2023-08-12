@@ -173,7 +173,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
         //招待コードが一致しているかどうか
         if ( db.dataServer.registration.invite.inviteCode !== dat[1] ) {
             console.log("auth :: registerUser : 招待コード違うわ");
-            return {key:-1, userid:-1};
+            return {result: "WRONG_CODE", key:-1, userid:-1};
 
         }
         console.log("auth :: registerUser : 招待コード合ってる！");
@@ -182,43 +182,72 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
 
     //ID格納用
     let newID = "";
-    //ID生成
-    for ( let i=0; i<8; i++ ) {
-        newID += Math.trunc(Math.random() * 9); //乱数を追加
-
-    }
-
     //パスワードを生成
     const pwGenerated = generateKey();
     //DBに書くためにハッシュ化する
     const pwHashed = await bcrypt.hash(pwGenerated, 10);
+    //setIntervalを格納する変数
+    let CheckIDInterval = null;
 
-    //DBに登録
-    db.dataUser.user[newID] = {
-        "name": dat[0],
-        "role": "Member",
-        "pw": pwHashed,
-        "icon": "",
-        "state": {
-            "loggedin": false,
-            "session_id": "",
-            "sessions": {},
-            "banned": false
-        },
-        "channel": db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER
-    };
+    //ユーザー名の空きを調べる
+    for ( let index in db.dataUser.user ) {
+        //ユーザー名がすでに使われていたら停止
+        if ( db.dataUser.user[index].name === dat[0] ) {
+            return {result: "USED_NAME", key:-1, userid:-1};
 
-    console.log("registerUser :: 登録結果 ↓");
-    console.log(db.dataUser.user[newID]);
+        }
 
-    //サーバーのJSONファイルを更新
-    fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+    }
 
-    //デフォルトアイコンを新規ユーザー用にクローン
-    fs.copyFileSync("./img/default.jpeg", "./img/" + newID + ".jpeg");
+    //ユーザーIDの空きを調べて作る
+    return new Promise((resolve) => {
+        CheckIDInterval = setInterval(() => {
+            //ID用変数を初期化
+            newID = "";
+            //IDへ乱数生成して格納
+            for ( let i=0; i<8; i++ ) {
+                newID += Math.trunc(Math.random() * 9); //乱数を追加
 
-    //パスワードを返す
-    return {key:pwGenerated, userid:newID};
+            }
+
+            //もし生成したIDが空いてるならここで次の処理へ
+            if ( db.dataUser.user[newID] === undefined ) resolve();
+
+        }, 10);
+
+        
+    }).then(() => {
+        //IDの空き確認用Intervalを停止
+        clearInterval(CheckIDInterval);
+
+        //DBに登録
+        db.dataUser.user[newID] = {
+            "name": dat[0],
+            "role": "Member",
+            "pw": pwHashed,
+            "icon": "",
+            "state": {
+                "loggedin": false,
+                "session_id": "",
+                "sessions": {},
+                "banned": false
+            },
+            "channel": db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER
+        };
+
+        console.log("registerUser :: 登録結果 ↓");
+        console.log(db.dataUser.user[newID]);
+
+        //サーバーのJSONファイルを更新
+        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+
+        //デフォルトアイコンを新規ユーザー用にクローン
+        fs.copyFileSync("./img/default.jpeg", "./img/" + newID + ".jpeg");
+
+        //パスワードを返す
+        return {result: "SUCCESS", key:pwGenerated};
+
+    });
 
 }
 
