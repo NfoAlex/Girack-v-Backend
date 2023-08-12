@@ -18,74 +18,76 @@ let authUser = async function authUser(cred) {
         let index = Object.keys(db.dataUser.user)[i];
 
         //ユーザー名とパスワードの一致を確認してセッションIDを生成する
-        if (
-            db.dataUser.user[index].name === username &&
-            (
-                bcrypt.compare(password, db.dataUser.user[index].pw) || //ハッシュ化とパスワード比較
-                db.dataUser.user[index].pw === password //一応平文前提でも、そしてハッシュ化する(次期ビルドで削除)
-            )
-        ) {
-            //セッションID入れるよう
-            let _session = "";
+        if ( db.dataUser.user[index].name === username ) {
+            //パスワードのハッシュ値計算
+            let passComparedResult = await bcrypt.compare(password, db.dataUser.user[index].pw);
+            //認証成功したら
+            if ( passComparedResult ) {
+                console.log("認証結果->",passComparedResult,);
 
-            //BANされているならそう結果を返す
-            if ( db.dataUser.user[index].state.banned ) {
-                return {result: false};
+                //セッションID入れるよう
+                let _session = "";
+
+                //BANされているならそう結果を返す
+                if ( db.dataUser.user[index].state.banned ) {
+                    return {result: false};
+
+                }
+
+                //セッションID用に24文字のコードを生成
+                let sessionidCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; //セッションIDに使う英数字
+                let sessionidLength = 24; //文字数
+                _session = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
+
+                let username = db.dataUser.user[index].name; //ユーザー名取得
+                
+                //ログイン時間を記録する用
+                let t = new Date();
+                //ログイン時間(分まで)を変数へ格納
+                let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
+                try {
+                    //セッションコードとデバイスを設定
+                    db.dataUser.user[index].state.sessions[_session] = {
+                        sessionName: "とあるデバイス",
+                        loggedinTime: _loginTime,
+                        loggedinTimeFirst: _loginTime
+                    };
+                } catch(e) {
+                    //セッションいれるところすらないなら作る
+                    db.dataUser.user[index].state.sessions = {};
+                    db.dataUser.user[index].state.sessions[_session] = {
+                        sessionName: "とあるデバイス",
+                        loggedinTime: _loginTime,
+                        loggedinTimeFirst: _loginTime
+                    };
+                }
+
+                // !!!! ↓↓次期ビルドで削除↓↓ !!!!
+                /************************************************************/
+                //パスワードが平文保存されているならハッシュ化して保存
+                if ( db.dataUser.user[index].pw === password ) {
+                    db.dataUser.user[index].pw = await bcrypt.hash(cred.password, 10);
+
+                }
+                //以前の形式のせっしょんIDがあるなら削除
+                if ( db.dataUser.user[index].state.session_id !== undefined ) {
+                    delete db.dataUser.user[index].state.session_id;
+                }
+                /************************************************************/
+                
+                //サーバーのJSONファイルを更新
+                fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+                
+                return {
+                    result: true, //ログイン成功の印
+                    userid: index, //ユーザーID
+                    username: username, //ユーザー名
+                    sessionid: _session, //セッションコード
+                    role: db.dataUser.user[index].role, //ロール
+                    channelJoined: db.dataUser.user[index].channel //参加しているチャンネル
+                }; //ユーザーの情報を送信
 
             }
-
-            //セッションID用に24文字のコードを生成
-            let sessionidCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; //セッションIDに使う英数字
-            let sessionidLength = 24; //文字数
-            _session = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
-
-            let username = db.dataUser.user[index].name; //ユーザー名取得
-            
-            //ログイン時間を記録する用
-            let t = new Date();
-            //ログイン時間(分まで)を変数へ格納
-            let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
-            try {
-                //セッションコードとデバイスを設定
-                db.dataUser.user[index].state.sessions[_session] = {
-                    sessionName: "とあるデバイス",
-                    loggedinTime: _loginTime,
-                    loggedinTimeFirst: _loginTime
-                };
-            } catch(e) {
-                //セッションいれるところすらないなら作る
-                db.dataUser.user[index].state.sessions = {};
-                db.dataUser.user[index].state.sessions[_session] = {
-                    sessionName: "とあるデバイス",
-                    loggedinTime: _loginTime,
-                    loggedinTimeFirst: _loginTime
-                };
-            }
-
-            // !!!! ↓↓次期ビルドで削除↓↓ !!!!
-            /************************************************************/
-            //パスワードが平文保存されているならハッシュ化して保存
-            if ( db.dataUser.user[index].pw === password ) {
-                db.dataUser.user[index].pw = await bcrypt.hash(cred.password, 10);
-
-            }
-            //以前の形式のせっしょんIDがあるなら削除
-            if ( db.dataUser.user[index].state.session_id !== undefined ) {
-                delete db.dataUser.user[index].state.session_id;
-            }
-            /************************************************************/
-            
-            //サーバーのJSONファイルを更新
-            fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
-            
-            return {
-                result: true, //ログイン成功の印
-                userid: index, //ユーザーID
-                username: username, //ユーザー名
-                sessionid: _session, //セッションコード
-                role: db.dataUser.user[index].role, //ロール
-                channelJoined: db.dataUser.user[index].channel //参加しているチャンネル
-            }; //ユーザーの情報を送信
 
         }
 
