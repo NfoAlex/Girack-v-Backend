@@ -11,7 +11,7 @@ const socketIo = require("socket.io");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20230810";
+const SERVER_VERSION = "alpha_20230812";
 
 const app = express();
 const server = http.createServer(app);
@@ -656,6 +656,34 @@ io.on("connection", (socket) => {
         //ユーザーの個人用データ保存
         infoUpdate.updateUserSaveMsgReadState(dat);
 
+        //もし複数端末でログインしているなら更新させる
+        if ( userOnline[dat.reqSender.userid] >= 2 ) {
+            //オンラインのSocketJSONを配列化
+            let objsocketOnline =  Object.entries(socketOnline);
+            //ループしてSocketIDが一致した項目を探す
+            for ( let index in objsocketOnline ) {
+                if ( objsocketOnline[index][1] === dat.reqSender.userid ) {                    
+                    //SocketIDで参加させる
+                    try {
+                        //io.to(objsocketOnline[index][0]).emit("infoUser", resultForPersonal);
+                        //ユーザーの個人用データ取得
+                        let userSave = db.getUserSave(dat);
+
+                        //データ送信
+                        io.to(objsocketOnline[index][0]).emit("infoUserSaveMsgReadState", {
+                            msgReadStateAvailable: userSave.msgReadStateAvailable,
+                            msgReadState: userSave.msgReadState
+                        });
+                    } catch(e) {
+                        console.log("index :: updateUserSaveMsgReadState : err->", e);
+                    }
+
+                }
+
+            }
+
+        }
+
     });
 
     //ユーザーのセッション名を変更
@@ -848,6 +876,7 @@ io.on("connection", (socket) => {
         let SystemMessageLogging = {
             userid: "SYSTEM",
             channelid: dat.channelid,
+            role: "SYSTEM",
             replyData: {
                 isReplying: false,
                 messageid: "",
@@ -866,7 +895,7 @@ io.on("connection", (socket) => {
 
         //システムメッセージを記録して送信
         let SystemMessageResult = msg.msgMix(SystemMessageLogging);
-        io.to("loggedin").emit("messageReceive", SystemMessageResult);
+        io.to("loggedin").emit("messageReceive", SystemMessageLogging);
         
     });
 
