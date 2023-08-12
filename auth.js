@@ -171,7 +171,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
     //招待制だったらコードを確認
     if ( db.dataServer.registration.invite.inviteOnly && db.dataServer.registration.available ) { //招待制かどうか
         //招待コードが一致しているかどうか
-        if ( db.dataServer.registration.invite.inviteCode !== dat[1] ) {
+        if ( db.dataServer.registration.invite.inviteCode !== dat.code ) {
             console.log("auth :: registerUser : 招待コード違うわ");
             return {result: "FAILED", pass:"", userid:""};
 
@@ -192,7 +192,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
     //ユーザー名の空きを調べる
     for ( let index in db.dataUser.user ) {
         //ユーザー名がすでに使われていたら停止
-        if ( db.dataUser.user[index].name === dat[0] ) {
+        if ( db.dataUser.user[index].name === dat.username ) {
             return {result: "FAILED", pass:"", userid:""};
 
         }
@@ -222,7 +222,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
 
         //DBに登録
         db.dataUser.user[newID] = {
-            "name": dat[0],
+            "name": dat.username,
             "role": "Member",
             "pw": pwHashed,
             "icon": "",
