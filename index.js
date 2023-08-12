@@ -876,6 +876,7 @@ io.on("connection", (socket) => {
         let SystemMessageLogging = {
             userid: "SYSTEM",
             channelid: dat.channelid,
+            role: "SYSTEM",
             replyData: {
                 isReplying: false,
                 messageid: "",
