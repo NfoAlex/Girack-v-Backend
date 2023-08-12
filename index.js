@@ -1191,6 +1191,13 @@ io.on("connection", (socket) => {
 
     //新規登録
     socket.on("register", async (dat) => {
+        //ユーザー名が２文字以下なら停止
+        if ( dat.username.length <= 2 ) {
+            socket.emit("registerEnd", {"pass":"", "result": "FAILED"});
+            return;
+
+        }
+
         //DBにユーザーを登録、パスワードとユーザーIDの取得
             //↓useridがついて来るがシステムメッセージにしか使っていない
         let createdUserAuth = await auth.registerUser(dat);
