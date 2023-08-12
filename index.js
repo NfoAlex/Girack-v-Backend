@@ -143,7 +143,7 @@ let sendUrlPreview = function sendUrlPreview(urlDataItem, channelid, msgId) {
     io.to("loggedin").emit("messageUpdate", dat); //履歴を返す
 
 }
-
+//外部スクリプトで使う用
 exports.sendUrlPreview = sendUrlPreview;
 
 ////////////////////////////////////////////////////////////////
@@ -1191,17 +1191,26 @@ io.on("connection", (socket) => {
 
     //新規登録
     socket.on("register", async (dat) => {
+        //ユーザー名が２文字以下なら停止
+        if ( dat.username.length <= 2 ) {
+            socket.emit("registerEnd", {"pass":"", "result": "FAILED"});
+            return;
+
+        }
+
         //DBにユーザーを登録、パスワードとユーザーIDの取得
+            //↓useridがついて来るがシステムメッセージにしか使っていない
         let createdUserAuth = await auth.registerUser(dat);
 
-        //返り値が-1じゃないなら
-        if ( createdUserAuth.key !== -1 ) {
-            socket.emit("registerEnd", createdUserAuth.key); //パスワードを送信
+        //成功したら送信
+        if ( createdUserAuth.result === "SUCCESS" ) {
+            socket.emit("registerEnd", {"pass":createdUserAuth.pass, "result":"SUCCESS"}); //パスワードを送信
 
             //記録するシステムメッセージ
             let SystemMessageLogging = {
                 userid: "SYSTEM",
                 channelid: db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE,
+                role: "SYSTEM",
                 replyData: {
                     isReplying: false,
                     messageid: "",
@@ -1219,11 +1228,11 @@ io.on("connection", (socket) => {
             };
 
             //システムメッセージを記録して送信
-            let SystemMessageResult = msg.msgMix(SystemMessageLogging);
-            io.to("loggedin").emit("messageReceive", SystemMessageResult);
+            msg.msgMix(SystemMessageLogging);
+            io.to("loggedin").emit("messageReceive", SystemMessageLogging);
         
-        } else {
-            socket.emit("registerEnd", -1);
+        } else { //失敗したら失敗を伝える
+            socket.emit("registerEnd", {"pass":"", "result": createdUserAuth.result});
 
         }
 

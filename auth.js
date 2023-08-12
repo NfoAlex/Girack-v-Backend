@@ -18,74 +18,74 @@ let authUser = async function authUser(cred) {
         let index = Object.keys(db.dataUser.user)[i];
 
         //ユーザー名とパスワードの一致を確認してセッションIDを生成する
-        if (
-            db.dataUser.user[index].name === username &&
-            (
-                bcrypt.compare(password, db.dataUser.user[index].pw) || //ハッシュ化とパスワード比較
-                db.dataUser.user[index].pw === password //一応平文前提でも、そしてハッシュ化する(次期ビルドで削除)
-            )
-        ) {
-            //セッションID入れるよう
-            let _session = "";
+        if ( db.dataUser.user[index].name === username ) {
+            //パスワードのハッシュ値計算
+            let passComparedResult = await bcrypt.compare(password, db.dataUser.user[index].pw);
+            //認証成功したら
+            if ( passComparedResult ) {
+                //セッションID入れるよう
+                let _session = "";
 
-            //BANされているならそう結果を返す
-            if ( db.dataUser.user[index].state.banned ) {
-                return {result: false};
+                //BANされているならそう結果を返す
+                if ( db.dataUser.user[index].state.banned ) {
+                    return {result: false};
+
+                }
+
+                //セッションID用に24文字のコードを生成
+                let sessionidCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; //セッションIDに使う英数字
+                let sessionidLength = 24; //文字数
+                _session = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
+
+                let username = db.dataUser.user[index].name; //ユーザー名取得
+                
+                //ログイン時間を記録する用
+                let t = new Date();
+                //ログイン時間(分まで)を変数へ格納
+                let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
+                try {
+                    //セッションコードとデバイスを設定
+                    db.dataUser.user[index].state.sessions[_session] = {
+                        sessionName: "とあるデバイス",
+                        loggedinTime: _loginTime,
+                        loggedinTimeFirst: _loginTime
+                    };
+                } catch(e) {
+                    //セッションいれるところすらないなら作る
+                    db.dataUser.user[index].state.sessions = {};
+                    db.dataUser.user[index].state.sessions[_session] = {
+                        sessionName: "とあるデバイス",
+                        loggedinTime: _loginTime,
+                        loggedinTimeFirst: _loginTime
+                    };
+                }
+
+                // !!!! ↓↓次期ビルドで削除↓↓ !!!!
+                /************************************************************/
+                //パスワードが平文保存されているならハッシュ化して保存
+                if ( db.dataUser.user[index].pw === password ) {
+                    db.dataUser.user[index].pw = await bcrypt.hash(cred.password, 10);
+
+                }
+                //以前の形式のせっしょんIDがあるなら削除
+                if ( db.dataUser.user[index].state.session_id !== undefined ) {
+                    delete db.dataUser.user[index].state.session_id;
+                }
+                /************************************************************/
+                
+                //サーバーのJSONファイルを更新
+                fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+                
+                return {
+                    result: true, //ログイン成功の印
+                    userid: index, //ユーザーID
+                    username: username, //ユーザー名
+                    sessionid: _session, //セッションコード
+                    role: db.dataUser.user[index].role, //ロール
+                    channelJoined: db.dataUser.user[index].channel //参加しているチャンネル
+                }; //ユーザーの情報を送信
 
             }
-
-            //セッションID用に24文字のコードを生成
-            let sessionidCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; //セッションIDに使う英数字
-            let sessionidLength = 24; //文字数
-            _session = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
-
-            let username = db.dataUser.user[index].name; //ユーザー名取得
-            
-            //ログイン時間を記録する用
-            let t = new Date();
-            //ログイン時間(分まで)を変数へ格納
-            let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
-            try {
-                //セッションコードとデバイスを設定
-                db.dataUser.user[index].state.sessions[_session] = {
-                    sessionName: "とあるデバイス",
-                    loggedinTime: _loginTime,
-                    loggedinTimeFirst: _loginTime
-                };
-            } catch(e) {
-                //セッションいれるところすらないなら作る
-                db.dataUser.user[index].state.sessions = {};
-                db.dataUser.user[index].state.sessions[_session] = {
-                    sessionName: "とあるデバイス",
-                    loggedinTime: _loginTime,
-                    loggedinTimeFirst: _loginTime
-                };
-            }
-
-            // !!!! ↓↓次期ビルドで削除↓↓ !!!!
-            /************************************************************/
-            //パスワードが平文保存されているならハッシュ化して保存
-            if ( db.dataUser.user[index].pw === password ) {
-                db.dataUser.user[index].pw = await bcrypt.hash(cred.password, 10);
-
-            }
-            //以前の形式のせっしょんIDがあるなら削除
-            if ( db.dataUser.user[index].state.session_id !== undefined ) {
-                delete db.dataUser.user[index].state.session_id;
-            }
-            /************************************************************/
-            
-            //サーバーのJSONファイルを更新
-            fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
-            
-            return {
-                result: true, //ログイン成功の印
-                userid: index, //ユーザーID
-                username: username, //ユーザー名
-                sessionid: _session, //セッションコード
-                role: db.dataUser.user[index].role, //ロール
-                channelJoined: db.dataUser.user[index].channel //参加しているチャンネル
-            }; //ユーザーの情報を送信
 
         }
 
@@ -99,14 +99,18 @@ let authUser = async function authUser(cred) {
 
 //パスワードを変更
 let changePassword = async function changePassword(dat) {
+    //現在のパスワードをハッシュ比較
+    let passComparedResult = await bcrypt.compare(dat.currentPassword, db.dataUser.user[dat.reqSender.userid].pw);
+
     //今のパスワードが一致しないならここで停止
-    if ( 
+    if (
         db.dataUser.user[dat.reqSender.userid].pw !== dat.currentPassword && //平文でも比較　次期ビルドで削除
-        !bcrypt.compare(dat.currentPassword, db.dataUser.user[dat.reqSender.userid].pw)
+        !passComparedResult
     ) {
         return -1;
     }
 
+    //パスワードをハッシュ化
     let newPassword = await bcrypt.hash(dat.newPassword, 10);
 
     //パスワード変更
@@ -171,9 +175,9 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
     //招待制だったらコードを確認
     if ( db.dataServer.registration.invite.inviteOnly && db.dataServer.registration.available ) { //招待制かどうか
         //招待コードが一致しているかどうか
-        if ( db.dataServer.registration.invite.inviteCode !== dat[1] ) {
+        if ( db.dataServer.registration.invite.inviteCode !== dat.code ) {
             console.log("auth :: registerUser : 招待コード違うわ");
-            return {key:-1, userid:-1};
+            return {result: "FAILED", pass:"", userid:""};
 
         }
         console.log("auth :: registerUser : 招待コード合ってる！");
@@ -182,43 +186,72 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
 
     //ID格納用
     let newID = "";
-    //ID生成
-    for ( let i=0; i<8; i++ ) {
-        newID += Math.trunc(Math.random() * 9); //乱数を追加
-
-    }
-
     //パスワードを生成
     const pwGenerated = generateKey();
     //DBに書くためにハッシュ化する
     const pwHashed = await bcrypt.hash(pwGenerated, 10);
+    //setIntervalを格納する変数
+    let CheckIDInterval = null;
 
-    //DBに登録
-    db.dataUser.user[newID] = {
-        "name": dat[0],
-        "role": "Member",
-        "pw": pwHashed,
-        "icon": "",
-        "state": {
-            "loggedin": false,
-            "session_id": "",
-            "sessions": {},
-            "banned": false
-        },
-        "channel": db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER
-    };
+    //ユーザー名の空きを調べる
+    for ( let index in db.dataUser.user ) {
+        //ユーザー名がすでに使われていたら停止
+        if ( db.dataUser.user[index].name === dat.username ) {
+            return {result: "FAILED", pass:"", userid:""};
 
-    console.log("registerUser :: 登録結果 ↓");
-    console.log(db.dataUser.user[newID]);
+        }
 
-    //サーバーのJSONファイルを更新
-    fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+    }
 
-    //デフォルトアイコンを新規ユーザー用にクローン
-    fs.copyFileSync("./img/default.jpeg", "./img/" + newID + ".jpeg");
+    //ユーザーIDの空きを調べて作る
+    return new Promise((resolve) => {
+        CheckIDInterval = setInterval(() => {
+            //ID用変数を初期化
+            newID = "";
+            //IDへ乱数生成して格納
+            for ( let i=0; i<8; i++ ) {
+                newID += Math.trunc(Math.random() * 9); //乱数を追加
 
-    //パスワードを返す
-    return {key:pwGenerated, userid:newID};
+            }
+
+            //もし生成したIDが空いてるならここで次の処理へ
+            if ( db.dataUser.user[newID] === undefined ) resolve();
+
+        }, 10);
+
+        
+    }).then(() => {
+        //IDの空き確認用Intervalを停止
+        clearInterval(CheckIDInterval);
+
+        //DBに登録
+        db.dataUser.user[newID] = {
+            "name": dat.username,
+            "role": "Member",
+            "pw": pwHashed,
+            "icon": "",
+            "state": {
+                "loggedin": false,
+                "session_id": "",
+                "sessions": {},
+                "banned": false
+            },
+            "channel": db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER
+        };
+
+        console.log("registerUser :: 登録結果 ↓");
+        console.log(db.dataUser.user[newID]);
+
+        //サーバーのJSONファイルを更新
+        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+
+        //デフォルトアイコンを新規ユーザー用にクローン
+        fs.copyFileSync("./img/default.jpeg", "./img/" + newID + ".jpeg");
+
+        //パスワードを返す
+        return {result: "SUCCESS", pass:pwGenerated, userid:newID};
+
+    });
 
 }
 
