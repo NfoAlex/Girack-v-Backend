@@ -1196,7 +1196,7 @@ io.on("connection", (socket) => {
 
         //返り値が-1じゃないなら
         if ( createdUserAuth.result === "SUCCESS" ) {
-            socket.emit("registerEnd", {"pass":createdUserAuth.key, "result": "SUCCESS"}); //パスワードを送信
+            socket.emit("registerEnd", {"pass":createdUserAuth.pass, "result": "SUCCESS"}); //パスワードを送信
 
             //記録するシステムメッセージ
             let SystemMessageLogging = {

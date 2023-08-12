@@ -173,7 +173,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
         //招待コードが一致しているかどうか
         if ( db.dataServer.registration.invite.inviteCode !== dat[1] ) {
             console.log("auth :: registerUser : 招待コード違うわ");
-            return {result: "WRONG_CODE", key:-1, userid:-1};
+            return {result: "FAILED", pass:""};
 
         }
         console.log("auth :: registerUser : 招待コード合ってる！");
@@ -193,7 +193,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
     for ( let index in db.dataUser.user ) {
         //ユーザー名がすでに使われていたら停止
         if ( db.dataUser.user[index].name === dat[0] ) {
-            return {result: "USED_NAME", key:-1, userid:-1};
+            return {result: "FAILED", pass:""};
 
         }
 
@@ -245,7 +245,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
         fs.copyFileSync("./img/default.jpeg", "./img/" + newID + ".jpeg");
 
         //パスワードを返す
-        return {result: "SUCCESS", key:pwGenerated};
+        return {result: "SUCCESS", pass:pwGenerated};
 
     });
 
