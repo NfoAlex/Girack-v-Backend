@@ -1221,7 +1221,7 @@ io.on("connection", (socket) => {
             };
 
             //システムメッセージを記録して送信
-            let SystemMessageResult = msg.msgMix(SystemMessageLogging);
+            msg.msgMix(SystemMessageLogging);
             io.to("loggedin").emit("messageReceive", SystemMessageLogging);
         
         } else {
