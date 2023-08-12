@@ -23,8 +23,6 @@ let authUser = async function authUser(cred) {
             let passComparedResult = await bcrypt.compare(password, db.dataUser.user[index].pw);
             //認証成功したら
             if ( passComparedResult ) {
-                console.log("認証結果->",passComparedResult,);
-
                 //セッションID入れるよう
                 let _session = "";
 
@@ -101,14 +99,18 @@ let authUser = async function authUser(cred) {
 
 //パスワードを変更
 let changePassword = async function changePassword(dat) {
+    //現在のパスワードをハッシュ比較
+    let passComparedResult = await bcrypt.compare(dat.currentPassword, db.dataUser.user[dat.reqSender.userid].pw);
+
     //今のパスワードが一致しないならここで停止
-    if ( 
+    if (
         db.dataUser.user[dat.reqSender.userid].pw !== dat.currentPassword && //平文でも比較　次期ビルドで削除
-        !bcrypt.compare(dat.currentPassword, db.dataUser.user[dat.reqSender.userid].pw)
+        !passComparedResult
     ) {
         return -1;
     }
 
+    //パスワードをハッシュ化
     let newPassword = await bcrypt.hash(dat.newPassword, 10);
 
     //パスワード変更
