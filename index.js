@@ -1192,16 +1192,18 @@ io.on("connection", (socket) => {
     //新規登録
     socket.on("register", async (dat) => {
         //DBにユーザーを登録、パスワードとユーザーIDの取得
+            //↓useridがついて来るがシステムメッセージにしか使っていない
         let createdUserAuth = await auth.registerUser(dat);
 
         //返り値が-1じゃないなら
         if ( createdUserAuth.result === "SUCCESS" ) {
-            socket.emit("registerEnd", {"pass":createdUserAuth.pass, "result": "SUCCESS"}); //パスワードを送信
+            socket.emit("registerEnd", {"pass":createdUserAuth.pass, "result":"SUCCESS"}); //パスワードを送信
 
             //記録するシステムメッセージ
             let SystemMessageLogging = {
                 userid: "SYSTEM",
                 channelid: db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE,
+                role: "SYSTEM",
                 replyData: {
                     isReplying: false,
                     messageid: "",
@@ -1220,7 +1222,7 @@ io.on("connection", (socket) => {
 
             //システムメッセージを記録して送信
             let SystemMessageResult = msg.msgMix(SystemMessageLogging);
-            io.to("loggedin").emit("messageReceive", SystemMessageResult);
+            io.to("loggedin").emit("messageReceive", SystemMessageLogging);
         
         } else {
             socket.emit("registerEnd", {"pass":"", "result": createdUserAuth.result});
