@@ -7,6 +7,11 @@ let db = require("./dbControl.js");
 //ユーザー認証
 let authUser = async function authUser(cred) {
     console.log("authUser :: これから確認...");
+    //入力情報がテキストじゃないなら阻止
+    if ( typeof(cred.password) !== "string" || typeof(cred.username) !== "string" ) {
+        return { result:false };
+
+    }
 
     //データからユーザー名とパスワード(ハッシュ化)を抽出
     let username = cred.username;
