@@ -807,6 +807,7 @@ exports.changeChannelSettings = changeChannelSettings; //チャンネルの設�
 exports.changeProfile = changeProfile; //プロフィールの変更
 exports.updateUserSaveConfig = updateUserSaveConfig; //ユーザーの個人データで設定データを上書き保存
 exports.updateUserSaveMsgReadState = updateUserSaveMsgReadState; //ユーザーの個人データで既読状態を上書き保存
+exports.updateUserSaveChannelOrder = updateUserSaveChannelOrder; //ユーザーの個人データでチャンネルの順番を上書き保存
 exports.channelAction = channelAction; //チャンネルの参加・退出
 exports.channelCreate = channelCreate; //チャンネル作成
 exports.channelRemove = channelRemove; //チャンネル削除
