@@ -1547,6 +1547,31 @@ io.on("connection", (socket) => {
 
     });
 
+    //ユーザーの個人用データでチャンネル順番を取得
+    socket.on("getUserSaveChannelOrder", (dat) => {
+        /*
+        dat
+        {
+            reqSender: {
+                ...
+            }
+        }
+        */
+
+        let paramRequire = [];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "getUserSaveChannelOrder") ) { return -1; }
+
+        //ユーザーの個人用データ取得
+        let userSave = db.getUserSave(dat);
+
+        //データ送信
+        socket.emit("infoUserSaveChannelOrder", {
+            displaychannelList: userSave.channelOrder
+        });
+
+    });
+
     //監査ログの取得
     socket.on("getModlog", async (dat) => {
         /*
