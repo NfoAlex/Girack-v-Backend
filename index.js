@@ -1564,6 +1564,11 @@ io.on("connection", (socket) => {
 
         //ユーザーの個人用データ取得
         let userSave = db.getUserSave(dat);
+        //ユーザーの個人データの中でチャンネルの順番が空なら空で渡す
+        if ( userSave.channelOrder === undefined ) {
+            userSave.channelOrder = [];
+
+        }
 
         //データ送信
         socket.emit("infoUserSaveChannelOrder", {
