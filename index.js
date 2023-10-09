@@ -701,6 +701,8 @@ io.on("connection", (socket) => {
         //整合性確認
         if ( !checkDataIntegrality(dat, paramRequire, "updateUserSaveChannelOrder") ) { return -1; }
 
+        //ユーザーの個人用データ保存
+        infoUpdate.updateUserSaveChannelOrder(dat);
 
     });
 

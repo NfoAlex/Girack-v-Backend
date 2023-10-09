@@ -412,7 +412,7 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat) {
 
     dataUserSave.config = dat.config;
     dataUserSave.configAvailable = true;
-    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイルを作成
+    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
 
 }
 
@@ -442,7 +442,7 @@ let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat) {
 
     dataUserSave.msgReadState = dat.msgReadState;
     dataUserSave.msgReadStateAvailable = true;
-    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイルを作成
+    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
 
 }
 
@@ -470,6 +470,9 @@ let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat) {
         fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
         dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     }
+
+    dataUserSave = dat.displaychannelList;
+    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
 
 }
 
