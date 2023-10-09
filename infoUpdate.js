@@ -446,7 +446,28 @@ let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat) {
 
 //ユーザーが設定しているチャンネルの順番を上書き保存
 let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat) {
-    
+    //ユーザーデータの取り込み先
+    let dataUserSave = {};
+
+    //データ読み取り、なければ作成
+    try{
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    } catch(e) {
+        let dataUserSaveInit = `
+            {
+                "configAvailable": false,
+                "config": {
+                },
+                "msgReadStateAvailable": false,
+                "msgReadState": {
+                    
+                },
+                "channelOrder": []
+            }
+        `;
+        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    }
 
 }
 

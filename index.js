@@ -686,6 +686,24 @@ io.on("connection", (socket) => {
 
     });
 
+    //ユーザーの個人用データでチャンネルの順番を上書き保存
+    socket.on("updateUserSaveChannelOrder", (dat) => {
+        /*
+        dat
+        {
+            displaychannelList: [...],
+            reqSender: {...}
+        }
+        */
+
+        let paramRequire = ["displaychannelList"];
+
+        //整合性確認
+        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSaveChannelOrder") ) { return -1; }
+
+
+    });
+
     //ユーザーのセッション名を変更
     socket.on("updateUserSessionName", (dat) => {
         /*
