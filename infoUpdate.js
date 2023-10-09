@@ -402,7 +402,8 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat) {
                 "msgReadStateAvailable": false,
                 "msgReadState": {
                     
-                }
+                },
+                "channelOrder": []
             }
         `;
         fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
@@ -431,7 +432,8 @@ let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat) {
                 "msgReadStateAvailable": false,
                 "msgReadState": {
                     
-                }
+                },
+                "channelOrder": []
             }
         `;
         fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
