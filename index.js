@@ -691,7 +691,7 @@ io.on("connection", (socket) => {
         /*
         dat
         {
-            displaychannelList: [...],
+            channelOrder: [...],
             reqSender: {...}
         }
         */
@@ -1567,7 +1567,7 @@ io.on("connection", (socket) => {
 
         //データ送信
         socket.emit("infoUserSaveChannelOrder", {
-            displaychannelList: userSave.channelOrder
+            channelOrder: userSave.channelOrder
         });
 
     });
