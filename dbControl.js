@@ -456,8 +456,8 @@ let getUserSave = function getUserSave(dat) {
                 },
                 "msgReadStateAvailable": false,
                 "msgReadState": {
-                    
-                }
+                },
+                "channelOrder": []
             }
         `;
         fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成

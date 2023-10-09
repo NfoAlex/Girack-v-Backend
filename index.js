@@ -11,7 +11,7 @@ const socketIo = require("socket.io");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20231006";
+const SERVER_VERSION = "alpha_20231009";
 
 const app = express();
 const server = http.createServer(app);
@@ -683,6 +683,26 @@ io.on("connection", (socket) => {
             }
 
         }
+
+    });
+
+    //ユーザーの個人用データでチャンネルの順番を上書き保存
+    socket.on("updateUserSaveChannelOrder", (dat) => {
+        /*
+        dat
+        {
+            channelOrder: [...],
+            reqSender: {...}
+        }
+        */
+
+        let paramRequire = ["displaychannelList"];
+
+        //整合性確認
+        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSaveChannelOrder") ) { return -1; }
+
+        //ユーザーの個人用データ保存
+        infoUpdate.updateUserSaveChannelOrder(dat);
 
     });
 
@@ -1523,6 +1543,31 @@ io.on("connection", (socket) => {
         socket.emit("infoUserSaveMsgReadState", {
             msgReadStateAvailable: userSave.msgReadStateAvailable,
             msgReadState: userSave.msgReadState
+        });
+
+    });
+
+    //ユーザーの個人用データでチャンネル順番を取得
+    socket.on("getUserSaveChannelOrder", (dat) => {
+        /*
+        dat
+        {
+            reqSender: {
+                ...
+            }
+        }
+        */
+
+        let paramRequire = [];
+
+        if ( !checkDataIntegrality(dat, paramRequire, "getUserSaveChannelOrder") ) { return -1; }
+
+        //ユーザーの個人用データ取得
+        let userSave = db.getUserSave(dat);
+
+        //データ送信
+        socket.emit("infoUserSaveChannelOrder", {
+            channelOrder: userSave.channelOrder
         });
 
     });

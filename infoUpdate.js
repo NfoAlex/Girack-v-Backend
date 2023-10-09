@@ -402,7 +402,8 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat) {
                 "msgReadStateAvailable": false,
                 "msgReadState": {
                     
-                }
+                },
+                "channelOrder": []
             }
         `;
         fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
@@ -411,7 +412,7 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat) {
 
     dataUserSave.config = dat.config;
     dataUserSave.configAvailable = true;
-    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイルを作成
+    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
 
 }
 
@@ -431,7 +432,8 @@ let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat) {
                 "msgReadStateAvailable": false,
                 "msgReadState": {
                     
-                }
+                },
+                "channelOrder": []
             }
         `;
         fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
@@ -440,7 +442,37 @@ let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat) {
 
     dataUserSave.msgReadState = dat.msgReadState;
     dataUserSave.msgReadStateAvailable = true;
-    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイルを作成
+    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
+
+}
+
+//ユーザーが設定しているチャンネルの順番を上書き保存
+let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat) {
+    //ユーザーデータの取り込み先
+    let dataUserSave = {};
+
+    //データ読み取り、なければ作成
+    try{
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    } catch(e) {
+        let dataUserSaveInit = `
+            {
+                "configAvailable": false,
+                "config": {
+                },
+                "msgReadStateAvailable": false,
+                "msgReadState": {
+                    
+                },
+                "channelOrder": []
+            }
+        `;
+        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
+        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    }
+
+    dataUserSave.channelOrder = dat.channelOrder;
+    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
 
 }
 
@@ -778,6 +810,7 @@ exports.changeChannelSettings = changeChannelSettings; //チャンネルの設�
 exports.changeProfile = changeProfile; //プロフィールの変更
 exports.updateUserSaveConfig = updateUserSaveConfig; //ユーザーの個人データで設定データを上書き保存
 exports.updateUserSaveMsgReadState = updateUserSaveMsgReadState; //ユーザーの個人データで既読状態を上書き保存
+exports.updateUserSaveChannelOrder = updateUserSaveChannelOrder; //ユーザーの個人データでチャンネルの順番を上書き保存
 exports.channelAction = channelAction; //チャンネルの参加・退出
 exports.channelCreate = channelCreate; //チャンネル作成
 exports.channelRemove = channelRemove; //チャンネル削除
