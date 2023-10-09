@@ -471,7 +471,7 @@ let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat) {
         dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     }
 
-    dataUserSave = dat.displaychannelList;
+    dataUserSave.channelOrder = dat.displaychannelList;
     fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
 
 }
