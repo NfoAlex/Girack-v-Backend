@@ -696,7 +696,7 @@ io.on("connection", (socket) => {
         }
         */
 
-        let paramRequire = ["displaychannelList"];
+        let paramRequire = ["channelOrder"];
 
         //整合性確認
         if ( !checkDataIntegrality(dat, paramRequire, "updateUserSaveChannelOrder") ) { return -1; }
