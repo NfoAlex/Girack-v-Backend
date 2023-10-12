@@ -909,7 +909,10 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
 
             //途中で読み取る履歴の数を満たしたら
             if ( readLength <= 0 ) {
-                return dat.reverse(); //追加された順だと古い順なので
+                return {
+                    dat: dat.reverse(), //追加された順だと古い順なので
+                    endOfHistory: false
+                }
 
             }
 
@@ -917,7 +920,14 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
 
     }
 
-    return dat.reverse(); //追加された順だと古い順なので
+    //もしほしい数より取得できた履歴が少なかったらここが履歴の終わりとマーク
+    let endOfHistory = false;
+    if ( readLength >= 1 ) { endOfHistory = true; }
+
+    return {
+        dat: dat.reverse(), //追加された順だと古い順なので
+        endOfHistory: endOfHistory, //履歴の終わりかどうか
+    } ;
 
 }
 
