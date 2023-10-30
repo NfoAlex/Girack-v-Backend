@@ -2,7 +2,7 @@ const fs = require('fs');
 let initSetup = require("./initialSetup.js");
 
 //ユーザーを記録しているJSONファイルを読み取る
-let dataUser = {};
+let dataUser = {user:{}};
 try { //読み込んでみる
     dataUser = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
 } catch(e) {
