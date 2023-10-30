@@ -865,7 +865,11 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
         });
     }
     catch(e) {
-        return -1;
+        return {
+            dat: [],
+            channelid: cid,
+            endOfHistory: true
+        };
     }
 
     //履歴用配列
@@ -911,8 +915,9 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
             if ( readLength <= 0 ) {
                 return {
                     dat: dat.reverse(), //追加された順だと古い順なので
+                    channelid: cid,
                     endOfHistory: false
-                }
+                };
 
             }
 
