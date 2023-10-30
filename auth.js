@@ -232,7 +232,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
         //DBに登録
         db.dataUser.user[newID] = {
             "name": dat.username,
-            "role": "Member",
+            "role": Object.keys(db.dataUser.user).length === 0?"Admin":"Member", //一番最初のユーザーならAdminとして登録
             "pw": pwHashed,
             "icon": "",
             "state": {
