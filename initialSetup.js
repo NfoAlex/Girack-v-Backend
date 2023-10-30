@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt"); //ハッシュ化用
 const fs = require('fs');
+const db = require('./dbControl.js');
 
 //一番最初のユーザーのパスワードを作るだけの関数
 let generateFirstAdminPassword = async function generateFirstAdminPassword() {
@@ -39,7 +40,6 @@ let generateFirstAdminPassword = async function generateFirstAdminPassword() {
     }`;
 
     fs.writeFileSync("./user.json", dataUserInitText); //JSONファイルを作成
-    let dataUser = JSON.parse(fs.readFileSync("./user.json", "utf-8")); //ユーザーデータのJSON読み込み
     
     //初回起動時にログインを促すためのメッセージ
     console.log("***********************************");
@@ -52,7 +52,8 @@ let generateFirstAdminPassword = async function generateFirstAdminPassword() {
     console.log("***********************************");
     console.log("***********************************");
 
-    return dataUser;
+    //dataUserにデータを格納する
+    db.dataUser = JSON.parse(dataUserInitText);
 
 }
 

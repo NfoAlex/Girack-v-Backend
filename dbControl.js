@@ -6,9 +6,12 @@ let dataUser = {};
 try { //読み込んでみる
     dataUser = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
 } catch(e) {
-    //読み込めないならユーザー作成を最初にする
-    dataUser = initSetup.generateFirstAdminPassword();
+    //読み込めないなら初回起動用のユーザー作成処理を行う
+    initSetup.generateFirstAdminPassword();
+
 }
+
+//console.log("dbControl :: dataUser->", dataUser);
 
 //サーバー情報や設定を記録しているJSONファイルを読み取る
 let dataServer = {};
