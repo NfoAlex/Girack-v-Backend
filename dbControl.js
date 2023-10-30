@@ -82,14 +82,12 @@ try { //読み込んでみる
 
 }
 
-try {
 //起動したときに全員をオフライン状態にする
 for ( let index in Object.keys(dataUser.user) ) {
     let userid = Object.keys(dataUser.user)[index]; //ユーザーIDを取得
     dataUser.user[userid].state.loggedin = false; //オフラインと設定
 
 }
-} catch(e){}
 
 console.log("=========================");
 console.log("DB認識!");
