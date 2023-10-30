@@ -22,7 +22,7 @@ let authUser = async function authUser(cred) {
         //ユーザーIDを巡回
         let index = Object.keys(db.dataUser.user)[i];
 
-        //ユーザー名とパスワードの一致を確認してセッションIDを生成する
+        //ユーザー名の一致を確認してセッションIDを生成する
         if ( db.dataUser.user[index].name === username ) {
             //パスワードのハッシュ値計算
             let passComparedResult = await bcrypt.compare(password, db.dataUser.user[index].pw);
@@ -65,18 +65,7 @@ let authUser = async function authUser(cred) {
                     };
                 }
 
-                // !!!! ↓↓次期ビルドで削除↓↓ !!!!
-                /************************************************************/
-                //パスワードが平文保存されているならハッシュ化して保存
-                if ( db.dataUser.user[index].pw === password ) {
-                    db.dataUser.user[index].pw = await bcrypt.hash(cred.password, 10);
-
-                }
-                //以前の形式のせっしょんIDがあるなら削除
-                if ( db.dataUser.user[index].state.session_id !== undefined ) {
-                    delete db.dataUser.user[index].state.session_id;
-                }
-                /************************************************************/
+                
                 
                 //サーバーのJSONファイルを更新
                 fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
