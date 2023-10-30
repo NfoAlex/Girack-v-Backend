@@ -931,6 +931,7 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
 
     return {
         dat: dat.reverse(), //追加された順だと古い順なので
+        channelid: cid,
         endOfHistory: endOfHistory, //履歴の終わりかどうか
     } ;
 
