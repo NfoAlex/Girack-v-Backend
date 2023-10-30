@@ -1,5 +1,4 @@
 const fs = require('fs');
-let initSetup = require("./initialSetup.js");
 
 //サーバー情報や設定を記録しているJSONファイルを読み取る
 let dataServer = {};
@@ -71,7 +70,6 @@ try { //読み込んでみる
     dataUser = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
 } catch(e) {
     //読み込めないならホルダーだけを作って作れる状態にする
-    //dataUser = initSetup.generateFirstAdminPassword();
     dataUser = {user:{}};
     fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4)); //JSONファイルを作成しておく
 
