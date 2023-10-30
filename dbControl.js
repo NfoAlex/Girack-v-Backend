@@ -1,24 +1,15 @@
 const fs = require('fs');
 let initSetup = require("./initialSetup.js");
 
-//ユーザーを記録しているJSONファイルを読み取る
-let dataUser = {};
-try { //読み込んでみる
-    dataUser = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
-} catch(e) {
-    //読み込めないならユーザー作成を最初にする
-    dataUser = initSetup.generateFirstAdminPassword();
-}
-
 //サーバー情報や設定を記録しているJSONファイルを読み取る
 let dataServer = {};
 let dataServerInitText = `
 {
     "servername": "Girack",
     "registration": {
-        "available": false,
+        "available": true,
         "invite": {
-            "inviteOnly": false,
+            "inviteOnly": true,
             "inviteCode": ""
         }
     },
@@ -55,9 +46,42 @@ try { //読み込んでみる
     //この時点で一度書き込み保存
     fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
 } catch(e) {
+    //ユーザー登録用のパスワードを生成
+    const invCodeLength = 24; //生成したい文字列の長さ
+    const invCodeSource = "abcdefghijklmnopqrstuvwxyz0123456789"; //元になる文字
+    let invCodeGenResult = "";
+
+    //生成
+    for(let i=0; i<invCodeLength; i++){
+        invCodeGenResult += invCodeSource[Math.floor(Math.random() * invCodeSource.length)];
+
+    }
+
+    dataServer = JSON.parse(dataServerInitText); //JSON化
+    dataServer.registration.invite.inviteCode = invCodeGenResult; //招待コードを割り当て
+
     //初期のサーバー情報
-    fs.writeFileSync("./server.json", dataServerInitText); //JSONファイルを作成
+    fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4)); //JSONファイルを作成
     dataServer = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
+}
+
+//ユーザーを記録しているJSONファイルを読み取る
+let dataUser = {};
+try { //読み込んでみる
+    dataUser = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
+} catch(e) {
+    //読み込めないならホルダーだけを作って作れる状態にする
+    //dataUser = initSetup.generateFirstAdminPassword();
+    dataUser = {user:{}};
+    fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4)); //JSONファイルを作成しておく
+
+    console.log("***********************************");
+    console.log("***********************************");
+    console.log("次の招待コードを使ってユーザーを登録してください。");
+    console.log("招待コード : ", dataServer.registration.invite.inviteCode);
+    console.log("***********************************");
+    console.log("***********************************");
+
 }
 
 try {
