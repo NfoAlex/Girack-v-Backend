@@ -1,6 +1,9 @@
 const bcrypt = require("bcrypt"); //ハッシュ化用
+const fs = require('fs');
 
-export function generateFirstAdminPassword() {
+//一番最初のユーザーのパスワードを作るだけの関数
+let generateFirstAdminPassword = async function generateFirstAdminPassword() {
+    console.log("やるぜ");
     //最初のユーザー用のパスワードを生成
     const pwLength = 24; //生成したい文字列の長さ
     const pwSource = "abcdefghijklmnopqrstuvwxyz0123456789"; //元になる文字
@@ -36,7 +39,7 @@ export function generateFirstAdminPassword() {
     }`;
 
     fs.writeFileSync("./user.json", dataUserInitText); //JSONファイルを作成
-    dataUser = JSON.parse(fs.readFileSync("./user.json", "utf-8")); //ユーザーデータのJSON読み込み
+    let dataUser = JSON.parse(fs.readFileSync("./user.json", "utf-8")); //ユーザーデータのJSON読み込み
     
     //初回起動時にログインを促すためのメッセージ
     console.log("***********************************");
@@ -48,6 +51,8 @@ export function generateFirstAdminPassword() {
     console.log("\n");
     console.log("***********************************");
     console.log("***********************************");
+
+    return dataUser;
 
 }
 
