@@ -11,7 +11,7 @@ const socketIo = require("socket.io");
 
 const port = process.env.PORT || 33333;
 
-const SERVER_VERSION = "alpha_20231029";
+const SERVER_VERSION = "alpha_20231110";
 
 const app = express();
 const server = http.createServer(app);
