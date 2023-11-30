@@ -65,7 +65,7 @@ let authUser = async function authUser(cred) {
                     };
                 }
 
-                // !!!! ↓↓次期ビルドで削除↓↓ !!!!
+                // !!!! ↓↓将来削除する↓↓ !!!!
                 /************************************************************/
                 //パスワードが平文保存されているならハッシュ化して保存
                 if ( db.dataUser.user[index].pw === password ) {
@@ -140,6 +140,21 @@ let authUserBySession = function authUserBySession(cred) {
                 return {result: false};
 
             }
+
+            //セッションIDを更新
+                //セッションID用に24文字のコードを生成
+            let sessionidCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let sessionidLength = 24;
+            _sessionid = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
+                //セッションデータを記憶
+            let currentSessionData = db.dataUser.user[userid].state.sessions[sessionid];
+                //セッションデータをコピー
+            db.dataUser.user[userid].state.sessions[_sessionid] = structuredClone(currentSessionData);
+                //今までのセッションデータを削除
+            delete db.dataUser.user[userid].state.sessions[sessionid];
+
+            //セッションＩＤを更新
+            sessionid = _sessionid;
 
             //ログイン時間を記録する用
             let t = new Date();
