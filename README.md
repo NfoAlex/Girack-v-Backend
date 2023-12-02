@@ -1,6 +1,8 @@
 # Girack-v-Backend
 
-Girackの後ろだな
+Girack-v-のバックエンド
+
+Girack-v-(フロントエンド) : https://github.com/NfoAlex/Girack-v-
 
 ## 環境構築
 
