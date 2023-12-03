@@ -502,6 +502,9 @@ let msgPin = function msgPin(dat) {
 
     }
 
+    //チャンネルの更新のためにJSONへ書き込み
+    fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
+
     //データ取り出し、更新
     try{
         dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
