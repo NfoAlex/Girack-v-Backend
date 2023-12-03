@@ -437,10 +437,10 @@ let getMessage = function getMessage(channelid, messageid) {
 
         }
     }
-    catch(e) { //エラーなら中止
+    catch(e) { //エラーなら空データを渡す
         return {
             "messageid": messageid,
-            "userid": "xxxxxxxxx",
+            "userid": "不明なユーザー",
             "channelid": channelid,
             "time": "20010101000000",
             "content": "消去されたメッセージ",
