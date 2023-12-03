@@ -493,13 +493,21 @@ let msgPin = function msgPin(dat) {
     let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
 
-    //チャンネルデータにpinsがあるなら追加、ないなら作成
-    if ( db.dataServer.channels[channelid].pins !== undefined ) {
-        db.dataServer.channels[channelid].pins.push(messageid);
+    //チャンネルデータにpinsないなら作成
+    if ( db.dataServer.channels[channelid].pins === undefined ) {
+        db.dataServer.channels[channelid].pins = [];
 
+    }
+
+    //すでにピン留めされていたら削除、そうでないなら追加
+    if ( db.dataServer.channels[channelid].pins.indexOf(messageid) !== -1 ) {
+        //配列上のピンの位置
+        let pinIndex = db.dataServer.channels[channelid].pins.indexOf(messageid);
+        //ピン削除
+        db.dataServer.channels[channelid].pins.splice(pinIndex, 1);
     } else {
-        db.dataServer.channels[channelid].pins = [messageid];
-
+        //ピン追加
+        db.dataServer.channels[channelid].pins.push(messageid);
     }
 
     //チャンネルの更新のためにJSONへ書き込み
