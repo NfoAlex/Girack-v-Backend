@@ -515,7 +515,12 @@ let msgPin = function msgPin(dat) {
             fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
 
             //返す
-            return {messageData: dataHistory[messageid]};
+            return {
+                action:"pin",
+                channelid: dataHistory[messageid].channelid,
+                messageid: dataHistory[messageid].messageid,
+                pinned: dataHistory[messageid].pinned,
+            };
 
         } else { //undefinedなら削除された体で返す
             return -1;
