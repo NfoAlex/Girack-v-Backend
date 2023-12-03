@@ -410,6 +410,7 @@ let getMessage = function getMessage(channelid, messageid) {
                 "userid": "不明なユーザー",
                 "channelid": channelid,
                 "time": "20010101000000",
+                "pinned": false,
                 "content": "消去されたメッセージ",
                 "replyData": {
                     "isReplying": false,
@@ -443,6 +444,7 @@ let getMessage = function getMessage(channelid, messageid) {
             "userid": "不明なユーザー",
             "channelid": channelid,
             "time": "20010101000000",
+            "pinned": false,
             "content": "消去されたメッセージ",
             "replyData": {
                 "isReplying": false,
@@ -823,6 +825,7 @@ let msgRecord = function msgRecord(json) {
             userid: json.userid,
             channelid: json.channelid,
             time: receivedTime,
+            pinned: false,
             content: json.content,
             isSystemMessage: json.isSystemMessage,
             replyData: json.replyData,
