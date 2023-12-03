@@ -407,7 +407,7 @@ let getMessage = function getMessage(channelid, messageid) {
         } else { //undefinedなら削除された体で返す
             return {
                 "messageid": messageid,
-                "userid": "xxxxxxxxx",
+                "userid": "不明なユーザー",
                 "channelid": channelid,
                 "time": "20010101000000",
                 "content": "消去されたメッセージ",
