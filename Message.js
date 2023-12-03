@@ -498,7 +498,7 @@ let msgPin = function msgPin(channelid, messageid) {
 
     }
 
-    //データ取り出し
+    //データ取り出し、更新
     try{
         dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
         //もしデータが正常にとれるならそのままピン留め
