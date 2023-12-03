@@ -489,6 +489,15 @@ let msgPin = function msgPin(channelid, messageid) {
     let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
 
+    //チャンネルデータにpinsがあるなら追加、ないなら作成
+    if ( db.dataServer.channels[channelid].pins !== undefined ) {
+        db.dataServer.channels[channelid].pins.push(channelid);
+
+    } else {
+        db.dataServer.channels[channelid].pins = [channelid];
+
+    }
+
     //データ取り出し
     try{
         dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
