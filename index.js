@@ -1698,6 +1698,27 @@ io.on("connection", (socket) => {
 
     });
 
+    //メッセージの単体取得
+    socket.on("getMessageSingle", (req) => {
+        /*
+        {
+            reqSender: {
+                userid: userinfo.userid,
+                sessionid: userinfo.sessionid
+            },
+            channelid: channelid,
+            messageid: msgId
+        }
+        */
+
+        let paramRequire = [
+            "channelid",
+            "messageid"
+        ];
+        if ( !checkDataIntegrality(dat, paramRequire, "actMessage") ) {return -1;}
+
+    })
+
     //メッセージの削除とかリアクションとか
     socket.on("actMessage", (dat) => {
         /*
