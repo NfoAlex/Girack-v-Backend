@@ -314,6 +314,7 @@ let getInfoChannel = function getInfoChannel(dat) {
             channelname: dataServer.channels[dat.targetid].name,
             channelid: dat.targetid,
             description: dataServer.channels[dat.targetid].description,
+            pins: dataServer.channels[dat.targetid].pins,
             scope: dataServer.channels[dat.targetid].scope,
             canTalk: dataServer.channels[dat.targetid].canTalk
         }
@@ -321,10 +322,12 @@ let getInfoChannel = function getInfoChannel(dat) {
     catch(e) {
         //読み取れなかったら
         infoParsed = {
-            channelname: "存在しないチャンネル",
             channelid: dat.targetid,
+            channelname: "存在しないチャンネル",
             description: "このチャンネルの情報がありません。これが見えていたらおかしいよ。",
-            scope: "deleted"
+            pins: [],
+            scope: "deleted",
+            canTalk: "Member"
         };
         console.log("dbControl :: getInfoChannel : エラー->", e);
     }
