@@ -510,8 +510,8 @@ let msgPin = function msgPin(dat) {
         dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
         //もしデータが正常にとれるならそのままピン留め
         if ( dataHistory[messageid] !== undefined ) {
-            //ピン留めしたと更新してJSONへ書き込み
-            dataHistory[messageid].pinned = true;
+            //ピン留めを更新してJSONへ書き込み
+            dataHistory[messageid].pinned = !dataHistory[messageid].pinned;
             fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
 
             //返す
