@@ -1721,6 +1721,27 @@ io.on("connection", (socket) => {
 
     });
 
+    //メッセージをチャンネルへピン留めする
+    socket.on("pinMessage", (dat) => {
+        /*
+        {
+            reqSender: {...},
+            channelid: channelid,
+            messageid: messageid
+        }}
+        */
+
+        let paramRequire = [
+            "channelid",
+            "messageid"
+        ];
+        if ( !checkDataIntegrality(req, paramRequire, "getMessageSingle") ) {return -1;}
+
+        //ピン留めする
+        msg.pinMessage(dat.channelid, dat.messageid);
+
+    });
+
     //メッセージの削除とかリアクションとか
     socket.on("actMessage", (dat) => {
         /*
