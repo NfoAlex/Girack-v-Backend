@@ -1715,7 +1715,7 @@ io.on("connection", (socket) => {
             "channelid",
             "messageid"
         ];
-        if ( !checkDataIntegrality(dat, paramRequire, "actMessage") ) {return -1;}
+        if ( !checkDataIntegrality(dat, paramRequire, "getMessageSingle") ) {return -1;}
 
     })
 
