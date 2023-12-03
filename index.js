@@ -1698,6 +1698,32 @@ io.on("connection", (socket) => {
 
     });
 
+    //メッセージの単体取得
+    socket.on("getMessageSingle", (req) => {
+        /*
+        {
+            reqSender: {
+                userid: userinfo.userid,
+                sessionid: userinfo.sessionid
+            },
+            channelid: channelid,
+            messageid: msgId
+        }
+        */
+
+        let paramRequire = [
+            "channelid",
+            "messageid"
+        ];
+        if ( !checkDataIntegrality(req, paramRequire, "getMessageSingle") ) {return -1;}
+
+        //メッセージ取得
+        let msgData = msg.getMessage(req.channelid, req.messageid);
+        //送信
+        socket.emit("messageSingle_" + req.messageid, msgData);
+
+    });
+
     //メッセージの削除とかリアクションとか
     socket.on("actMessage", (dat) => {
         /*
@@ -1739,9 +1765,13 @@ io.on("connection", (socket) => {
 
         }
 
-        console.log(result);
         /*  ToDo : messageUpdateで更新するようにする  */
         io.to(dat.channelid).emit("messageUpdate", result); //履歴を返す
+
+        //最新のメッセージデータ取得
+        let msgData = msg.getMessage(dat.channelid, dat.messageid);
+        //現状を送信
+        io.to(dat.channelid).emit("messageSingle_" + dat.messageid, msgData);
 
     });
 
@@ -1764,6 +1794,11 @@ io.on("connection", (socket) => {
         let contentEdited = msg.msgEdit(dat);
         contentEdited.action = "edit";
         io.to(dat.channelid).emit("messageUpdate", contentEdited);
+
+        //最新のメッセージデータ取得
+        let msgData = msg.getMessage(dat.channelid, dat.messageid);
+        //現状を送信
+        io.to(dat.channelid).emit("messageSingle_" + dat.messageid, msgData);
 
     });
 

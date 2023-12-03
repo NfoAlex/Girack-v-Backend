@@ -407,7 +407,7 @@ let getMessage = function getMessage(channelid, messageid) {
         } else { //undefinedなら削除された体で返す
             return {
                 "messageid": messageid,
-                "userid": "xxxxxxxxx",
+                "userid": "不明なユーザー",
                 "channelid": channelid,
                 "time": "20010101000000",
                 "content": "消去されたメッセージ",
@@ -437,10 +437,10 @@ let getMessage = function getMessage(channelid, messageid) {
 
         }
     }
-    catch(e) { //エラーなら中止
+    catch(e) { //エラーなら空データを渡す
         return {
             "messageid": messageid,
-            "userid": "xxxxxxxxx",
+            "userid": "不明なユーザー",
             "channelid": channelid,
             "time": "20010101000000",
             "content": "消去されたメッセージ",
@@ -887,18 +887,6 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
             if ( readCount >= startLength ) { //比較、最初からならstartLengthは0
                 //メッセージデータ
                 let messageData = Object.entries(dataHistory)[Object.entries(dataHistory).length-i][1];
-                //console.log("Message :: msgRecordCallNew : メッセージデータ->", messageData);
-                
-                //もし返信しているメッセージなら返信先の内容を取得して追加
-                try {
-                    if ( messageData.replyData.isReplying ) {
-                        //返信先を取得
-                        let messageDataReplied = getMessage(cid, messageData.replyData.messageid);
-                        //返信先の内容を追加
-                        messageData.replyData.content = messageDataReplied.content;
-
-                    }
-                } catch(e) {}
 
                 //履歴を配列へ追加
                 dat.push(
@@ -940,6 +928,7 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
 exports.msgMix = msgMix; //メッセージ送受信
 exports.addUrlPreview = addUrlPreview; //URLプレビュー設定
 exports.msgRecord = msgRecord; //履歴に記録
+exports.getMessage = getMessage; //メッセージの単体取得
 exports.msgDelete = msgDelete; //メッセージ削除
 exports.msgReaction = msgReaction; //メッセージにリアクションする
 exports.msgEdit = msgEdit; //メッセージの編集
