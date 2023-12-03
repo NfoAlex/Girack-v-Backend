@@ -1721,27 +1721,6 @@ io.on("connection", (socket) => {
 
     });
 
-    //メッセージをチャンネルへピン留めする
-    socket.on("pinMessage", (dat) => {
-        /*
-        {
-            reqSender: {...},
-            channelid: channelid,
-            messageid: messageid
-        }}
-        */
-
-        let paramRequire = [
-            "channelid",
-            "messageid"
-        ];
-        if ( !checkDataIntegrality(req, paramRequire, "getMessageSingle") ) {return -1;}
-
-        //ピン留めする
-        msg.pinMessage(dat.channelid, dat.messageid);
-
-    });
-
     //メッセージの削除とかリアクションとか
     socket.on("actMessage", (dat) => {
         /*
@@ -1769,7 +1748,12 @@ io.on("connection", (socket) => {
 
         }
 
+        //行動内容によって処理を変える
         switch( dat.action ) {
+            case "pin":
+                result = msg.msgPin(dat);
+                break;
+
             case "delete":
                 //削除、そして更新するメッージのIDなどを取り込む
                 result = msg.msgDelete(dat);
