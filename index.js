@@ -1768,6 +1768,11 @@ io.on("connection", (socket) => {
         /*  ToDo : messageUpdateで更新するようにする  */
         io.to(dat.channelid).emit("messageUpdate", result); //履歴を返す
 
+        //最新のメッセージデータ取得
+        let msgData = msg.getMessage(dat.channelid, dat.messageid);
+        //現状を送信
+        io.to(dat.channelid).emit("messageSingle_" + dat.messageid, msgData);
+
     });
 
     //メッセージの編集
@@ -1789,6 +1794,11 @@ io.on("connection", (socket) => {
         let contentEdited = msg.msgEdit(dat);
         contentEdited.action = "edit";
         io.to(dat.channelid).emit("messageUpdate", contentEdited);
+
+        //最新のメッセージデータ取得
+        let msgData = msg.getMessage(dat.channelid, dat.messageid);
+        //現状を送信
+        io.to(dat.channelid).emit("messageSingle_" + dat.messageid, msgData);
 
     });
 
