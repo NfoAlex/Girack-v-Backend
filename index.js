@@ -1718,9 +1718,9 @@ io.on("connection", (socket) => {
         if ( !checkDataIntegrality(req, paramRequire, "getMessageSingle") ) {return -1;}
 
         //メッセージ取得
-        let msg = msg.getMessage(req.channelid, req.messageid);
+        let msgData = msg.getMessage(req.channelid, req.messageid);
         //送信
-        socket.emit("messageSingle", msg);
+        socket.emit("messageSingle_" + req.messageid, msgData);
 
     });
 
