@@ -1765,7 +1765,6 @@ io.on("connection", (socket) => {
 
         }
 
-        console.log(result);
         /*  ToDo : messageUpdateで更新するようにする  */
         io.to(dat.channelid).emit("messageUpdate", result); //履歴を返す
 
