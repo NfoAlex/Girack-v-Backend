@@ -33,7 +33,9 @@ let dataServerInitText = `
         "0001": {
             "name": "random",
             "description": "なんでも雑談",
-            "scope": "public"
+            "pins": [],
+            "scope": "public",
+            "canTalk": "Member"
         }
     }
 }`;
