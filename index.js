@@ -1717,7 +1717,12 @@ io.on("connection", (socket) => {
         ];
         if ( !checkDataIntegrality(dat, paramRequire, "getMessageSingle") ) {return -1;}
 
-    })
+        //メッセージ取得
+        let msg = msg.getMessage(req.channelid, req.messageid);
+        //送信
+        socket.emit("messageSingle", msg);
+
+    });
 
     //メッセージの削除とかリアクションとか
     socket.on("actMessage", (dat) => {
