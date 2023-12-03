@@ -474,8 +474,43 @@ let getMessage = function getMessage(channelid, messageid) {
 }
 
 //メッセージをチャンネルへピン留めする
-    
 let msgPin = function msgPin(channelid, messageid) {
+    /*
+    dat
+    {
+        action: "pin",
+        channelid: channelid,
+        messageid: msgId,
+        reqSender: {...}
+    }
+    */
+
+    //メッセージIDから送信日付を取得してパスを割り出す
+    let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
+    let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
+
+    //データ取り出し
+    try{
+        dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
+        //もしデータが正常にとれるならそのままピン留め
+        if ( dataHistory[messageid] !== undefined ) {
+            //ピン留めしたと更新してJSONへ書き込み
+            dataHistory[messageid].pinned = true;
+            fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
+
+            //返す
+            return {messageData: dataHistory[messageid]};
+
+        } else { //undefinedなら削除された体で返す
+            return -1;
+
+        }
+    }
+    catch(e) { //エラーなら中止
+        console.log("Message :: msgPin : エラー->", e);
+        return -1;
+    }
+
 }
 
 //メッセージの削除
