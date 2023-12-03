@@ -474,7 +474,7 @@ let getMessage = function getMessage(channelid, messageid) {
 }
 
 //メッセージをチャンネルへピン留めする
-let msgPin = function msgPin(channelid, messageid) {
+let msgPin = function msgPin(dat) {
     /*
     dat
     {
