@@ -1702,10 +1702,7 @@ io.on("connection", (socket) => {
     socket.on("getMessageSingle", (req) => {
         /*
         {
-            reqSender: {
-                userid: userinfo.userid,
-                sessionid: userinfo.sessionid
-            },
+            reqSender: {...},
             channelid: channelid,
             messageid: msgId
         }
@@ -1738,7 +1735,6 @@ io.on("connection", (socket) => {
             }
         }
         */
-        //msg.msgDelete(dat);
 
         let result = -1; //結果用変数
 
@@ -1747,7 +1743,6 @@ io.on("connection", (socket) => {
             "channelid",
             "messageid",
         ];
-
         if ( !checkDataIntegrality(dat, paramRequire, "actMessage") ) {
             return -1;
 
