@@ -940,6 +940,7 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
 exports.msgMix = msgMix; //メッセージ送受信
 exports.addUrlPreview = addUrlPreview; //URLプレビュー設定
 exports.msgRecord = msgRecord; //履歴に記録
+exports.getMessage = getMessage; //メッセージの単体取得
 exports.msgDelete = msgDelete; //メッセージ削除
 exports.msgReaction = msgReaction; //メッセージにリアクションする
 exports.msgEdit = msgEdit; //メッセージの編集
