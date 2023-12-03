@@ -410,6 +410,7 @@ let getMessage = function getMessage(channelid, messageid) {
                 "userid": "不明なユーザー",
                 "channelid": channelid,
                 "time": "20010101000000",
+                "pinned": false,
                 "content": "消去されたメッセージ",
                 "replyData": {
                     "isReplying": false,
@@ -443,6 +444,7 @@ let getMessage = function getMessage(channelid, messageid) {
             "userid": "不明なユーザー",
             "channelid": channelid,
             "time": "20010101000000",
+            "pinned": false,
             "content": "消去されたメッセージ",
             "replyData": {
                 "isReplying": false,
@@ -467,6 +469,75 @@ let getMessage = function getMessage(channelid, messageid) {
             },
             "reaction": {}
         };
+    }
+
+}
+
+//メッセージをチャンネルへピン留めする
+let msgPin = function msgPin(dat) {
+    /*
+    dat
+    {
+        action: "pin",
+        channelid: channelid,
+        messageid: msgId,
+        reqSender: {...}
+    }
+    */
+
+    //メッセージIDとチャンネルIDを抽出
+    let messageid = dat.messageid;
+    let channelid = dat.channelid;
+
+    //メッセージIDから送信日付を取得してパスを割り出す
+    let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
+    let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
+
+    //チャンネルデータにpinsないなら作成
+    if ( db.dataServer.channels[channelid].pins === undefined ) {
+        db.dataServer.channels[channelid].pins = [];
+
+    }
+
+    //すでにピン留めされていたら削除、そうでないなら追加
+    if ( db.dataServer.channels[channelid].pins.indexOf(messageid) !== -1 ) {
+        //配列上のピンの位置
+        let pinIndex = db.dataServer.channels[channelid].pins.indexOf(messageid);
+        //ピン削除
+        db.dataServer.channels[channelid].pins.splice(pinIndex, 1);
+    } else {
+        //ピン追加
+        db.dataServer.channels[channelid].pins.push(messageid);
+    }
+
+    //チャンネルの更新のためにJSONへ書き込み
+    fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
+
+    //データ取り出し、更新
+    try{
+        dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8')); //メッセージデータのJSON読み込み
+        //もしデータが正常にとれるならそのままピン留め
+        if ( dataHistory[messageid] !== undefined ) {
+            //ピン留めを更新してJSONへ書き込み
+            dataHistory[messageid].pinned = !dataHistory[messageid].pinned;
+            fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
+
+            //返す
+            return {
+                action:"pin",
+                channelid: dataHistory[messageid].channelid,
+                messageid: dataHistory[messageid].messageid,
+                pinned: dataHistory[messageid].pinned,
+            };
+
+        } else { //undefinedなら削除された体で返す
+            return -1;
+
+        }
+    }
+    catch(e) { //エラーなら中止
+        console.log("Message :: msgPin : エラー->", e);
+        return -1;
     }
 
 }
@@ -818,6 +889,7 @@ let msgRecord = function msgRecord(json) {
             userid: json.userid,
             channelid: json.channelid,
             time: receivedTime,
+            pinned: false,
             content: json.content,
             isSystemMessage: json.isSystemMessage,
             replyData: json.replyData,
@@ -929,6 +1001,7 @@ exports.msgMix = msgMix; //メッセージ送受信
 exports.addUrlPreview = addUrlPreview; //URLプレビュー設定
 exports.msgRecord = msgRecord; //履歴に記録
 exports.getMessage = getMessage; //メッセージの単体取得
+exports.msgPin = msgPin; //メッセージをチャンネルへピン留めする
 exports.msgDelete = msgDelete; //メッセージ削除
 exports.msgReaction = msgReaction; //メッセージにリアクションする
 exports.msgEdit = msgEdit; //メッセージの編集

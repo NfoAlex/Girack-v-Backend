@@ -1702,10 +1702,7 @@ io.on("connection", (socket) => {
     socket.on("getMessageSingle", (req) => {
         /*
         {
-            reqSender: {
-                userid: userinfo.userid,
-                sessionid: userinfo.sessionid
-            },
+            reqSender: {...},
             channelid: channelid,
             messageid: msgId
         }
@@ -1738,7 +1735,6 @@ io.on("connection", (socket) => {
             }
         }
         */
-        //msg.msgDelete(dat);
 
         let result = -1; //結果用変数
 
@@ -1747,13 +1743,25 @@ io.on("connection", (socket) => {
             "channelid",
             "messageid",
         ];
-
         if ( !checkDataIntegrality(dat, paramRequire, "actMessage") ) {
             return -1;
 
         }
 
+        //行動内容によって処理を変える
         switch( dat.action ) {
+            case "pin":
+                result = msg.msgPin(dat);
+                //チャンネル情報の更新もしてるからデータを送信
+                //現在のチャンネルの情報を取得、送信
+                let info = db.getInfoChannel({
+                    targetid: dat.channelid,
+                    reqSender: dat.reqSender
+                });
+                console.log("index :: actMessage : channeldata->", info);
+                io.to("loggedin").emit("infoChannel", info);
+                break;
+
             case "delete":
                 //削除、そして更新するメッージのIDなどを取り込む
                 result = msg.msgDelete(dat);

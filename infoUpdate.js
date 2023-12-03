@@ -602,7 +602,9 @@ let channelCreate = async function channelCreate(dat) {
         db.dataServer.channels[newChannelId] = {
             name: dat.channelname,
             description: dat.description,
-            scope: dat.scope
+            pins: [],
+            scope: dat.scope,
+            canTalk: "Member"
         };
 
         //チャンネル作成者をそのまま参加させる
