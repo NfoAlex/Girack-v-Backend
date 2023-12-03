@@ -1752,6 +1752,14 @@ io.on("connection", (socket) => {
         switch( dat.action ) {
             case "pin":
                 result = msg.msgPin(dat);
+                //チャンネル情報の更新もしてるからデータを送信
+                //現在のチャンネルの情報を取得、送信
+                let info = db.getInfoChannel({
+                    targetid: dat.channelid,
+                    reqSender: dat.reqSender
+                });
+                console.log("index :: actMessage : channeldata->", info);
+                io.to("loggedin").emit("infoChannel", info);
                 break;
 
             case "delete":
