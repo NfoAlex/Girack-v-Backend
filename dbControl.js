@@ -299,9 +299,10 @@ let getInfoChannel = function getInfoChannel(dat) {
             infoParsed = {
                 channelid: dat.targetid,
                 channelname: "存在しないチャンネル",
-                channelid: dat.targetid,
                 description: "このチャンネルの情報がありません。これが見えていたらおかしいよ。",
-                scope: "deleted"
+                pins: [],
+                scope: "deleted",
+                canTalk: "Member"
             };
 
             return infoParsed;
