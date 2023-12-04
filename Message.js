@@ -489,6 +489,25 @@ let msgPin = function msgPin(dat) {
     let messageid = dat.messageid;
     let channelid = dat.channelid;
 
+    //ピン留めができるロール
+    let pinnableRole = db.dataServer.config.MESSAGE.MESSAGE_PIN_ROLE || "Member";
+    //ロールチェック
+    if (        //設定がAdminならAdminじゃないやつを弾く
+        pinnableRole === "Admin"
+            &&
+        db.dataUser.user[dat.reqSender.userid].role !== "Admin"
+    ) {
+        return -1;
+
+    } else if ( //設定がModeratorならMemberを弾く
+        pinnableRole === "Moderator"
+            &&
+        db.dataUser.user[dat.reqSender.userid].role === "Member"
+    ) {
+        return -1;
+
+    }
+
     //メッセージIDから送信日付を取得してパスを割り出す
     let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
     let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
