@@ -1726,7 +1726,7 @@ io.on("connection", (socket) => {
         /*
         dat
         {
-            action: ("delete"|"reaction"),
+            action: ("pin"|"delete"|"reaction"),
             channelid: channelid,
             messageid: msgId,
             reqSender: {
@@ -1752,6 +1752,7 @@ io.on("connection", (socket) => {
         switch( dat.action ) {
             case "pin":
                 result = msg.msgPin(dat);
+                if ( result === -1 ) return;
                 //チャンネル情報の更新もしてるからデータを送信
                 //現在のチャンネルの情報を取得、送信
                 let info = db.getInfoChannel({
