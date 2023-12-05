@@ -1762,6 +1762,9 @@ io.on("connection", (socket) => {
                 console.log("index :: actMessage : channeldata->", info);
                 io.to("loggedin").emit("infoChannel", info);
 
+                //もしピン留めを外したならシステムメッセージを送らない
+                if (!result.pinned) {break;}
+
                 //記録するシステムメッセージ
                 let SystemMessageLogging = {
                     userid: "SYSTEM",
