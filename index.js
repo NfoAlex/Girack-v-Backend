@@ -1761,6 +1761,29 @@ io.on("connection", (socket) => {
                 });
                 console.log("index :: actMessage : channeldata->", info);
                 io.to("loggedin").emit("infoChannel", info);
+
+                //記録するシステムメッセージ
+                let SystemMessageLogging = {
+                    userid: "SYSTEM",
+                    channelid: dat.channelid,
+                    replyData: {
+                        isReplying: false,
+                        messageid: "",
+                    },
+                    fileData: { 
+                        isAttatched: false,
+                        attatchmentData: null
+                    },
+                    content: {
+                        term: "MESSAGE_PINNED",
+                        targetUser: "",
+                        triggeredUser: dat.reqSender.userid
+                    },
+                    isSystemMessage: true
+                };
+                //システムメッセージを記録して送信
+                msg.msgMix(SystemMessageLogging);
+                io.to(dat.channelid).emit("messageReceive", SystemMessageLogging);
                 break;
 
             case "delete":
