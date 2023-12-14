@@ -201,11 +201,10 @@ io.on("connection", (socket) => {
 
         //データに必要なパラメータ
         let paramsRequire = [
-            "userid",
             "channelid",
             "content",
             "replyData",
-            "sessionid"
+            "fileData"
         ];
 
         //なんかSYSTEMを装ってたらここで停止
