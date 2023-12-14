@@ -31,7 +31,7 @@ let msgMix = async function msgMix(m) {
 
     try {
         //送信者のロールとそのチャンネルで話せるロールを取得
-        let userRole = db.dataUser.user[m.userid].role;
+        let userRole = db.dataUser.user[m.reqSender.userid].role;
         let channelCanTalkRole = db.dataServer.channels[m.channelid].canTalk;
 
         //もし送信者がMemberで話せるロールがMember以外なら処理停止
