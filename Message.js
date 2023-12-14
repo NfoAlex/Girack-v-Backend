@@ -66,6 +66,9 @@ let msgMix = async function msgMix(m) {
 
     }
 
+    //ユーザーIDの偽装を防ぐ
+    m.userid = m.reqSender.userid;
+
     //もし返信データに必須のプロパティがないならホルダーを作る
     if ( m["replyData"] === null ) {
         //空データとして整理
