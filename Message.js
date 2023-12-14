@@ -66,6 +66,36 @@ let msgMix = async function msgMix(m) {
 
     }
 
+    //もし返信データに必須のプロパティがないならホルダーを作る
+    if ( m["replyData"] === null ) {
+        //空データとして整理
+        m.replyData = {
+            isReplying: false,
+            messageid: ""
+        };
+    } else if ( !(m["replyData"].hasOwnProperty("isReplying")) ) {
+        //空データとして整理
+        m.replyData = {
+            isReplying: false,
+            messageid: ""
+        };
+    }
+
+    //もし添付ファイルデータに必須のプロパティがないならホルダーを作る
+    if ( m["fileData"] === null ) {
+        //空データとして整理
+        m.fileData = {
+            isAttatched: false,
+            attatchmentData: null
+        };
+    } else if ( !m["fileData"].hasOwnProperty("isAttatched") ) {
+        //空データとして整理
+        m.fileData = {
+            isAttatched: false,
+            attatchmentData: null
+        };
+    }
+
     //URLデータホルダーを追加
     m.urlData = {
         dataLoaded: false,
