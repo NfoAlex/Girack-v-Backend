@@ -191,21 +191,19 @@ io.on("connection", (socket) => {
         メッセージのデータ型
         m {
             type: "message"
-            userid: userid, //ユーザー固有のID
             channelid: channelid, //チャンネルのID
             content: inputRef.current.input.value, //内容
-            hasURL: (true|false), //URLが含まれるかどうか
-            sessionid: sessionid //送信者のセッションID
+            replyData: {...} //返信データ
+            fileData: {...} //ファイルデータ
         }
         */
 
         //データに必要なパラメータ
         let paramsRequire = [
-            "userid",
             "channelid",
             "content",
             "replyData",
-            "sessionid"
+            "fileData"
         ];
 
         //なんかSYSTEMを装ってたらここで停止

@@ -31,7 +31,7 @@ let msgMix = async function msgMix(m) {
 
     try {
         //送信者のロールとそのチャンネルで話せるロールを取得
-        let userRole = db.dataUser.user[m.userid].role;
+        let userRole = db.dataUser.user[m.reqSender.userid].role;
         let channelCanTalkRole = db.dataServer.channels[m.channelid].canTalk;
 
         //もし送信者がMemberで話せるロールがMember以外なら処理停止
@@ -64,6 +64,39 @@ let msgMix = async function msgMix(m) {
 
         }
 
+    }
+
+    //ユーザーIDの偽装を防ぐ
+    m.userid = m.reqSender.userid;
+
+    //もし返信データに必須のプロパティがないならホルダーを作る
+    if ( m["replyData"] === null ) {
+        //空データとして整理
+        m.replyData = {
+            isReplying: false,
+            messageid: ""
+        };
+    } else if ( !(m["replyData"].hasOwnProperty("isReplying")) ) {
+        //空データとして整理
+        m.replyData = {
+            isReplying: false,
+            messageid: ""
+        };
+    }
+
+    //もし添付ファイルデータに必須のプロパティがないならホルダーを作る
+    if ( m["fileData"] === null ) {
+        //空データとして整理
+        m.fileData = {
+            isAttatched: false,
+            attatchmentData: null
+        };
+    } else if ( !m["fileData"].hasOwnProperty("isAttatched") ) {
+        //空データとして整理
+        m.fileData = {
+            isAttatched: false,
+            attatchmentData: null
+        };
     }
 
     //URLデータホルダーを追加
