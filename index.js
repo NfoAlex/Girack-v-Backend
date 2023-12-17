@@ -12,7 +12,8 @@ const socketIo = require("socket.io");
 
 //サーバーバージョン
 const SERVER_VERSION = "alpha_20231212";
-const DOMAIN_ALLOWED = "localhost";
+//許可するドメイン
+const DOMAIN_ALLOWED = "";
 
 //サーバー、インスタンス設定
 const port = process.env.PORT || 33333;
