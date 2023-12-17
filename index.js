@@ -183,7 +183,24 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
 
 
 io.on("connection", (socket) => {
-    console.log("-- 新規接続 --");
+    console.log("-------------");
+    console.log("* 新規接続");
+    console.log("* Origin : ", socket.handshake.headers.origin);
+    console.log("-------------");
+
+    console.log('?1->', socket.handshake.headers.origin.startsWith("asdf"));
+    console.log('?1->', socket.handshake.headers.origin.startsWith("h"));
+
+    //ドメインの比較（人力CORS）
+    if (
+        !socket.handshake.headers.origin.startsWith("http://"+DOMAIN_ALLOWED)
+            ||
+        !socket.handshake.headers.origin.startsWith("https://"+DOMAIN_ALLOWED)
+    ) {
+        //ドメインが違うなら殺す
+        return -1;
+
+    }
 
     //メッセージ処理
     socket.on("msgSend", async (m) => {
