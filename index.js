@@ -200,7 +200,6 @@ io.on("connection", (socket) => {
             !socket.handshake.headers.origin.startsWith("https://"+DOMAIN_ALLOWED)
         ) {
             //ドメインが違うなら殺す
-            console.log("お前違うじゃん");
             socket.disconnect();
             return -1;
 
