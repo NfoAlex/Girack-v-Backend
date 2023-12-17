@@ -188,18 +188,23 @@ io.on("connection", (socket) => {
     console.log("* Origin : ", socket.handshake.headers.origin);
     console.log("-------------");
 
-    console.log('?1->', socket.handshake.headers.origin.startsWith("asdf"));
-    console.log('?1->', socket.handshake.headers.origin.startsWith("h"));
-
     //ドメインの比較（人力CORS）
     if (
-        !socket.handshake.headers.origin.startsWith("http://"+DOMAIN_ALLOWED)
-            ||
-        !socket.handshake.headers.origin.startsWith("https://"+DOMAIN_ALLOWED)
+        //ORIGINがある？
+        socket.handshake.headers.origin !== undefined
     ) {
-        //ドメインが違うなら殺す
-        return -1;
+        if (
+            //ドメインが違う？
+            !socket.handshake.headers.origin.startsWith("http://"+DOMAIN_ALLOWED)
+                &&
+            !socket.handshake.headers.origin.startsWith("https://"+DOMAIN_ALLOWED)
+        ) {
+            //ドメインが違うなら殺す
+            console.log("お前違うじゃん");
+            socket.disconnect();
+            return -1;
 
+        }
     }
 
     //メッセージ処理
