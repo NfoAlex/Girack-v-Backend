@@ -22,9 +22,6 @@ const server = http.createServer(app);
 //CORS設定
 const io = socketIo(server, {
     maxHttpBufferSize: 1e8, // 100 MB
-    cors: {
-        credentials: true
-    }
 });
 
 //接続しているSocketJSON
