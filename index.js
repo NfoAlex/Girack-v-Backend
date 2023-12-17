@@ -3,16 +3,19 @@ const msg = require("./Message.js"); //メッセージの処理関連
 const auth = require("./auth.js"); //認証関連
 const infoUpdate = require("./infoUpdate.js");
 
+//ライブラリインポート、設定
 const fs = require("fs");
 const fsPromise = require("fs").promises;
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 
-const port = process.env.PORT || 33333;
-
+//サーバーバージョン
 const SERVER_VERSION = "alpha_20231212";
+const DOMAIN_ALLOWED = "localhost";
 
+//サーバー、インスタンス設定
+const port = process.env.PORT || 33333;
 const app = express();
 const server = http.createServer(app);
 
