@@ -205,8 +205,14 @@ io.on("connection", (socket) => {
         //ORIGIN情報があり、
         socket.handshake.headers.origin !== undefined
             &&
-        //ドメインが設定されているなら
+        //許可するドメインが指定されており、
         DOMAIN_ALLOWED !== ""
+            &&
+        ( //同一環境からのアクセスでないなら
+            !socket.handshake.headers.origin.startsWith("http://localhost")
+                &&
+            !socket.handshake.headers.origin.startsWith("http://127.0.0.1")
+        )
     ) { //ドメイン設定と比較して許可できるか調べる
         if ( DOMAIN_PROTOCOL_SENSITIVE ) {
             //プロトコルを限定して判別
