@@ -1073,6 +1073,29 @@ io.on("connection", (socket) => {
     });
 
 // ===========================================================
+// API関連
+
+    //自分のAPIリストを取得
+    socket.on("getApiList", (dat) => {
+        /*
+        dat
+        {
+            reqSender: {...},
+        }
+        */
+
+        //セッション認証
+        if ( !checkDataIntegrality(dat, [], "getApiList") ) return -1;
+
+        //APIの情報取得
+        let dataAPI = apiMan.getApiList(dat.userid);
+
+        //送信
+        socket.emit("InfoApiList", dataAPI);
+
+    });
+
+// ===========================================================
 // 認証関連
 
     //認証
