@@ -111,7 +111,7 @@ const registerApi = function registerApi(dat) {
         //トークン割り当て
         apiDataRegistering.token = _token;
 
-        //空いているIDに対してデータを格納
+        //空いているIDに対してデータを格納、JSON書き込み
         apiMan.dataAPI[randomIdGen] = apiDataRegistering;
         fs.writeFileSync("./apiList.json", JSON.stringify(apiMan.dataAPI, null, 4));
         //ループ停止
@@ -123,8 +123,16 @@ const registerApi = function registerApi(dat) {
 
 //API情報を削除する
 const removeApi = function removeApi(dat) {
+    //そもそもデータがないなら停止
+    if ( apiMan.dataAPI[dat.apiId] === undefined ) return -1;
 
-}
+    //ユーザーIDが同じか確認
+    if ( apiMan.dataAPI[dat.apiId].userid === dat.reqSender.userid) {
+        //APIデータを削除、JSON書き込み
+        delete apiMan.dataAPI[dat.apiId];
+        fs.writeFileSync("./apiList.json", JSON.stringify(apiMan.dataAPI, null, 4));
+    }
+};
 
 //エクスポート
 exports.getApiList = getApiList;
