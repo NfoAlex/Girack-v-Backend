@@ -1,5 +1,19 @@
 const fs = require('fs');
 
+//サーバーをホストするための環境設定を読み込む
+let dataHostConfig = {};
+try { //読み込んでみる
+    dataHostConfig = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
+
+} catch(e) {
+    //読み込めないなら設定を仮設定を作成
+    dataHostConfig = {
+        allowedOrigin: "", //すべてのドメインを許可
+        port: "33333", //ホストするポート番号
+    };
+
+}
+
 //サーバー情報や設定を記録しているJSONファイルを読み取る
 let dataServer = {};
 let dataServerInitText = `
