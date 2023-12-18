@@ -1,8 +1,8 @@
 const fs = require('fs');
 
 //サーバー情報や設定を記録しているJSONファイルを読み取る
-let dataServer = {};
-let dataServerInitText = `
+var dataServer = {};
+const dataServerInitText = `
 {
     "servername": "Girack",
     "registration": {
@@ -73,7 +73,7 @@ try { //読み込んでみる
 }
 
 //ユーザーを記録しているJSONファイルを読み取る
-let dataUser = {};
+var dataUser = {};
 try { //読み込んでみる
     dataUser = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
 } catch(e) {
