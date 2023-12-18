@@ -1096,7 +1096,7 @@ io.on("connection", (socket) => {
     });
 
     //APIの新規登録
-    socket.on("registerApi", (dat) => {
+    socket.on("registerApi", async (dat) => {
         /*
         dat
         {
@@ -1123,7 +1123,13 @@ io.on("connection", (socket) => {
         }
 
         //APIの登録
-        apiMan.registerApi(dat);
+        await apiMan.registerApi(dat);
+
+        //APIの情報取得
+        let dataAPI = apiMan.getApiList(dat.reqSender.userid);
+
+        //取得情報を送信
+        socket.emit("InfoApiList", dataAPI);
 
     });
 
