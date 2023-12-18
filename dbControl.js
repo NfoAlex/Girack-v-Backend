@@ -1,9 +1,5 @@
 const fs = require('fs');
 
-//サーバーをホストするための環境設定を読み込む
-const dataHostConfig = require("./HOST_CONFIG.js").HOST_CONFIG;
-console.log("dbControl :: 読み込んだホスト設定 -> ", dataHostConfig);
-
 //サーバー情報や設定を記録しているJSONファイルを読み取る
 let dataServer = {};
 let dataServerInitText = `
@@ -611,6 +607,5 @@ exports.getModlog = getModlog; //監査ログを取得
 exports.getInfoServer = getInfoServer; //サーバーの詳細設定を取得
 exports.getInitInfo = getInitInfo; //サーバーの初期情報
 
-exports.dataHostConfig = dataHostConfig; //サーバーのホスト設定
 exports.dataServer = dataServer; //サーバー情報
 exports.dataUser = dataUser; //ユーザー情報

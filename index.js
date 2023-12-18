@@ -15,10 +15,10 @@ const SERVER_VERSION = "alpha_20231212";
 
 /*********************************************************************************************************************/
 //ホスト設定を読み込む
-    //設定はHOST_CONFIG.jsから
 
-    //ドメイン許可設定
-    const ALLOWED_ORIGIN = db.dataHostConfig.allowedOrigin || []; //無効なら全ドメイン許可
+//サーバーをホストするための環境設定を読み込む
+const dataHostConfig = require("./HOST_CONFIG.js").HOST_CONFIG;
+console.log("dbControl :: 読み込んだホスト設定 -> ", dataHostConfig);
 
     //ポート番号
     const port = db.dataHostConfig.port || 33333; //無効なら33333にする
