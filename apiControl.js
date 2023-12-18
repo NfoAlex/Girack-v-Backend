@@ -78,7 +78,7 @@ const registerApi = function registerApi(dat) {
                 //乱数生成
                 let n = Math.floor(Math.random() * 9);
                 //IDへ追加する
-                randomIdGen += (i).toString();
+                randomIdGen += (n).toString();
 
             }
 
