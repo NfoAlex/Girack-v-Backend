@@ -98,7 +98,7 @@ try {
 } catch(e) {
     //読み込めないならホルダーだけを作って作れる状態にする
     dataAPI = {};
-    fs.writeFileSync("./api.json", JSON.stringify(dataAPI, null, 4)); //JSONファイルを作成しておく
+    fs.writeFileSync("./apiList.json", JSON.stringify(dataAPI, null, 4)); //JSONファイルを作成しておく
 }
 
 //起動したときに全員をオフライン状態にする
