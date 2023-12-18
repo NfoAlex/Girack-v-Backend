@@ -211,32 +211,21 @@ io.on("connection", (socket) => {
             !socket.handshake.headers.origin.startsWith("http://127.0.0.1")
         )
     ) { //ドメイン設定と比較して許可できるか調べる
-        if ( DOMAIN_PROTOCOL_SENSITIVE ) {
-            //プロトコルを限定して判別
-            if ( !socket.handshake.headers.origin.startsWith(DOMAIN_ALLOWED) ) {
-                console.log("部ちぎった", DOMAIN_PROTOCOL_SENSITIVE);
-                socket.disconnect();
-                return -1;
+        //許可されているかどうか
+        let flagOriginAllowed = false;
+        //許可されたドメインの数分ループを回して判別
+        for ( let index in ALLOWED_ORIGIN)  {
+            //Originがそのドメインから始まっているかどうかで判別
+            if ( socket.handshake.headers.origin.startsWith(ALLOWED_ORIGIN[index]) ) {
+                flagOriginAllowed = true; //許可されたドメインと設定
+                break; //ループ停止
             }
-        } else {
-            //httpとhttpsの両方で判別
-            if (
-                //httpsとhttpを足した用のドメイン比較して違うなら
-                !socket.handshake.headers.origin.startsWith("http://"+DOMAIN_ALLOWED)
-                    &&
-                !socket.handshake.headers.origin.startsWith("https://"+DOMAIN_ALLOWED)
-            ) { //通信を切る
-                //ドメインが違うなら殺す
-                console.log("部ちぎった", DOMAIN_PROTOCOL_SENSITIVE);
-                socket.disconnect();
-                return -1;
 
-            } else {
-                console.log("いいよ");
-            }
         }
-    } else {
-        console.log("そもそも許可");
+
+        //許可されなかったのならsocket通信を切る
+        if ( !flagOriginAllowed ) socket.disconnect(); //切断
+        
     }
 
     //メッセージ処理
