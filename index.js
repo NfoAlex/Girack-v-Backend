@@ -235,7 +235,11 @@ io.on("connection", (socket) => {
 
         //許可されなかったのならsocket通信を切る
         if ( !flagOriginAllowed ) socket.disconnect(); //切断
-        
+
+    //そもそもOriginがなければ切断
+    } else if ( socket.handshake.headers.origin === undefined ) {
+        socket.disconnect(); //切断
+
     }
 
     //メッセージ処理
