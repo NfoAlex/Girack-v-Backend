@@ -32,7 +32,7 @@ const dataServerInitText = `
         "API": {
             "API_ENABLED": false,
             "API_CANREGISTER_ROLE": "Admin",
-            "API_NEEDAPPLY": true
+            "API_NEEDAPPROVE": true
         }
     },
     "channels": {
