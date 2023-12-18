@@ -1133,6 +1133,32 @@ io.on("connection", (socket) => {
 
     });
 
+    //APIの新規登録
+    socket.on("removeApi", async (dat) => {
+        /*
+        dat
+        {
+            reqSender: {...},
+            apiId: "123458973"
+        }
+        */
+
+        //セッション認証
+        if ( !checkDataIntegrality(dat, ["apiId"], "removeApi") ) {
+            return -1;
+        }
+
+        //APIの削除
+        await apiMan.removeApi(dat);
+
+        //APIの情報取得
+        let dataAPI = apiMan.getApiList(dat.reqSender.userid);
+
+        //取得情報を送信
+        socket.emit("InfoApiList", dataAPI);
+
+    });
+
 
 // ===========================================================
 // 認証関連
