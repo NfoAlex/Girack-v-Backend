@@ -28,6 +28,11 @@ let dataServerInitText = `
             "MESSAGE_PIN_ROLE": "Admin",
             "MESSAGE_TXT_MAXLENGTH": "250",
             "MESSAGE_FILE_MAXSIZE": "5e7"
+        },
+        "API": {
+            "API_ENABLED": false,
+            "API_CANREGISTER_ROLE": "Admin",
+            "API_NEEDAPPLY": true
         }
     },
     "channels": {
