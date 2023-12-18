@@ -90,6 +90,17 @@ try { //読み込んでみる
 
 }
 
+//APIコード用のJSONファイルを読み取る
+var dataAPI = {};
+try {
+    //APIデータを読み取り
+    dataAPI = JSON.parse(fs.readFileSync('./api.json', 'utf-8')); //サーバー情報のJSON読み込み
+} catch(e) {
+    //読み込めないならホルダーだけを作って作れる状態にする
+    dataAPI = {};
+    fs.writeFileSync("./api.json", JSON.stringify(dataAPI, null, 4)); //JSONファイルを作成しておく
+}
+
 //起動したときに全員をオフライン状態にする
 for ( let index in Object.keys(dataUser.user) ) {
     let userid = Object.keys(dataUser.user)[index]; //ユーザーIDを取得
@@ -612,5 +623,6 @@ exports.getModlog = getModlog; //監査ログを取得
 exports.getInfoServer = getInfoServer; //サーバーの詳細設定を取得
 exports.getInitInfo = getInitInfo; //サーバーの初期情報
 
+exports.dataAPI = dataAPI; //API情報
 exports.dataServer = dataServer; //サーバー情報
 exports.dataUser = dataUser; //ユーザー情報
