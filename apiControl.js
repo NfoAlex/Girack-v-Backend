@@ -10,7 +10,6 @@ const db = require("./dbControl.js");
     apiName: "",
     actionOnServer: {
         USER_GETINFO: false,
-        SERVER_GETCONFIG: false,
         CHANNEL_GETINFO: true,
         CHANNEL_GETLIST: false
     },
