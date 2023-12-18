@@ -33,7 +33,7 @@ let dataServerInitText = `
     "channels": {
         "0001": {
             "name": "random",
-            "description": "なんでも雑談",
+            "description": "雑談用のチャンネル",
             "pins": [],
             "scope": "public",
             "canTalk": "Member"
