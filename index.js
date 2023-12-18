@@ -197,7 +197,6 @@ io.on("connection", (socket) => {
     console.log("-------------");
     console.log("* 新規接続");
     console.log("* Origin : ", socket.handshake.headers.origin);
-    console.log("* AllowerDomain : ", ("https://"+DOMAIN_ALLOWED));
     console.log("-------------");
 
     //アクセスしたオリジンの比較、制限（人力CORS）
