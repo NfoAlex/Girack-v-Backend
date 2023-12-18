@@ -101,7 +101,7 @@ const registerApi = function registerApi(dat) {
             //ループ回数カウント
             loopCount++;
 
-    }, 100);
+        }, 100);
 
     }).then((randomIdGen) => { //空いているIDが見つかったら
         //APIトークン用に24文字のコードを生成
