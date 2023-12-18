@@ -18,9 +18,7 @@ const SERVER_VERSION = "alpha_20231212";
     //設定はHOST_CONFIG.jsから
 
     //ドメイン許可設定
-    const DOMAIN_ALLOWED = db.dataHostConfig.allowedOrigin || ""; //無効なら全ドメイン許可
-        //プロトコルも含めているならhttpかhttpsを気にするように
-        const DOMAIN_PROTOCOL_SENSITIVE = DOMAIN_ALLOWED.includes("http://") || DOMAIN_ALLOWED.includes("https://");
+    const ALLOWED_ORIGIN = db.dataHostConfig.allowedOrigin || []; //無効なら全ドメイン許可
 
     //ポート番号
     const port = db.dataHostConfig.port || 33333; //無効なら33333にする
@@ -205,7 +203,7 @@ io.on("connection", (socket) => {
         socket.handshake.headers.origin !== undefined
             &&
         //許可するドメインが指定されており、
-        DOMAIN_ALLOWED !== ""
+        ALLOWED_ORIGIN.length !== 0
             &&
         ( //同一環境からのアクセスでないなら
             !socket.handshake.headers.origin.startsWith("http://localhost")
