@@ -57,6 +57,7 @@ const registerApi = function registerApi(dat) {
     const apiDataRegistering = {
         userid: dat.reqSender.userid,
         token: "",
+        type: dat.registerApiData.type,
         status: db.dataServer.config.API.API_NEEDAPPROVE?"pending":"disabled",
         apiName: dat.registerApiData.apiName,
         actionOnServer: dat.registerApiData.apiActionOnServer,
