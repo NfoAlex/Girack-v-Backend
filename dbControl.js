@@ -1,18 +1,8 @@
 const fs = require('fs');
 
 //サーバーをホストするための環境設定を読み込む
-let dataHostConfig = {};
-try { //読み込んでみる
-    dataHostConfig = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
-
-} catch(e) {
-    //読み込めないなら設定を仮設定を作成
-    dataHostConfig = {
-        allowedOrigin: "", //すべてのドメインを許可
-        port: "33333", //ホストするポート番号
-    };
-
-}
+const dataHostConfig = require("./HOST_CONFIG.js").HOST_CONFIG;
+console.log("dbControl :: 読み込んだホスト設定 -> ", dataHostConfig);
 
 //サーバー情報や設定を記録しているJSONファイルを読み取る
 let dataServer = {};
@@ -621,5 +611,6 @@ exports.getModlog = getModlog; //監査ログを取得
 exports.getInfoServer = getInfoServer; //サーバーの詳細設定を取得
 exports.getInitInfo = getInitInfo; //サーバーの初期情報
 
+exports.dataHostConfig = dataHostConfig; //サーバーのホスト設定
 exports.dataServer = dataServer; //サーバー情報
 exports.dataUser = dataUser; //ユーザー情報
