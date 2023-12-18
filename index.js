@@ -20,8 +20,18 @@ const SERVER_VERSION = "alpha_20231212";
 const dataHostConfig = require("./HOST_CONFIG.js").HOST_CONFIG;
 console.log("dbControl :: 読み込んだホスト設定 -> ", dataHostConfig);
 
+//もしそもそも設定が無効なら警告して止める
+if ( dataHostConfig === undefined ) {
+    console.error("\nindex :: サーバーホスト設定が取得できませんでした。リポジトリより'HOST_CONFIG.js'を再取得してください。\n");
+    return -1;
+
+}
+
+    //Origin許可設定
+    const ALLOWED_ORIGIN = dataHostConfig.allowedOrigin || []; //無効なら全ドメイン許可
+
     //ポート番号
-    const port = db.dataHostConfig.port || 33333; //無効なら33333にする
+    const port = dataHostConfig.port || 33333; //無効なら33333にする
 /*********************************************************************************************************************/
 
 //サーバーインスタンスを構成する
