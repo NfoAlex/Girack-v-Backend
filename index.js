@@ -1095,6 +1095,38 @@ io.on("connection", (socket) => {
 
     });
 
+    //APIの新規登録
+    socket.on("registerApi", (dat) => {
+        /*
+        dat
+        {
+            reqSender: {...},
+            registerApiData: {
+                apiName: "asdf",
+                actionOnServer: {
+                    USER_GETINFO: false,
+                    CHANNEL_GETINFO: true,
+                    CHANNEL_GETLIST: false
+                },
+                actionPerChannel: { //こいつはまだ
+
+                }
+            }
+        }
+        */
+
+        //セッション認証
+        let paramRequire = ["registerApiData"];
+        if ( !checkDataIntegrality(dat, paramRequire, "registerApi") ) {
+            return -1;
+        }
+
+        //APIの登録
+        apiMan.registerApi(dat);
+
+    });
+
+
 // ===========================================================
 // 認証関連
 
@@ -1183,8 +1215,10 @@ io.on("connection", (socket) => {
             "newPassword"
         ];
 
+        //セッション確認
         if ( !checkDataIntegrality(dat, paramRequire, "changePassword") ) return -1
 
+        //パスワード変更
         let result = await auth.changePassword(dat);
 
         //パスワードの変更結果を送信
