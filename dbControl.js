@@ -94,7 +94,7 @@ try { //読み込んでみる
 var dataAPI = {};
 try {
     //APIデータを読み取り
-    dataAPI = JSON.parse(fs.readFileSync('./api.json', 'utf-8')); //サーバー情報のJSON読み込み
+    dataAPI = JSON.parse(fs.readFileSync('./apiList.json', 'utf-8')); //サーバー情報のJSON読み込み
 } catch(e) {
     //読み込めないならホルダーだけを作って作れる状態にする
     dataAPI = {};
