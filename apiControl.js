@@ -7,7 +7,7 @@ const db = require("./dbControl.js");
 {
     userid: 12345678,
     type: "user"|"bot",
-    status: "active"|"pending"|"disabled",
+    status: "ACTIVE"|"PENDING"|"DISABLED",
     apiName: "",
     actionOnServer: {
         USER_GETINFO: false,
@@ -58,7 +58,7 @@ const registerApi = function registerApi(dat) {
         userid: dat.reqSender.userid,
         token: "",
         type: dat.registerApiData.type,
-        status: db.dataServer.config.API.API_NEEDAPPROVE?"pending":"disabled",
+        status: db.dataServer.config.API.API_NEEDAPPROVE?"PENDING":"DISABLED",
         apiName: dat.registerApiData.apiName,
         actionOnServer: dat.registerApiData.apiActionOnServer,
         actionPerChannel: {}
