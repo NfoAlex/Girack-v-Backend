@@ -12,11 +12,15 @@ const socketIo = require("socket.io");
 
 //サーバーバージョン
 const SERVER_VERSION = "alpha_20231212";
-//許可するドメイン
-const DOMAIN_ALLOWED = "";
 
-//サーバー、インスタンス設定
-const port = process.env.PORT || 33333;
+/*********************************************************************************************************************/
+//ホスト設定を読み込む
+    //設定はHOST_CONFIG.jsから
+const DOMAIN_ALLOWED = db.dataHostConfig.allowedOrigin || ""; //サーバーホスト設定から読み込み(無効なら全ドメイン許可)
+const port = db.dataHostConfig.port || 33333; //サーバーホスト設定から読み込み (無効なら33333にする)
+/*********************************************************************************************************************/
+
+//サーバーインスタンスを構成する
 const app = express();
 const server = http.createServer(app);
 
