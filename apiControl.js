@@ -48,6 +48,11 @@ const getApiList = function getApiList(userid) {
 
 //API情報を生成する
 const registerApi = function registerApi(dat) {
+    //名前が空なら登録させない
+    if ( dat.registerApiData.apiName === "" ) {
+        return -1;
+    }
+
     //登録するAPI情報
     const apiDataRegistering = {
         userid: dat.reqSender.userid,

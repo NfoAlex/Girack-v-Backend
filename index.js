@@ -1103,6 +1103,7 @@ io.on("connection", (socket) => {
             reqSender: {...},
             registerApiData: {
                 apiName: "asdf",
+                type: "user"|"bot",
                 actionOnServer: {
                     USER_GETINFO: false,
                     CHANNEL_GETINFO: true,
