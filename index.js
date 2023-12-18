@@ -1,4 +1,5 @@
 const db = require("./dbControl.js"); //データベース関連
+const apiMan = require("./apiControl.js"); //APIデータ関連
 const msg = require("./Message.js"); //メッセージの処理関連
 const auth = require("./auth.js"); //認証関連
 const infoUpdate = require("./infoUpdate.js");

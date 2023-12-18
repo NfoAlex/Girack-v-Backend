@@ -1,4 +1,5 @@
-const api = require("./dbControl.js");
+const apiMan = require("./dbControl.js");
+const db = require("./dbControl.js");
 
 //APIデータのテンプレ
 /*
