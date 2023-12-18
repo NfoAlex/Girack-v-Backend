@@ -137,3 +137,4 @@ const removeApi = function removeApi(dat) {
 //エクスポート
 exports.getApiList = getApiList;
 exports.registerApi = registerApi;
+exports.removeApi = removeApi;
