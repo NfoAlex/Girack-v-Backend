@@ -16,8 +16,14 @@ const SERVER_VERSION = "alpha_20231212";
 /*********************************************************************************************************************/
 //ホスト設定を読み込む
     //設定はHOST_CONFIG.jsから
-const DOMAIN_ALLOWED = db.dataHostConfig.allowedOrigin || ""; //サーバーホスト設定から読み込み(無効なら全ドメイン許可)
-const port = db.dataHostConfig.port || 33333; //サーバーホスト設定から読み込み (無効なら33333にする)
+
+    //ドメイン許可設定
+    const DOMAIN_ALLOWED = db.dataHostConfig.allowedOrigin || ""; //無効なら全ドメイン許可
+        //プロトコルも含めているならhttpかhttpsを気にするように
+        const DOMAIN_PROTOCOL_SENSITIVE = DOMAIN_ALLOWED.includes("http://") || DOMAIN_ALLOWED.includes("https://");
+
+    //ポート番号
+    const port = db.dataHostConfig.port || 33333; //無効なら33333にする
 /*********************************************************************************************************************/
 
 //サーバーインスタンスを構成する
@@ -194,22 +200,40 @@ io.on("connection", (socket) => {
     console.log("* AllowerDomain : ", ("https://"+DOMAIN_ALLOWED));
     console.log("-------------");
 
-    //ドメインの比較（人力CORS）
+    //アクセスしたオリジンの比較、制限（人力CORS）
     if (
-        //ORIGINがある？
+        //ORIGIN情報があり、
         socket.handshake.headers.origin !== undefined
-    ) {
-        if (
-            //ドメインが違う？
-            !socket.handshake.headers.origin.startsWith("http://"+DOMAIN_ALLOWED)
-                &&
-            !socket.handshake.headers.origin.startsWith("https://"+DOMAIN_ALLOWED)
-        ) {
-            //ドメインが違うなら殺す
-            socket.disconnect();
-            return -1;
+            &&
+        //ドメインが設定されているなら
+        DOMAIN_ALLOWED !== ""
+    ) { //ドメイン設定と比較して許可できるか調べる
+        if ( DOMAIN_PROTOCOL_SENSITIVE ) {
+            //プロトコルを限定して判別
+            if ( !socket.handshake.headers.origin.startsWith(DOMAIN_ALLOWED) ) {
+                console.log("部ちぎった", DOMAIN_PROTOCOL_SENSITIVE);
+                socket.disconnect();
+                return -1;
+            }
+        } else {
+            //httpとhttpsの両方で判別
+            if (
+                //httpsとhttpを足した用のドメイン比較して違うなら
+                !socket.handshake.headers.origin.startsWith("http://"+DOMAIN_ALLOWED)
+                    &&
+                !socket.handshake.headers.origin.startsWith("https://"+DOMAIN_ALLOWED)
+            ) { //通信を切る
+                //ドメインが違うなら殺す
+                console.log("部ちぎった", DOMAIN_PROTOCOL_SENSITIVE);
+                socket.disconnect();
+                return -1;
 
+            } else {
+                console.log("いいよ");
+            }
         }
+    } else {
+        console.log("そもそも許可");
     }
 
     //メッセージ処理
