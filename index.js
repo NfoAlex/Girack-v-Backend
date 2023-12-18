@@ -1088,7 +1088,7 @@ io.on("connection", (socket) => {
         if ( !checkDataIntegrality(dat, [], "getApiList") ) return -1;
 
         //APIの情報取得
-        let dataAPI = apiMan.getApiList(dat.userid);
+        let dataAPI = apiMan.getApiList(dat.reqSender.userid);
 
         //送信
         socket.emit("InfoApiList", dataAPI);
