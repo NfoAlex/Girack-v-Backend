@@ -1149,7 +1149,7 @@ io.on("connection", (socket) => {
         }
 
         //APIの削除
-        await apiMan.removeApi(dat);
+        apiMan.removeApi(dat);
 
         //APIの情報取得
         let dataAPI = apiMan.getApiList(dat.reqSender.userid);
