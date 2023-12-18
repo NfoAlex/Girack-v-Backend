@@ -106,7 +106,7 @@ const registerApi = function registerApi(dat) {
     }).then((randomIdGen) => { //空いているIDが見つかったら
         //APIトークン用に24文字のコードを生成
         let apiTokenCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        let apiTokenLength = 24; //文字数
+        let apiTokenLength = 64; //文字数
         _token = Array.from(Array(apiTokenLength)).map(()=>apiTokenCharset[Math.floor(Math.random()*apiTokenCharset.length)]).join('');
         //トークン割り当て
         apiDataRegistering.token = _token;
