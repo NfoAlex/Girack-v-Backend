@@ -199,7 +199,7 @@ const disableApi = function disableApi(dat) {
         //ユーザーIDの確認
         dat.reqSender.userid === db.dataApi[dat.apiId].userid
     ) {
-        db.dataApi[dat.apiId].status = "ACTIVE";
+        db.dataApi[dat.apiId].status.active = false;
 
     }
     
