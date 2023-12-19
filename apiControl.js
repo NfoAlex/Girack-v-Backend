@@ -184,6 +184,7 @@ const activateApi = function activateApi(dat) {
     ) {
         //有効と設定してJSON書き込み
         db.dataApi[dat.apiId].status.active = true;
+        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataAPI, null, 4));
 
     }
     
@@ -199,7 +200,9 @@ const disableApi = function disableApi(dat) {
         //ユーザーIDの確認
         dat.reqSender.userid === db.dataApi[dat.apiId].userid
     ) {
+        //無効と設定してJSON書き込み
         db.dataApi[dat.apiId].status.active = false;
+        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataAPI, null, 4));
 
     }
     
