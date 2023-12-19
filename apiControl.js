@@ -6,7 +6,10 @@ const db = require("./dbControl.js");
 {
     userid: 12345678,
     type: "user"|"bot",
-    status: "ACTIVE"|"PENDING"|"DISABLED",
+    status: {
+        activated: false,
+        approved: true
+    },
     apiName: "",
     actionOnServer: {
         USER_GETINFO: false,
