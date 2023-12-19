@@ -1171,6 +1171,29 @@ io.on("connection", (socket) => {
 
     });
 
+    //APIを有効化（許可）
+    socket.on("activateApi", (dat) => {
+        /*
+        dat
+        {
+            apiId: 12345...,
+            reqSender: {...}
+        }
+        */
+
+        //セッション認証
+        if ( !checkDataIntegrality(dat, ["apiId"], "activateApi") ) return -1;
+
+        //有効化
+        apiMan.activateApi(dat);
+
+        //APIの情報取得
+        let dataAPI = apiMan.getApiList(dat.reqSender.userid);
+
+        //取得情報を送信
+        socket.emit("InfoApiList", dataAPI);
+
+    });
 
 // ===========================================================
 // 認証関連
