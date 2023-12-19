@@ -169,6 +169,9 @@ const removeApi = function removeApi(dat) {
 const activateApi = function activateApi(dat) {
     //AdminかどうかとユーザーIDを確認
     if (
+        //APIが有効かどうか
+        db.dataServer.config.API.API_ENABLED
+            &&
         //Adminなら誰でも許可する
         db.dataUser.user[dat.reqSender.userid].role === "Admin"
             ||
