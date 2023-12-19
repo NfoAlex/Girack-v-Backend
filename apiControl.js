@@ -172,10 +172,14 @@ const activateApi = function activateApi(dat) {
         //Adminなら誰でも許可する
         db.dataUser.user[dat.reqSender.userid].role === "Admin"
             ||
-        //ユーザーIDの確認
-        dat.reqSender.userid === db.dataApi[dat.apiId].userid
+        (
+            //ユーザーIDの確認と承認済みかどうかの確認
+            dat.reqSender.userid === db.dataApi[dat.apiId].userid
+                &&
+            db.dataApi[dat.apiId].status.approved
+        )
     ) {
-        db.dataApi[dat.apiId].status = "ACTIVE";
+        db.dataApi[dat.apiId].status.active = true;
 
     }
     
