@@ -187,6 +187,7 @@ const disableApi = function disableApi(dat) {
         db.dataApi[dat.apiId].status = "ACTIVE";
 
     }
+    
 };
 
 //エクスポート
