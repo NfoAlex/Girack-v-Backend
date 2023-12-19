@@ -7,7 +7,7 @@ const db = require("./dbControl.js");
     userid: 12345678,
     type: "user"|"bot",
     status: {
-        activated: false,
+        active: false,
         approved: true
     },
     apiName: "",
@@ -85,7 +85,10 @@ const registerApi = function registerApi(dat) {
         userid: dat.reqSender.userid, //登録するユーザーID
         token: "", //トークン
         type: dat.registerApiData.type, //bot or user
-        status: approveStatus, //APIが許可制ならPENDINGに
+        status: {
+            active: false,
+            approved: true
+        },
         apiName: dat.registerApiData.apiName, //登録名
         actionOnServer: dat.registerApiData.apiActionOnServer, //サーバーに関してできること
         actionPerChannel: {} //チャンネルそれぞれに対してできること
