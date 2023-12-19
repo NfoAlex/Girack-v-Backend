@@ -59,7 +59,17 @@ const registerApi = function registerApi(dat) {
     if ( db.dataUser.user[dat.reqSender.userid].role === "Admin" ) { //Admin?
         approveStatus = "DISABLED";
 
-    } else if ( db.dataServer.config.API.API_ENABLED ) { //APIが使えるという設定？
+    } else if (
+        db.dataServer.config.API.API_ENABLED
+            &&
+        (
+            db.dataServer.config.API.API_CANREGISTER_ROLE === "Moderator"
+                &&
+            db.dataUser.user[dat.reqSender.userid].role !== "Member"
+        )
+            ||
+        db.dataServer.config.API.API_CANREGISTER_ROLE === "Member"
+    ) { //APIが使えるという設定？
         approveStatus = db.dataServer.config.API.API_NEEDAPPROVE?"PENDING":"DISABLED";
 
     } else { //設定が無効なら
