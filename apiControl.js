@@ -31,13 +31,13 @@ const db = require("./dbControl.js");
 
 //API情報を取得する
 const getApiList = function getApiList(userid) {
-    //結果を入れる配列
-    let arrResult = [];
+    //結果を入れるJSON
+    let arrResult = {};
     //APIの数分ループしてユーザーIDが同じものを探す
     for ( let index in db.dataAPI ) {
         if ( db.dataAPI[index].userid === userid ) {
-            //配列へ追加
-            arrResult.push(db.dataAPI[index]);
+            //JSONへ追加
+            arrResult[index] = (db.dataAPI[index]);
 
         }
 
@@ -197,7 +197,7 @@ const activateApi = function activateApi(dat) {
 const disableApi = function disableApi(dat) {
     //そもそもデータがないなら停止
     if ( db.dataApi[dat.apiId] === undefined ) return -1
-    
+
     //AdminかどうかとユーザーIDを確認
     if (
         //Adminなら誰でも許可する
