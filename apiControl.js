@@ -1,5 +1,4 @@
 const fs = require("fs");
-const apiMan = require("./dbControl.js");
 const db = require("./dbControl.js");
 
 //APIデータのテンプレ
@@ -32,10 +31,10 @@ const getApiList = function getApiList(userid) {
     //結果を入れる配列
     let arrResult = [];
     //APIの数分ループしてユーザーIDが同じものを探す
-    for ( let index in apiMan.dataAPI ) {
-        if ( apiMan.dataAPI[index].userid === userid ) {
+    for ( let index in db.dataAPI ) {
+        if ( db.dataAPI[index].userid === userid ) {
             //配列へ追加
-            arrResult.push(apiMan.dataAPI[index]);
+            arrResult.push(db.dataAPI[index]);
 
         }
 
@@ -65,7 +64,7 @@ const registerApi = function registerApi(dat) {
 
     } else { //設定が無効なら
         return -1;
-        
+
     }
 
     //登録するAPI情報
@@ -101,7 +100,7 @@ const registerApi = function registerApi(dat) {
             console.log("apiControl :: registerApi : randomIdGen->", randomIdGen);
 
             //生成したIDの部分が空いているかどうか
-            if ( apiMan.dataAPI[randomIdGen] === undefined ) { //空いているなら
+            if ( db.dataAPI[randomIdGen] === undefined ) { //空いているなら
                 //API情報の登録処理へ
                 resolve(randomIdGen);
 
@@ -127,8 +126,8 @@ const registerApi = function registerApi(dat) {
         apiDataRegistering.token = _token;
 
         //空いているIDに対してデータを格納、JSON書き込み
-        apiMan.dataAPI[randomIdGen] = apiDataRegistering;
-        fs.writeFileSync("./apiList.json", JSON.stringify(apiMan.dataAPI, null, 4));
+        db.dataAPI[randomIdGen] = apiDataRegistering;
+        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataAPI, null, 4));
         //ループ停止
         clearInterval(checkIdLoop);
 
@@ -139,10 +138,10 @@ const registerApi = function registerApi(dat) {
 //API情報を削除する
 const removeApi = function removeApi(dat) {
     //そもそもデータがないなら停止
-    if ( apiMan.dataAPI[dat.apiId] === undefined ) return -1;
+    if ( db.dataAPI[dat.apiId] === undefined ) return -1;
 
     //ユーザーIDが同じか確認
-    if ( apiMan.dataAPI[dat.apiId].userid === dat.reqSender.userid) {
+    if ( db.dataAPI[dat.apiId].userid === dat.reqSender.userid) {
         //APIデータを削除、JSON書き込み
         delete apiMan.dataAPI[dat.apiId];
         fs.writeFileSync("./apiList.json", JSON.stringify(apiMan.dataAPI, null, 4));
