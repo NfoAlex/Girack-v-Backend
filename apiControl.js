@@ -175,14 +175,16 @@ const activateApi = function activateApi(dat) {
         //APIが有効かどうか
         db.dataServer.config.API.API_ENABLED
             &&
-        //Adminなら誰でも許可する
-        db.dataUser.user[dat.reqSender.userid].role === "Admin"
-            ||
         (
-            //ユーザーIDの確認と承認済みかどうかの確認
-            dat.reqSender.userid === db.dataApi[dat.apiId].userid
-                &&
-            db.dataApi[dat.apiId].status.approved
+            //Adminなら誰でも許可する
+            db.dataUser.user[dat.reqSender.userid].role === "Admin"
+                ||
+            (
+                //ユーザーIDの確認と承認済みかどうかの確認
+                dat.reqSender.userid === db.dataApi[dat.apiId].userid
+                    &&
+                db.dataApi[dat.apiId].status.approved
+            )
         )
     ) {
         //有効と設定してJSON書き込み
