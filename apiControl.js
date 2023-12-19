@@ -153,8 +153,39 @@ const removeApi = function removeApi(dat) {
     //ユーザーIDが同じか確認
     if ( db.dataAPI[dat.apiId].userid === dat.reqSender.userid) {
         //APIデータを削除、JSON書き込み
-        delete apiMan.dataAPI[dat.apiId];
-        fs.writeFileSync("./apiList.json", JSON.stringify(apiMan.dataAPI, null, 4));
+        delete db.dataAPI[dat.apiId];
+        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataAPI, null, 4));
+    }
+};
+
+//APIの有効化(登録を許可)
+const activateApi = function activateApi(dat) {
+    //AdminかどうかとユーザーIDを確認
+    if (
+        //Adminなら誰でも許可する
+        db.dataUser.user[dat.reqSender.userid].role === "Admin"
+            ||
+        //ユーザーIDの確認
+        dat.reqSender.userid === db.dataApi[dat.apiId].userid
+    ) {
+        db.dataApi[dat.apiId].status = "ACTIVE";
+
+    }
+    
+};
+
+//APIの有効化(登録を許可)
+const disableApi = function disableApi(dat) {
+    //AdminかどうかとユーザーIDを確認
+    if (
+        //Adminなら誰でも許可する
+        db.dataUser.user[dat.reqSender.userid].role === "Admin"
+            ||
+        //ユーザーIDの確認
+        dat.reqSender.userid === db.dataApi[dat.apiId].userid
+    ) {
+        db.dataApi[dat.apiId].status = "ACTIVE";
+
     }
 };
 
@@ -162,3 +193,5 @@ const removeApi = function removeApi(dat) {
 exports.getApiList = getApiList;
 exports.registerApi = registerApi;
 exports.removeApi = removeApi;
+exports.activateApi = activateApi;
+exports.disableApi = disableApi;
