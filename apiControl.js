@@ -34,10 +34,10 @@ const getApiList = function getApiList(userid) {
     //結果を入れるJSON
     let arrResult = {};
     //APIの数分ループしてユーザーIDが同じものを探す
-    for ( let index in db.dataAPI ) {
-        if ( db.dataAPI[index].userid === userid ) {
+    for ( let index in db.dataApi ) {
+        if ( db.dataApi[index].userid === userid ) {
             //JSONへ追加
-            arrResult[index] = (db.dataAPI[index]);
+            arrResult[index] = (db.dataApi[index]);
 
         }
 
@@ -117,7 +117,7 @@ const registerApi = function registerApi(dat) {
             console.log("apiControl :: registerApi : randomIdGen->", randomIdGen);
 
             //生成したIDの部分が空いているかどうか
-            if ( db.dataAPI[randomIdGen] === undefined ) { //空いているなら
+            if ( db.dataApi[randomIdGen] === undefined ) { //空いているなら
                 //API情報の登録処理へ
                 resolve(randomIdGen);
 
@@ -143,8 +143,8 @@ const registerApi = function registerApi(dat) {
         apiDataRegistering.token = _token;
 
         //空いているIDに対してデータを格納、JSON書き込み
-        db.dataAPI[randomIdGen] = apiDataRegistering;
-        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataAPI, null, 4));
+        db.dataApi[randomIdGen] = apiDataRegistering;
+        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataApi, null, 4));
         //ループ停止
         clearInterval(checkIdLoop);
 
@@ -155,13 +155,13 @@ const registerApi = function registerApi(dat) {
 //APIアクセスを削除する
 const removeApi = function removeApi(dat) {
     //そもそもデータがないなら停止
-    if ( db.dataAPI[dat.apiId] === undefined ) return -1;
+    if ( db.dataApi[dat.apiId] === undefined ) return -1;
 
     //ユーザーIDが同じか確認
-    if ( db.dataAPI[dat.apiId].userid === dat.reqSender.userid) {
+    if ( db.dataApi[dat.apiId].userid === dat.reqSender.userid) {
         //APIデータを削除、JSON書き込み
-        delete db.dataAPI[dat.apiId];
-        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataAPI, null, 4));
+        delete db.dataApi[dat.apiId];
+        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataApi, null, 4));
     }
 };
 
@@ -187,7 +187,7 @@ const activateApi = function activateApi(dat) {
     ) {
         //有効と設定してJSON書き込み
         db.dataApi[dat.apiId].status.active = true;
-        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataAPI, null, 4));
+        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataApi, null, 4));
 
     }
     
@@ -208,7 +208,7 @@ const disableApi = function disableApi(dat) {
     ) {
         //無効と設定してJSON書き込み
         db.dataApi[dat.apiId].status.active = false;
-        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataAPI, null, 4));
+        fs.writeFileSync("./apiList.json", JSON.stringify(db.dataApi, null, 4));
 
     }
     
