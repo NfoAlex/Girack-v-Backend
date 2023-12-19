@@ -182,6 +182,7 @@ const activateApi = function activateApi(dat) {
             db.dataApi[dat.apiId].status.approved
         )
     ) {
+        //有効と設定してJSON書き込み
         db.dataApi[dat.apiId].status.active = true;
 
     }
