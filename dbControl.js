@@ -91,14 +91,14 @@ try { //読み込んでみる
 }
 
 //APIコード用のJSONファイルを読み取る
-var dataAPI = {};
+var dataApi = {};
 try {
     //APIデータを読み取り
-    dataAPI = JSON.parse(fs.readFileSync('./apiList.json', 'utf-8')); //サーバー情報のJSON読み込み
+    dataApi = JSON.parse(fs.readFileSync('./apiList.json', 'utf-8')); //サーバー情報のJSON読み込み
 } catch(e) {
     //読み込めないならホルダーだけを作って作れる状態にする
-    dataAPI = {};
-    fs.writeFileSync("./apiList.json", JSON.stringify(dataAPI, null, 4)); //JSONファイルを作成しておく
+    dataApi = {};
+    fs.writeFileSync("./apiList.json", JSON.stringify(dataApi, null, 4)); //JSONファイルを作成しておく
 }
 
 //起動したときに全員をオフライン状態にする
@@ -623,6 +623,6 @@ exports.getModlog = getModlog; //監査ログを取得
 exports.getInfoServer = getInfoServer; //サーバーの詳細設定を取得
 exports.getInitInfo = getInitInfo; //サーバーの初期情報
 
-exports.dataAPI = dataAPI; //API情報
+exports.dataApi = dataApi; //API情報
 exports.dataServer = dataServer; //サーバー情報
 exports.dataUser = dataUser; //ユーザー情報
