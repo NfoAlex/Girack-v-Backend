@@ -145,7 +145,7 @@ const registerApi = function registerApi(dat) {
 
 };
 
-//API情報を削除する
+//APIアクセスを削除する
 const removeApi = function removeApi(dat) {
     //そもそもデータがないなら停止
     if ( db.dataAPI[dat.apiId] === undefined ) return -1;
@@ -174,7 +174,7 @@ const activateApi = function activateApi(dat) {
     
 };
 
-//APIの有効化(登録を許可)
+//APIの無効化(登録を許可)
 const disableApi = function disableApi(dat) {
     //AdminかどうかとユーザーIDを確認
     if (
