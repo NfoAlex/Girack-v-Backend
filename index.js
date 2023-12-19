@@ -465,7 +465,6 @@ io.on("connection", (socket) => {
         if ( descChanged ) {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
-                userid: "SYSTEM",
                 channelid: dat.targetid,
                 replyData: {
                     isReplying: false,
@@ -480,7 +479,11 @@ io.on("connection", (socket) => {
                     targetUser: "",
                     triggeredUser: dat.reqSender.userid
                 },
-                isSystemMessage: true
+                isSystemMessage: true,
+                reqSender: {
+                    userid: "SYSTEM",
+                    sessionid: "SYSTEM"
+                }
             };
 
             //システムメッセージを記録して送信
@@ -493,7 +496,6 @@ io.on("connection", (socket) => {
         if ( nameChanged ) {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
-                userid: "SYSTEM",
                 channelid: dat.targetid,
                 replyData: {
                     isReplying: false,
@@ -508,7 +510,11 @@ io.on("connection", (socket) => {
                     targetUser: "",
                     triggeredUser: dat.reqSender.userid
                 },
-                isSystemMessage: true
+                isSystemMessage: true,
+                reqSender: {
+                    userid: "SYSTEM",
+                    sessionid: "SYSTEM"
+                }
             };
 
             //システムメッセージを記録して送信
@@ -521,7 +527,6 @@ io.on("connection", (socket) => {
         if ( scopeChanged && db.dataServer.config.CHANNEL.CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER ) {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
-                userid: "SYSTEM",
                 channelid: dat.targetid,
                 replyData: {
                     isReplying: false,
@@ -536,7 +541,11 @@ io.on("connection", (socket) => {
                     targetUser: "",
                     triggeredUser: dat.reqSender.userid
                 },
-                isSystemMessage: true
+                isSystemMessage: true,
+                reqSender: {
+                    userid: "SYSTEM",
+                    sessionid: "SYSTEM"
+                }
             };
 
             //システムメッセージを記録して送信
@@ -950,7 +959,6 @@ io.on("connection", (socket) => {
 
         //記録するシステムメッセージ
         let SystemMessageLogging = {
-            userid: "SYSTEM",
             channelid: dat.channelid,
             role: "SYSTEM",
             replyData: {
@@ -966,7 +974,11 @@ io.on("connection", (socket) => {
                 targetUser: targetUser,
                 triggeredUser: triggeredUser
             },
-            isSystemMessage: true
+            isSystemMessage: true,
+            reqSender: {
+                userid: "SYSTEM",
+                sessionid: "SYSTEM"
+            }
         };
 
         //システムメッセージを記録して送信
@@ -1374,7 +1386,6 @@ io.on("connection", (socket) => {
 
             //記録するシステムメッセージ
             let SystemMessageLogging = {
-                userid: "SYSTEM",
                 channelid: db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE,
                 role: "SYSTEM",
                 replyData: {
@@ -1390,7 +1401,11 @@ io.on("connection", (socket) => {
                     targetUser: "",
                     triggeredUser: createdUserAuth.userid
                 },
-                isSystemMessage: true
+                isSystemMessage: true,
+                reqSender: {
+                    userid: "SYSTEM",
+                    sessionid: "SYSTEM"
+                }
             };
 
             //システムメッセージを記録して送信
@@ -1913,7 +1928,6 @@ io.on("connection", (socket) => {
 
                 //記録するシステムメッセージ
                 let SystemMessageLogging = {
-                    userid: "SYSTEM",
                     channelid: dat.channelid,
                     replyData: {
                         isReplying: false,
@@ -1928,7 +1942,11 @@ io.on("connection", (socket) => {
                         targetUser: "",
                         triggeredUser: dat.reqSender.userid
                     },
-                    isSystemMessage: true
+                    isSystemMessage: true,
+                    reqSender: {
+                        userid: "SYSTEM",
+                        sessionid: "SYSTEM"
+                    }
                 };
                 //システムメッセージを記録して送信
                 msg.msgMix(SystemMessageLogging);
