@@ -55,13 +55,13 @@ const registerApi = function registerApi(dat) {
 
     //登録するAPI情報
     const apiDataRegistering = {
-        userid: dat.reqSender.userid,
-        token: "",
-        type: dat.registerApiData.type,
-        status: db.dataServer.config.API.API_NEEDAPPROVE?"PENDING":"DISABLED",
-        apiName: dat.registerApiData.apiName,
-        actionOnServer: dat.registerApiData.apiActionOnServer,
-        actionPerChannel: {}
+        userid: dat.reqSender.userid, //登録するユーザーID
+        token: "", //トークン
+        type: dat.registerApiData.type, //bot or user
+        status: db.dataServer.config.API.API_NEEDAPPROVE?"PENDING":"DISABLED", //APIが許可制ならPENDINGに
+        apiName: dat.registerApiData.apiName, //登録名
+        actionOnServer: dat.registerApiData.apiActionOnServer, //サーバーに関してできること
+        actionPerChannel: {} //チャンネルそれぞれに対してできること
     };
 
     let checkIdLoop; //ループ関数格納用変数
