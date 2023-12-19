@@ -1,0 +1,1 @@
+const apiMan = require("./apiControl.js"); //APIデータ関連
