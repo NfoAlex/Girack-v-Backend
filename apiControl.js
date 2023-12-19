@@ -46,10 +46,25 @@ const getApiList = function getApiList(userid) {
 
 };
 
-//API情報を生成する
+//API情報を登録、生成する
 const registerApi = function registerApi(dat) {
     //名前が空なら登録させない
     if ( dat.registerApiData.apiName === "" ) {
+        return -1;
+
+    }
+
+    //APIの状態設定用
+    let approveStatus = "";
+    //ロールとAPI利用が可能かどうか確認
+    if ( db.dataUser.user[dat.reqSender.userid].role === "Admin" ) { //Admin?
+        approveStatus = "DISABLED";
+        
+
+    } else if ( db.dataServer.config.API.API_ENABLED ) { //APIが使えるという設定？
+        approveStatus = db.dataServer.config.API.API_NEEDAPPROVE?"PENDING":"DISABLED";
+
+    } else { //設定が無効なら
         return -1;
     }
 
@@ -58,7 +73,7 @@ const registerApi = function registerApi(dat) {
         userid: dat.reqSender.userid, //登録するユーザーID
         token: "", //トークン
         type: dat.registerApiData.type, //bot or user
-        status: db.dataServer.config.API.API_NEEDAPPROVE?"PENDING":"DISABLED", //APIが許可制ならPENDINGに
+        status: approveStatus, //APIが許可制ならPENDINGに
         apiName: dat.registerApiData.apiName, //登録名
         actionOnServer: dat.registerApiData.apiActionOnServer, //サーバーに関してできること
         actionPerChannel: {} //チャンネルそれぞれに対してできること
