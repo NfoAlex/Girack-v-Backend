@@ -1,4 +1,5 @@
 const db = require("./dbControl.js"); //データベース関連
+const apiMan = require("./apiControl.js"); //APIデータ関連
 const msg = require("./Message.js"); //メッセージの処理関連
 const auth = require("./auth.js"); //認証関連
 const infoUpdate = require("./infoUpdate.js");
@@ -464,7 +465,6 @@ io.on("connection", (socket) => {
         if ( descChanged ) {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
-                userid: "SYSTEM",
                 channelid: dat.targetid,
                 replyData: {
                     isReplying: false,
@@ -479,7 +479,11 @@ io.on("connection", (socket) => {
                     targetUser: "",
                     triggeredUser: dat.reqSender.userid
                 },
-                isSystemMessage: true
+                isSystemMessage: true,
+                reqSender: {
+                    userid: "SYSTEM",
+                    sessionid: "SYSTEM"
+                }
             };
 
             //システムメッセージを記録して送信
@@ -492,7 +496,6 @@ io.on("connection", (socket) => {
         if ( nameChanged ) {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
-                userid: "SYSTEM",
                 channelid: dat.targetid,
                 replyData: {
                     isReplying: false,
@@ -507,7 +510,11 @@ io.on("connection", (socket) => {
                     targetUser: "",
                     triggeredUser: dat.reqSender.userid
                 },
-                isSystemMessage: true
+                isSystemMessage: true,
+                reqSender: {
+                    userid: "SYSTEM",
+                    sessionid: "SYSTEM"
+                }
             };
 
             //システムメッセージを記録して送信
@@ -520,7 +527,6 @@ io.on("connection", (socket) => {
         if ( scopeChanged && db.dataServer.config.CHANNEL.CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER ) {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
-                userid: "SYSTEM",
                 channelid: dat.targetid,
                 replyData: {
                     isReplying: false,
@@ -535,7 +541,11 @@ io.on("connection", (socket) => {
                     targetUser: "",
                     triggeredUser: dat.reqSender.userid
                 },
-                isSystemMessage: true
+                isSystemMessage: true,
+                reqSender: {
+                    userid: "SYSTEM",
+                    sessionid: "SYSTEM"
+                }
             };
 
             //システムメッセージを記録して送信
@@ -949,7 +959,6 @@ io.on("connection", (socket) => {
 
         //記録するシステムメッセージ
         let SystemMessageLogging = {
-            userid: "SYSTEM",
             channelid: dat.channelid,
             role: "SYSTEM",
             replyData: {
@@ -965,7 +974,11 @@ io.on("connection", (socket) => {
                 targetUser: targetUser,
                 triggeredUser: triggeredUser
             },
-            isSystemMessage: true
+            isSystemMessage: true,
+            reqSender: {
+                userid: "SYSTEM",
+                sessionid: "SYSTEM"
+            }
         };
 
         //システムメッセージを記録して送信
@@ -1072,6 +1085,141 @@ io.on("connection", (socket) => {
     });
 
 // ===========================================================
+// API関連
+
+    //自分のAPIリストを取得
+    socket.on("getApiList", (dat) => {
+        /*
+        dat
+        {
+            reqSender: {...},
+        }
+        */
+
+        //セッション認証
+        if ( !checkDataIntegrality(dat, [], "getApiList") ) return -1;
+
+        //APIの情報取得
+        let dataAPI = apiMan.getApiList(dat.reqSender.userid);
+
+        //送信
+        socket.emit("InfoApiList", dataAPI);
+
+    });
+
+    //APIの新規登録
+    socket.on("registerApi", async (dat) => {
+        /*
+        dat
+        {
+            reqSender: {...},
+            registerApiData: {
+                apiName: "asdf",
+                type: "user"|"bot",
+                actionOnServer: {
+                    USER_GETINFO: false,
+                    CHANNEL_GETINFO: true,
+                    CHANNEL_GETLIST: false
+                },
+                actionPerChannel: { //こいつはまだ
+
+                }
+            }
+        }
+        */
+
+        //セッション認証
+        let paramRequire = ["registerApiData"];
+        if ( !checkDataIntegrality(dat, paramRequire, "registerApi") ) {
+            return -1;
+        }
+
+        //APIの登録
+        await apiMan.registerApi(dat);
+
+        //APIの情報取得
+        let dataAPI = apiMan.getApiList(dat.reqSender.userid);
+
+        //取得情報を送信
+        socket.emit("InfoApiList", dataAPI);
+
+    });
+
+    //APIの新規登録
+    socket.on("removeApi", async (dat) => {
+        /*
+        dat
+        {
+            reqSender: {...},
+            apiId: "123458973"
+        }
+        */
+
+        //セッション認証
+        if ( !checkDataIntegrality(dat, ["apiId"], "removeApi") ) {
+            return -1;
+        }
+
+        //APIの削除
+        apiMan.removeApi(dat);
+
+        //APIの情報取得
+        let dataAPI = apiMan.getApiList(dat.reqSender.userid);
+
+        //取得情報を送信
+        socket.emit("InfoApiList", dataAPI);
+
+    });
+
+    //APIを有効化（許可）
+    socket.on("activateApi", (dat) => {
+        /*
+        dat
+        {
+            apiId: 12345...,
+            reqSender: {...}
+        }
+        */
+
+        //セッション認証
+        if ( !checkDataIntegrality(dat, ["apiId"], "activateApi") ) return -1;
+
+        //有効化
+        apiMan.activateApi(dat);
+
+        //APIの情報取得
+        let dataAPI = apiMan.getApiList(dat.reqSender.userid);
+
+        //取得情報を送信
+        socket.emit("InfoApiList", dataAPI);
+
+    });
+
+    //APIを有効化（許可）
+    socket.on("disableApi", (dat) => {
+        /*
+        dat
+        {
+            apiId: 12345...,
+            reqSender: {...}
+        }
+        */
+
+        //セッション認証
+        if ( !checkDataIntegrality(dat, ["apiId"], "disableApi") ) return -1;
+
+        //有効化
+        apiMan.disableApi(dat);
+
+        //APIの情報取得
+        let dataAPI = apiMan.getApiList(dat.reqSender.userid);
+
+        //取得情報を送信
+        socket.emit("InfoApiList", dataAPI);
+
+    });
+
+// ===========================================================
 // 認証関連
 
     //認証
@@ -1159,8 +1307,10 @@ io.on("connection", (socket) => {
             "newPassword"
         ];
 
+        //セッション確認
         if ( !checkDataIntegrality(dat, paramRequire, "changePassword") ) return -1
 
+        //パスワード変更
         let result = await auth.changePassword(dat);
 
         //パスワードの変更結果を送信
@@ -1283,7 +1433,6 @@ io.on("connection", (socket) => {
 
             //記録するシステムメッセージ
             let SystemMessageLogging = {
-                userid: "SYSTEM",
                 channelid: db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE,
                 role: "SYSTEM",
                 replyData: {
@@ -1299,7 +1448,11 @@ io.on("connection", (socket) => {
                     targetUser: "",
                     triggeredUser: createdUserAuth.userid
                 },
-                isSystemMessage: true
+                isSystemMessage: true,
+                reqSender: {
+                    userid: "SYSTEM",
+                    sessionid: "SYSTEM"
+                }
             };
 
             //システムメッセージを記録して送信
@@ -1822,7 +1975,6 @@ io.on("connection", (socket) => {
 
                 //記録するシステムメッセージ
                 let SystemMessageLogging = {
-                    userid: "SYSTEM",
                     channelid: dat.channelid,
                     replyData: {
                         isReplying: false,
@@ -1837,7 +1989,11 @@ io.on("connection", (socket) => {
                         targetUser: "",
                         triggeredUser: dat.reqSender.userid
                     },
-                    isSystemMessage: true
+                    isSystemMessage: true,
+                    reqSender: {
+                        userid: "SYSTEM",
+                        sessionid: "SYSTEM"
+                    }
                 };
                 //システムメッセージを記録して送信
                 msg.msgMix(SystemMessageLogging);

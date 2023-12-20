@@ -191,7 +191,7 @@ let mod = function mod(dat) {
 let changeServerSettings = function changeServerSettings(dat) {
     /*
     servername: "xxx",
-    config: this.displaySettings.config,
+    config: this.config,
     registration: {
         available: this.displaySettings.registerAvailable,
         invite: {

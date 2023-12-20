@@ -1,8 +1,8 @@
 const fs = require('fs');
 
 //サーバー情報や設定を記録しているJSONファイルを読み取る
-let dataServer = {};
-let dataServerInitText = `
+var dataServer = {};
+const dataServerInitText = `
 {
     "servername": "Girack",
     "registration": {
@@ -28,12 +28,17 @@ let dataServerInitText = `
             "MESSAGE_PIN_ROLE": "Admin",
             "MESSAGE_TXT_MAXLENGTH": "250",
             "MESSAGE_FILE_MAXSIZE": "5e7"
+        },
+        "API": {
+            "API_ENABLED": false,
+            "API_CANREGISTER_ROLE": "Admin",
+            "API_NEEDAPPROVE": true
         }
     },
     "channels": {
         "0001": {
             "name": "random",
-            "description": "なんでも雑談",
+            "description": "雑談用のチャンネル",
             "pins": [],
             "scope": "public",
             "canTalk": "Member"
@@ -68,7 +73,7 @@ try { //読み込んでみる
 }
 
 //ユーザーを記録しているJSONファイルを読み取る
-let dataUser = {};
+var dataUser = {};
 try { //読み込んでみる
     dataUser = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
 } catch(e) {
@@ -83,6 +88,17 @@ try { //読み込んでみる
     console.log("***********************************");
     console.log("***********************************");
 
+}
+
+//APIコード用のJSONファイルを読み取る
+var dataApi = {};
+try {
+    //APIデータを読み取り
+    dataApi = JSON.parse(fs.readFileSync('./apiList.json', 'utf-8')); //サーバー情報のJSON読み込み
+} catch(e) {
+    //読み込めないならホルダーだけを作って作れる状態にする
+    dataApi = {};
+    fs.writeFileSync("./apiList.json", JSON.stringify(dataApi, null, 4)); //JSONファイルを作成しておく
 }
 
 //起動したときに全員をオフライン状態にする
@@ -607,5 +623,6 @@ exports.getModlog = getModlog; //監査ログを取得
 exports.getInfoServer = getInfoServer; //サーバーの詳細設定を取得
 exports.getInitInfo = getInitInfo; //サーバーの初期情報
 
+exports.dataApi = dataApi; //API情報
 exports.dataServer = dataServer; //サーバー情報
 exports.dataUser = dataUser; //ユーザー情報
