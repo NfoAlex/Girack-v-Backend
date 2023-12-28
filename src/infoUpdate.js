@@ -598,14 +598,19 @@ let channelCreate = async function channelCreate(dat) {
         }, 100);
 
     }).then(() => {
-        //チャンネル作成
-        db.dataServer.channels[newChannelId] = {
-            name: dat.channelname,
-            description: dat.description,
-            pins: [],
-            scope: dat.scope,
-            canTalk: "Member"
-        };
+        try {
+            //チャンネル作成
+            db.dataServer.channels[newChannelId] = {
+                name: (dat.channelname).toString(),
+                description: (dat.description).toString(),
+                pins: [],
+                scope: dat.scope,
+                canTalk: "Member"
+            };
+        } catch(e) {
+            console.log("infoUpdate :: channelCreate : e->", e);
+            return -1;
+        }
 
         //チャンネル作成者をそのまま参加させる
         db.dataUser.user[dat.reqSender.userid].channel.push(newChannelId);
@@ -651,11 +656,14 @@ let channelRemove = function channelRemove(dat) {
     }
     */
 
+    //そもそも指定のチャンネルIDがないなら処理停止
+    if ( db.dataServer.channels[dat.channelid] === undefined ) return -1;
+
     //チャンネル削除
     delete db.dataServer.channels[dat.channelid];
 
     //消去されたチャンネルにいたユーザーリスト
-    let userChanged = [];
+    let userChangedEffected = [];
 
     //ユーザー全員から消したチャンネルをユーザーの"参加チャンネル"リストから消去
     for ( index in Object.entries(db.dataUser.user) ) {
@@ -664,7 +672,7 @@ let channelRemove = function channelRemove(dat) {
         //ユーザーの参加チャンネルリストを加工
         db.dataUser.user[userid].channel = Object.entries(db.dataUser.user)[index][1].channel.filter(cid => cid!==dat.channelid);
         //消去されたチャンネルにいたユーザーリストに追加
-        userChanged.push(userid);
+        userChangedEffected.push(userid);
 
     }
 
@@ -707,7 +715,7 @@ let channelRemove = function channelRemove(dat) {
     fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
 
     //参加していた人リストにそれぞれクライアントで更新させる
-    return userChanged;
+    return userChangedEffected;
 
 }
 

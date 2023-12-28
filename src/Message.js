@@ -47,6 +47,7 @@ let msgMix = async function msgMix(m) {
         }
     } catch(e) {
         console.log("Message :: msgMix : 権限エラー->", e);
+        return -1;
     }
 
     //システムメッセージじゃないなら内容検査
@@ -69,34 +70,44 @@ let msgMix = async function msgMix(m) {
     //ユーザーIDの偽装を防ぐ
     m.userid = m.reqSender.userid;
 
-    //もし返信データに必須のプロパティがないならホルダーを作る
-    if ( m["replyData"] === null ) {
-        //空データとして整理
-        m.replyData = {
-            isReplying: false,
-            messageid: ""
-        };
-    } else if ( !(m["replyData"].hasOwnProperty("isReplying")) ) {
-        //空データとして整理
-        m.replyData = {
-            isReplying: false,
-            messageid: ""
-        };
+    try {
+        //もし返信データに必須のプロパティがないならホルダーを作る
+        if ( m["replyData"] === null ) {
+            //空データとして整理
+            m.replyData = {
+                isReplying: false,
+                messageid: ""
+            };
+        } else if ( !(m["replyData"].hasOwnProperty("isReplying")) ) {
+            //空データとして整理
+            m.replyData = {
+                isReplying: false,
+                messageid: ""
+            };
+        }
+    } catch(e) {
+        console.log("Message :: msgMix : e->", e);
+        return -1;
     }
 
-    //もし添付ファイルデータに必須のプロパティがないならホルダーを作る
-    if ( m["fileData"] === null ) {
-        //空データとして整理
-        m.fileData = {
-            isAttatched: false,
-            attatchmentData: null
-        };
-    } else if ( !m["fileData"].hasOwnProperty("isAttatched") ) {
-        //空データとして整理
-        m.fileData = {
-            isAttatched: false,
-            attatchmentData: null
-        };
+    try {
+        //もし添付ファイルデータに必須のプロパティがないならホルダーを作る
+        if ( m["fileData"] === null ) {
+            //空データとして整理
+            m.fileData = {
+                isAttatched: false,
+                attatchmentData: null
+            };
+        } else if ( !m["fileData"].hasOwnProperty("isAttatched") ) {
+            //空データとして整理
+            m.fileData = {
+                isAttatched: false,
+                attatchmentData: null
+            };
+        }
+    } catch(e) {
+        console.log("Message :: msgMix : e->", e);
+        return -1;
     }
 
     //URLデータホルダーを追加
@@ -117,6 +128,8 @@ let msgMix = async function msgMix(m) {
 
     //ファイルが添付されているなら
     if ( m.fileData.isAttatched ) {
+        //添付されているとするのにデータがなければここで停止
+        if ( m.fileData.attatchmentData === undefined ) return -1;
         /*************************************/
         //ファイル名被り防止(一時的)
         for ( let index in m.fileData.attatchmentData ) {
@@ -156,7 +169,8 @@ let msgMix = async function msgMix(m) {
 
     msgRecord(m); //メッセージをDBに記録
 
-    let MessageCompiled = getLatestMessage(m.channelid); //DBからメッセージ取得して送信
+    //DBから最新メッセージ取得して送信
+    let MessageCompiled = getLatestMessage(m.channelid);
 
     return MessageCompiled;
 

@@ -119,6 +119,13 @@ module.exports = (io) => {
 
         //sessionidによる認証
         socket.on("authBySession", (cred, CLIENT_VERSION) => {
+            /*
+            cred
+            {
+                userid: userid,
+                sessionid: sessionid
+            }
+            */
             console.log("index :: authByCookie : 認証time");
             
             //バージョンチェック

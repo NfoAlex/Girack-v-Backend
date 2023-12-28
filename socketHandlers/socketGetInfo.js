@@ -61,6 +61,7 @@ module.exports = (io) => {
 
             console.log("index :: getInfoUser : データ->", dat);
 
+            //整合性確認
             if ( !indexJS.checkDataIntegrality(dat, paramRequire, "getInfoUser") ) return -1;
 
             info = db.getInfoUser(dat); //情報収集

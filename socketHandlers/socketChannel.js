@@ -52,37 +52,42 @@ module.exports = (io) => {
             let SocketIsOnline = false; //影響を受けるユーザーがオンラインかどうか
             let SocketIDTarget = ""; //影響を受けるユーザーのSocketID
 
-            //操作者と標的ユーザーが同じでなく、標的のユーザーがオンラインなら本人に対して情報を更新させる
-            if ( dat.userid !== dat.reqSender.userid && db.dataUser.user[dat.userid].state.loggedin ) {
-                //対象のユーザーはオンラインと設定
-                SocketIsOnline = true;
-                //オンラインのSocketJSONを配列化
-                let objsocketOnline =  Object.entries(socketOnline);
-                //ループしてSocketIDが一致した項目を探す
-                for ( let index in objsocketOnline ) {
-                    if ( objsocketOnline[index][1] === dat.userid ) {
-                        //SocketIDを格納
-                        SocketIDTarget = objsocketOnline[index][0];
-                        //ユーザーの情報を無理やり取得
-                        let resultForPersonal = {
-                            username: db.dataUser.user[dat.userid].name, //ユーザーの表示名
-                            userid: dat.userid, //ユーザーID
-                            channelJoined: db.dataUser.user[dat.userid].channel, //入っているチャンネルリスト(array)
-                            role: db.dataUser.user[dat.userid].role, //ユーザーのロール
-                            loggedin: db.dataUser.user[dat.userid].state.loggedin, //ユーザーがログインしている状態かどうか
-                            banned: db.dataUser.user[dat.userid].state.banned //BANされているかどうか
-                        };
-                        //SocketIDで参加させる
-                        try {
-                            io.to(objsocketOnline[index][0]).emit("infoUser", resultForPersonal);
-                        } catch(e) {
-                            console.log(e);
+            try {
+                //操作者と標的ユーザーが同じでなく、標的のユーザーがオンラインなら本人に対して情報を更新させる
+                if ( dat.userid !== dat.reqSender.userid && db.dataUser.user[dat.userid].state.loggedin ) {
+                    //対象のユーザーはオンラインと設定
+                    SocketIsOnline = true;
+                    //オンラインのSocketJSONを配列化
+                    let objsocketOnline =  Object.entries(socketOnline);
+                    //ループしてSocketIDが一致した項目を探す
+                    for ( let index in objsocketOnline ) {
+                        if ( objsocketOnline[index][1] === dat.userid ) {
+                            //SocketIDを格納
+                            SocketIDTarget = objsocketOnline[index][0];
+                            //ユーザーの情報を無理やり取得
+                            let resultForPersonal = {
+                                username: db.dataUser.user[dat.userid].name, //ユーザーの表示名
+                                userid: dat.userid, //ユーザーID
+                                channelJoined: db.dataUser.user[dat.userid].channel, //入っているチャンネルリスト(array)
+                                role: db.dataUser.user[dat.userid].role, //ユーザーのロール
+                                loggedin: db.dataUser.user[dat.userid].state.loggedin, //ユーザーがログインしている状態かどうか
+                                banned: db.dataUser.user[dat.userid].state.banned //BANされているかどうか
+                            };
+                            //SocketIDで参加させる
+                            try {
+                                io.to(objsocketOnline[index][0]).emit("infoUser", resultForPersonal);
+                            } catch(e) {
+                                console.log(e);
+                            }
+
                         }
 
                     }
 
                 }
-
+            } catch(e) {
+                console.log("socketChannel :: channelAction : e->", e);
+                return -1;
             }
 
             let TERM = ""; //システムメッセージのフラグ
@@ -176,6 +181,7 @@ module.exports = (io) => {
             dat
             {
                 channelname: dat.channelname,
+                description: dat.description
                 reqSender: {
                     userid: "このリクエストを送っているユーザーのID",
                     sessionid: "セッションID"
@@ -183,7 +189,7 @@ module.exports = (io) => {
             }
             */
             //必要パラメータ
-            let paramRequire = ["channelname"];
+            let paramRequire = ["channelname", "description"];
             //整合性確認
             if ( !indexJS.checkDataIntegrality(dat, paramRequire, "channelCreate") ) return -1;
 
@@ -233,13 +239,15 @@ module.exports = (io) => {
             console.log("index :: channelRemove : チャンネル消すぜ");
             console.log(dat);
 
-            let userChanged = [];
-
-            //セッションが適合か確認
-            if ( auth.checkUserSession(dat.reqSender) ) {
-                userChanged = infoUpdate.channelRemove(dat);
-
+            //整合性確認
+            if ( !indexJS.checkDataIntegrality(dat, ["channelid"], "channelRemove") ) {
+                return -1;
             }
+
+            //チャンネル削除、返り値にユーザーリストを受け取る
+            let userChangedEffected = infoUpdate.channelRemove(dat);
+            //もし削除に失敗していたら停止
+            if ( userChangedEffected === -1 ) return -1;
 
             //現在のチャンネルリストを取得
             let channelList = db.getInfoList({
@@ -251,17 +259,17 @@ module.exports = (io) => {
             io.to("loggedin").emit("infoList", channelList);
 
             //消去したチャンネル分、人のプロフィールを更新
-            for ( index in userChanged ) {
+            for ( let index in userChangedEffected ) {
                 //チャンネル削除したのを伝えるためにユーザー情報を収集
-                let userNow = db.getInfoUser({
-                    targetid: userChanged[index],
+                let userInfoNow = db.getInfoUser({
+                    targetid: userChangedEffected[index],
                     reqSender: {
-                        userid: userChanged[index], //フル情報をとるため
+                        userid: userChangedEffected[index], //フル情報をとるため
                     }
                 });
 
                 //ユーザー情報送信
-                io.to("loggedin").emit("infoUser", userNow);
+                io.to("loggedin").emit("infoUser", userInfoNow);
                 
             }
 
