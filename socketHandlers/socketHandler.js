@@ -61,7 +61,9 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
 
 }
 
-console.log("動いてない...?");
+////////////////////////////////////////////////////////////////
+
+console.log("socketHandler :: socketハンドラ");
 
 module.exports = (io) => {
 io.on("connection", (socket) => {
