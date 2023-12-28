@@ -44,9 +44,6 @@ const io = socketIo(server, {
     maxHttpBufferSize: 1e8, // 100 MB
 });
 
-require("./socketHandlers/socketHandler.js")(io);
-require("./socketHandlers/socketAuth.js")(io);
-
 //必要なディレクトリの確認、なければ作成
     //フォルダ親
 try{fs.mkdirSync("./userFiles/");}catch(e){}
@@ -191,6 +188,10 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
     return true;
 
 }
+
+//Socketハンドラのインポート
+require("./socketHandlers/socketHandler.js")(io);
+require("./socketHandlers/socketAuth.js")(io);
 
 
 // io.on("connection", (socket) => {
