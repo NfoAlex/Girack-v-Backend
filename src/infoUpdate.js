@@ -392,7 +392,7 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat) {
 
     //データ読み取り、なければ作成
     try{
-        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+        dataUserSave = JSON.parse(fs.readFileSync('./userFiles/usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     } catch(e) {
         let dataUserSaveInit = `
             {
@@ -406,13 +406,13 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat) {
                 "channelOrder": []
             }
         `;
-        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
-        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+        fs.writeFileSync("./userFiles/usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
+        dataUserSave = JSON.parse(fs.readFileSync('./userFiles/usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     }
 
     dataUserSave.config = dat.config;
     dataUserSave.configAvailable = true;
-    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
+    fs.writeFileSync("./userFiles/usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
 
 }
 
@@ -422,7 +422,7 @@ let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat) {
 
     //データ読み取り、なければ作成
     try{
-        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+        dataUserSave = JSON.parse(fs.readFileSync('./userFiles/usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     } catch(e) {
         let dataUserSaveInit = `
             {
@@ -436,13 +436,13 @@ let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat) {
                 "channelOrder": []
             }
         `;
-        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
-        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+        fs.writeFileSync("./userFiles/usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
+        dataUserSave = JSON.parse(fs.readFileSync('./userFiles/usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     }
 
     dataUserSave.msgReadState = dat.msgReadState;
     dataUserSave.msgReadStateAvailable = true;
-    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
+    fs.writeFileSync("./userFiles/usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
 
 }
 
@@ -453,7 +453,7 @@ let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat) {
 
     //データ読み取り、なければ作成
     try{
-        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+        dataUserSave = JSON.parse(fs.readFileSync('./userFiles/usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     } catch(e) {
         let dataUserSaveInit = `
             {
@@ -467,12 +467,12 @@ let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat) {
                 "channelOrder": []
             }
         `;
-        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
-        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+        fs.writeFileSync("./userFiles/usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
+        dataUserSave = JSON.parse(fs.readFileSync('./userFiles/usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     }
 
     dataUserSave.channelOrder = dat.channelOrder;
-    fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
+    fs.writeFileSync("./userFiles/usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
 
 }
 
@@ -771,7 +771,7 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo) {
     //JSONのファイル名
     let nameOfJson = "modlog_" + tDateForName;
     //監査ログを書きこむJSONファイルのディレクトリ
-    let pathOfJson = "./modlog/" + nameOfJson + ".json";
+    let pathOfJson = "./serverFiles/modlog/" + nameOfJson + ".json";
 
     //JSONファイルを開いてみて、いけたらそのまま読み込んで処理、なかったら作る
     try { //JSONの存在確認

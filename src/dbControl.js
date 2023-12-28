@@ -1,9 +1,7 @@
 const fs = require('fs');
 
 //サーバー情報や設定を記録しているJSONファイルを読み取る
-let dataServer = {};
-let dataServerInitText = `
-{
+const dataServerTemplate = {
     "servername": "Girack",
     "registration": {
         "available": true,
@@ -39,15 +37,16 @@ let dataServerInitText = `
             "canTalk": "Member"
         }
     }
-}`;
+};
+//サーバー設定適用用変数
+let dataServerLoaded = {};
 try { //読み込んでみる
     //serverデータを読み取り
-    let dataServerLoaded = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
+    dataServerLoaded = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
     //テンプレに上書きする感じでサーバー情報を取り込む
-    dataServer = mergeDeeply(JSON.parse(dataServerInitText), dataServerLoaded);
-    //この時点で一度書き込み保存
-    fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
+    dataServerLoaded = mergeDeeply(dataServerTemplate, dataServerLoaded);
 } catch(e) {
+    console.log("dbControl :: dataServerの読み込みエラー->", e);
     //ユーザー登録用のパスワードを生成
     const invCodeLength = 24; //生成したい文字列の長さ
     const invCodeSource = "abcdefghijklmnopqrstuvwxyz0123456789"; //元になる文字
@@ -59,23 +58,28 @@ try { //読み込んでみる
 
     }
 
-    dataServer = JSON.parse(dataServerInitText); //JSON化
-    dataServer.registration.invite.inviteCode = invCodeGenResult; //招待コードを割り当て
+    //JSONをコピーする
+    dataServerLoaded = dataServerTemplate;
+    //招待コードを割り当て
+    dataServerLoaded.registration.invite.inviteCode = invCodeGenResult;
 
-    //初期のサーバー情報
-    fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4)); //JSONファイルを作成
-    dataServer = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
 }
+//サーバー情報変数を適用
+const dataServer = dataServerLoaded;
+//この時点で一度書き込み保存
+fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
 
 //ユーザーを記録しているJSONファイルを読み取る
-let dataUser = {};
-try { //読み込んでみる
-    dataUser = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    //この変数はホルダー
+let dataUserLoaded = {};
+try { //JSONファイルを読み込んでみる
+    dataUserLoaded = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
 } catch(e) {
     //読み込めないならホルダーだけを作って作れる状態にする
-    dataUser = {user:{}};
-    fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4)); //JSONファイルを作成しておく
+    dataUserLoaded = {user:{}};
+    fs.writeFileSync("./user.json", JSON.stringify(dataUserLoaded, null, 4)); //JSONファイルを作成しておく
 
+    //初回ロードになるはずだから招待コードをコンソールへ表示しておく
     console.log("***********************************");
     console.log("***********************************");
     console.log("次の招待コードを使ってユーザーを登録してください。");
@@ -84,6 +88,8 @@ try { //読み込んでみる
     console.log("***********************************");
 
 }
+//ユーザーデータを適用
+const dataUser = dataUserLoaded;
 
 //起動したときに全員をオフライン状態にする
 for ( let index in Object.keys(dataUser.user) ) {
@@ -435,7 +441,7 @@ let getUserSave = function getUserSave(dat) {
 
     //データ読み取り、なければ作成
     try{
-        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+        dataUserSave = JSON.parse(fs.readFileSync('./userFiles/usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     } catch(e) {
         let dataUserSaveInit = `
             {
@@ -448,8 +454,8 @@ let getUserSave = function getUserSave(dat) {
                 "channelOrder": []
             }
         `;
-        fs.writeFileSync("./usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
-        dataUserSave = JSON.parse(fs.readFileSync('./usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
+        fs.writeFileSync("./userFiles/usersave/"+dat.reqSender.userid+".json", dataUserSaveInit); //JSONファイルを作成
+        dataUserSave = JSON.parse(fs.readFileSync('./userFiles/usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     }
 
     return dataUserSave;
@@ -465,7 +471,7 @@ let getModlog = async function getModlog(dat) {
     try {
         ListOfJson = await new Promise((resolve) => { //取得が完了するまで処理を待つ
             //読み込み
-            fs.readdir("./modlog/", (err, files) => {
+            fs.readdir("./serverFiles/modlog/", (err, files) => {
                 ListOfJson = files; //ファイルの名前取得
                 resolve(); //処理を終了、次の処理へ
 
@@ -497,7 +503,7 @@ let getModlog = async function getModlog(dat) {
     //それぞれのJSONファイルからデータを取得して配列に追加
     for ( let jsonIndex in ListOfJson) {
         //監査ログJSONを取り出し
-        let dataModlog = JSON.parse(fs.readFileSync("./modlog/"+ListOfJson[jsonIndex]));
+        let dataModlog = JSON.parse(fs.readFileSync("./serverFiles/modlog/"+ListOfJson[jsonIndex]));
         //監査ログのデータを配列化
         let objModlog = Object.entries(dataModlog);
 
