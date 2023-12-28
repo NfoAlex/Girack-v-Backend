@@ -259,6 +259,9 @@ require("./socketHandlers/socketUpdateInfo.js")(io);
 
 //Socketの初期処理の割り当て他
 io.on("connection", (socket) => {
+    //Origin判別
+    checkOrigin(socket);
+
     //切断時のログ
     socket.on("disconnect", () => {
         console.log("*** " + socket.id + " 切断 ***");
