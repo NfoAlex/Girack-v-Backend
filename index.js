@@ -172,6 +172,7 @@ exports.sendUrlPreview = sendUrlPreview;
 //Socketハンドラのインポート
 require("./socketHandlers/socketHandler.js")(io);
 require("./socketHandlers/socketAuth.js")(io);
+require("./socketHandlers/socketChannel.js")(io);
 
 
 //サーバーを開く
