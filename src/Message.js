@@ -198,7 +198,7 @@ let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePat
 let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex) {
     let fulldate = msgId.slice(0,4) + "_" + msgId.slice(4,6) + "_" + msgId.slice(6,8);
 
-    let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
+    let pathOfJson = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
     let dataHistory = {};
 
     //URLプレビュー用JSON変数
@@ -393,7 +393,7 @@ let getLatestMessage = function latestMessage(channelid) {
     let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
 
     //メッセージを送るチャンネルの履歴データのディレクトリ
-    let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
+    let pathOfJson = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
     let dataHistory = {}; //メッセージデータのJSON読み込み
 
     try {
@@ -427,7 +427,7 @@ let getLatestMessage = function latestMessage(channelid) {
 let getMessage = function getMessage(channelid, messageid) {
     //メッセージIDから送信日付を取得
     let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
-    let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
+    let pathOfJson = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
 
     //データ取り出し
     try{
@@ -543,7 +543,7 @@ let msgPin = function msgPin(dat) {
 
     //メッセージIDから送信日付を取得してパスを割り出す
     let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
-    let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
+    let pathOfJson = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
 
     //チャンネルデータにpinsないなら作成
     if ( db.dataServer.channels[channelid].pins === undefined ) {
@@ -615,7 +615,7 @@ let msgDelete = function msgDelete(dat) {
     let fulldate = dat.messageid.slice(0,4) + "_" + dat.messageid.slice(4,6) + "_" + dat.messageid.slice(6,8);
     
     //メッセージを送るチャンネルの履歴データのディレクトリ
-    let pathOfJson = "./record/" + dat.channelid + "/" + fulldate + ".json";
+    let pathOfJson = "./serverFiles/record/" + dat.channelid + "/" + fulldate + ".json";
     let dataHistory = {};
     //console.log("Message :: msgDelete : 消そうとしているjson -> " + pathOfJson);
 
@@ -724,7 +724,7 @@ let msgReaction = function msgReaction(dat) {
     let fulldate = dat.messageid.slice(0,4) + "_" + dat.messageid.slice(4,6) + "_" + dat.messageid.slice(6,8);
     
     //メッセージを送るチャンネルの履歴データのディレクトリ
-    let pathOfJson = "./record/" + dat.channelid + "/" + fulldate + ".json";
+    let pathOfJson = "./serverFiles/record/" + dat.channelid + "/" + fulldate + ".json";
     let dataHistory = {};
 
     //データ取り出し
@@ -791,7 +791,7 @@ let msgEdit = function msgEdit(dat) {
 
     //メッセージIDから送信日付を取得してパスを割り出す
     let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
-    let pathOfJson = "./record/" + channelid + "/" + fulldate + ".json";
+    let pathOfJson = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
 
     //データ取り出し
     try{
@@ -875,7 +875,7 @@ let msgRecord = function msgRecord(json) {
     ].join("");
 
     //メッセージを送るチャンネルの履歴データのディレクトリ
-    let pathOfJson = "./record/" + json.channelid + "/" + fulldate + ".json";
+    let pathOfJson = "./serverFiles/record/" + json.channelid + "/" + fulldate + ".json";
     let pathOfJsonFileIndex = "./userFiles/fileidIndex/" + json.channelid + "/" + fulldate + ".json";
     
     //JSONファイルを開いてみて、いけたらそのまま読み込み、なかったら作る
@@ -885,7 +885,7 @@ let msgRecord = function msgRecord(json) {
 
     } catch(err) { //存在無しなら(読み込みエラーなら)
         //そのチャンネルのディレクトリ作成もトライ(過去に作ってたならスルー)
-        try{fs.mkdirSync("./record/" + json.channelid);}catch(e){/* ここにくるなら存在するから過去に作っていたということ */}
+        try{fs.mkdirSync("./serverFiles/record/" + json.channelid);}catch(e){/* ここにくるなら存在するから過去に作っていたということ */}
         fs.writeFileSync(pathOfJson, "{}"); //DBをJSONで保存
 
     }
@@ -966,7 +966,7 @@ let msgRecord = function msgRecord(json) {
 //メッセージ履歴を最新から順に範囲分返す
 let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength) { //cid=>チャンネルID, readLength=>ほしい履歴の範囲, startLength=>ほしい履歴の範囲の始まり位置
     //履歴JSONへのパス
-    let dirOfJson = "./record/" + cid;
+    let dirOfJson = "./serverFiles/record/" + cid;
     let readCount = 0;
 
     //startLengthが空なら最初から読むように
@@ -1002,7 +1002,7 @@ let msgRecordCallNew = async function msgRecordCall(cid, readLength, startLength
     //履歴の読み込み開始
     for ( let index in ListOfJson ) {
         //データ読み込み
-        let dataHistory = JSON.parse(fs.readFileSync("./record/" + cid + "/" + ListOfJson[index], 'utf-8'));
+        let dataHistory = JSON.parse(fs.readFileSync("./serverFiles/record/" + cid + "/" + ListOfJson[index], 'utf-8'));
         let jsonLength = Object.entries(dataHistory).length;
 
         //ループで履歴を追加
