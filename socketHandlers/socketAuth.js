@@ -5,17 +5,21 @@ const infoUpdate = require("../src/infoUpdate.js");
 
 const fs = require("fs");
 
-const index = require("../index.js");
-const SERVER_VERSION = index.SERVER_VERSION;
+const indexJS = require("../index.js");
+const SERVER_VERSION = indexJS.SERVER_VERSION;
 
 //アクティブなsocketとユーザーIDリストをインポート
-let socketOnline = index.socketOnline;
-let userOnline = index.userOnline;
+let socketOnline = indexJS.socketOnline;
+let userOnline = indexJS.userOnline;
 
 console.log("socketAuth :: 認証部分");
 
 module.exports = (io) => {
     io.on("connection", (socket) => {
+
+        //Originチェック
+        indexJS.checkOrigin(socket);
+
         //認証
         socket.on("auth", async (key, CLIENT_VERSION) => { //key = "パスワード"
             console.log("auth :: 受信 ↓");
