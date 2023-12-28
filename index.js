@@ -44,7 +44,7 @@ const io = socketIo(server, {
 });
 
 //require("./socketHandler.js")(io);
-require("./socketAuth.js")(io);
+require("./socketHandlers/socketAuth.js")(io);
 
 //必要なディレクトリの確認、なければ作成
     //フォルダ親
