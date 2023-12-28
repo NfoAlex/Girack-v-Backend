@@ -663,7 +663,7 @@ let channelRemove = function channelRemove(dat) {
     delete db.dataServer.channels[dat.channelid];
 
     //消去されたチャンネルにいたユーザーリスト
-    let userChanged = [];
+    let userChangedEffected = [];
 
     //ユーザー全員から消したチャンネルをユーザーの"参加チャンネル"リストから消去
     for ( index in Object.entries(db.dataUser.user) ) {
@@ -672,7 +672,7 @@ let channelRemove = function channelRemove(dat) {
         //ユーザーの参加チャンネルリストを加工
         db.dataUser.user[userid].channel = Object.entries(db.dataUser.user)[index][1].channel.filter(cid => cid!==dat.channelid);
         //消去されたチャンネルにいたユーザーリストに追加
-        userChanged.push(userid);
+        userChangedEffected.push(userid);
 
     }
 
@@ -715,7 +715,7 @@ let channelRemove = function channelRemove(dat) {
     fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
 
     //参加していた人リストにそれぞれクライアントで更新させる
-    return userChanged;
+    return userChangedEffected;
 
 }
 

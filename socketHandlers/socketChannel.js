@@ -244,7 +244,7 @@ module.exports = (io) => {
                 return -1;
             }
 
-            //チャンネル削除
+            //チャンネル削除、返り値にユーザーリストを受け取る
             let userChangedEffected = infoUpdate.channelRemove(dat);
             //もし削除に失敗していたら停止
             if ( userChangedEffected === -1 ) return -1;
