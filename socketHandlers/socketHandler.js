@@ -76,7 +76,45 @@ console.log("socketHandler :: socketハンドラ");
 
 module.exports = (io) => {
 io.on("connection", (socket) => {
-    console.log("-- 新規接続 --");
+    console.log("-------------");
+    console.log("* 新規接続");
+    console.log("* Origin : ", socket.handshake.headers.origin);
+    console.log("-------------");
+
+    //アクセスしたオリジンの比較、制限（人力CORS）
+    if (
+        //ORIGIN情報があり、
+        socket.handshake.headers.origin !== undefined
+            &&
+        //許可するドメインが指定されており、
+        ALLOWED_ORIGIN.length !== 0
+            &&
+        ( //同一環境からのアクセスでないなら
+            !socket.handshake.headers.origin.startsWith("http://localhost")
+                &&
+            !socket.handshake.headers.origin.startsWith("http://127.0.0.1")
+        )
+    ) { //ドメイン設定と比較して許可できるか調べる
+        //許可されているかどうか
+        let flagOriginAllowed = false;
+        //許可されたドメインの数分ループを回して判別
+        for ( let index in ALLOWED_ORIGIN)  {
+            //Originがそのドメインから始まっているかどうかで判別
+            if ( socket.handshake.headers.origin.startsWith(ALLOWED_ORIGIN[index]) ) {
+                flagOriginAllowed = true; //許可されたドメインと設定
+                break; //ループ停止
+            }
+
+        }
+
+        //許可されなかったのならsocket通信を切る
+        if ( !flagOriginAllowed ) socket.disconnect(); //切断
+
+    //そもそもOriginがなければ切断
+    } else if ( socket.handshake.headers.origin === undefined ) {
+        socket.disconnect(); //切断
+
+    }
 
     //メッセージ処理
     socket.on("msgSend", async (m) => {
