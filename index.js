@@ -12,6 +12,7 @@ const socketIo = require("socket.io");
 
 //サーバーバージョン
 const SERVER_VERSION = "alpha_20231218";
+exports.SERVER_VERSION = SERVER_VERSION;
 
 /*********************************************************************************************************************/
 //ホスト設定を読み込む
