@@ -257,7 +257,7 @@ module.exports = (io) => {
             io.to("loggedin").emit("infoList", channelList);
 
             //消去したチャンネル分、人のプロフィールを更新
-            for ( index in userChanged ) {
+            for ( let index in userChanged ) {
                 //チャンネル削除したのを伝えるためにユーザー情報を収集
                 let userNow = db.getInfoUser({
                     targetid: userChanged[index],
