@@ -656,6 +656,9 @@ let channelRemove = function channelRemove(dat) {
     }
     */
 
+    //そもそも指定のチャンネルIDがないなら処理停止
+    if ( db.dataServer.channels[dat.channelid] === undefined ) return -1;
+
     //チャンネル削除
     delete db.dataServer.channels[dat.channelid];
 
