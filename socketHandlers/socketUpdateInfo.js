@@ -13,7 +13,7 @@ const SERVER_VERSION = indexJS.SERVER_VERSION;
 let socketOnline = indexJS.socketOnline;
 let userOnline = indexJS.userOnline;
 
-console.log("socketMessage :: メッセージ関係");
+console.log("socketUpdateInfo :: 情報更新系");
 
 module.exports = (io) => {
     io.on("connection", (socket) => {

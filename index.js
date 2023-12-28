@@ -256,7 +256,7 @@ require("./socketHandlers/socketAuth.js")(io);
 require("./socketHandlers/socketChannel.js")(io);
 require("./socketHandlers/socketGetInfo.js")(io);
 require("./socketHandlers/socketMessage.js")(io);
-
+require("./socketHandlers/socketUpdateInfo.js")(io);
 
 //サーバーを開く
 server.listen(port, () => {
