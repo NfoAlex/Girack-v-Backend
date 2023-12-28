@@ -70,14 +70,16 @@ const dataServer = dataServerLoaded;
 fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
 
 //ユーザーを記録しているJSONファイルを読み取る
-let dataUser = {};
-try { //読み込んでみる
-    dataUser = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    //この変数はホルダー
+let dataUserLoaded = {};
+try { //JSONファイルを読み込んでみる
+    dataUserLoaded = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
 } catch(e) {
     //読み込めないならホルダーだけを作って作れる状態にする
-    dataUser = {user:{}};
-    fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4)); //JSONファイルを作成しておく
+    dataUserLoaded = {user:{}};
+    fs.writeFileSync("./user.json", JSON.stringify(dataUserLoaded, null, 4)); //JSONファイルを作成しておく
 
+    //初回ロードになるはずだから招待コードをコンソールへ表示しておく
     console.log("***********************************");
     console.log("***********************************");
     console.log("次の招待コードを使ってユーザーを登録してください。");
@@ -86,6 +88,8 @@ try { //読み込んでみる
     console.log("***********************************");
 
 }
+//ユーザーデータを適用
+const dataUser = dataUserLoaded;
 
 //起動したときに全員をオフライン状態にする
 for ( let index in Object.keys(dataUser.user) ) {
