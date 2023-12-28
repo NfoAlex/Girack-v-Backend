@@ -1,9 +1,7 @@
 const fs = require('fs');
 
 //サーバー情報や設定を記録しているJSONファイルを読み取る
-let dataServer = {};
-let dataServerInitText = `
-{
+const dataServerTemplate = {
     "servername": "Girack",
     "registration": {
         "available": true,
@@ -39,15 +37,16 @@ let dataServerInitText = `
             "canTalk": "Member"
         }
     }
-}`;
+};
+//サーバー設定適用用変数
+let dataServerLoaded = {};
 try { //読み込んでみる
     //serverデータを読み取り
-    let dataServerLoaded = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
+    dataServerLoaded = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
     //テンプレに上書きする感じでサーバー情報を取り込む
-    dataServer = mergeDeeply(JSON.parse(dataServerInitText), dataServerLoaded);
-    //この時点で一度書き込み保存
-    fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
+    dataServerLoaded = mergeDeeply(dataServerTemplate, dataServerLoaded);
 } catch(e) {
+    console.log("dbControl :: dataServerの読み込みエラー->", e);
     //ユーザー登録用のパスワードを生成
     const invCodeLength = 24; //生成したい文字列の長さ
     const invCodeSource = "abcdefghijklmnopqrstuvwxyz0123456789"; //元になる文字
@@ -59,13 +58,16 @@ try { //読み込んでみる
 
     }
 
-    dataServer = JSON.parse(dataServerInitText); //JSON化
-    dataServer.registration.invite.inviteCode = invCodeGenResult; //招待コードを割り当て
+    //JSONをコピーする
+    dataServerLoaded = dataServerTemplate;
+    //招待コードを割り当て
+    dataServerLoaded.registration.invite.inviteCode = invCodeGenResult;
 
-    //初期のサーバー情報
-    fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4)); //JSONファイルを作成
-    dataServer = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
 }
+//サーバー情報変数を適用
+const dataServer = dataServerLoaded;
+//この時点で一度書き込み保存
+fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
 
 //ユーザーを記録しているJSONファイルを読み取る
 let dataUser = {};
