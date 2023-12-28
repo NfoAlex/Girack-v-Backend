@@ -465,7 +465,7 @@ let getModlog = async function getModlog(dat) {
     try {
         ListOfJson = await new Promise((resolve) => { //取得が完了するまで処理を待つ
             //読み込み
-            fs.readdir("./modlog/", (err, files) => {
+            fs.readdir("./serverFiles/modlog/", (err, files) => {
                 ListOfJson = files; //ファイルの名前取得
                 resolve(); //処理を終了、次の処理へ
 
@@ -497,7 +497,7 @@ let getModlog = async function getModlog(dat) {
     //それぞれのJSONファイルからデータを取得して配列に追加
     for ( let jsonIndex in ListOfJson) {
         //監査ログJSONを取り出し
-        let dataModlog = JSON.parse(fs.readFileSync("./modlog/"+ListOfJson[jsonIndex]));
+        let dataModlog = JSON.parse(fs.readFileSync("./serverFiles/modlog/"+ListOfJson[jsonIndex]));
         //監査ログのデータを配列化
         let objModlog = Object.entries(dataModlog);
 
