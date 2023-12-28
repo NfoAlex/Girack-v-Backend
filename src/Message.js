@@ -128,6 +128,8 @@ let msgMix = async function msgMix(m) {
 
     //ファイルが添付されているなら
     if ( m.fileData.isAttatched ) {
+        //添付されているとするのにデータがなければここで停止
+        if ( m.fileData.attatchmentData === undefined ) return -1;
         /*************************************/
         //ファイル名被り防止(一時的)
         for ( let index in m.fileData.attatchmentData ) {
