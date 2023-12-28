@@ -1,12 +1,12 @@
-const db = require("./dbControl.js"); //データベース関連
-const msg = require("./Message.js"); //メッセージの処理関連
-const auth = require("./auth.js"); //認証関連
-const infoUpdate = require("./infoUpdate.js");
+const db = require("../dbControl.js"); //データベース関連
+const msg = require("../Message.js"); //メッセージの処理関連
+const auth = require("../auth.js"); //認証関連
+const infoUpdate = require("../infoUpdate.js");
 
-const index = require("./index.js");
+const index = require("../index.js");
 const SERVER_VERSION = index.SERVER_VERSION;
 
-console.log("this is auth");
+console.log("socketAuth :: 認証部分");
 
 module.exports = (io) => {
     io.on("connection", (socket) => {
