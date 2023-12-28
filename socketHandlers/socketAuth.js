@@ -18,6 +18,13 @@ module.exports = (io) => {
     io.on("connection", (socket) => {
         //認証
         socket.on("auth", async (key, CLIENT_VERSION) => { //key = "パスワード"
+            /*
+            key
+            {
+                username:this.unForAuth,
+                password:this.pwForAuth
+            }
+            */
             console.log("auth :: 受信 ↓");
             console.log(key);
 
