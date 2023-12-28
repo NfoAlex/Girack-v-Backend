@@ -169,7 +169,8 @@ let msgMix = async function msgMix(m) {
 
     msgRecord(m); //メッセージをDBに記録
 
-    let MessageCompiled = getLatestMessage(m.channelid); //DBからメッセージ取得して送信
+    //DBから最新メッセージ取得して送信
+    let MessageCompiled = getLatestMessage(m.channelid);
 
     return MessageCompiled;
 
