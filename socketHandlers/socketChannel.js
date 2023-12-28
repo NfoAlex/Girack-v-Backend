@@ -181,6 +181,7 @@ module.exports = (io) => {
             dat
             {
                 channelname: dat.channelname,
+                description: dat.description
                 reqSender: {
                     userid: "このリクエストを送っているユーザーのID",
                     sessionid: "セッションID"
@@ -188,7 +189,7 @@ module.exports = (io) => {
             }
             */
             //必要パラメータ
-            let paramRequire = ["channelname"];
+            let paramRequire = ["channelname", "description"];
             //整合性確認
             if ( !indexJS.checkDataIntegrality(dat, paramRequire, "channelCreate") ) return -1;
 
