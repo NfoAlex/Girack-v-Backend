@@ -5,6 +5,9 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 
+//データ整合性確認用
+const auth = require("./src/auth.js");
+
 //サーバーバージョン
 const SERVER_VERSION = "alpha_20231218";
 exports.SERVER_VERSION = SERVER_VERSION;
@@ -168,6 +171,40 @@ let sendUrlPreview = function sendUrlPreview(urlDataItem, channelid, msgId) {
 exports.sendUrlPreview = sendUrlPreview;
 
 ////////////////////////////////////////////////////////////////
+
+//データが正規のものか確認する
+function checkDataIntegrality(dat, paramRequire, funcName) {
+
+    try{
+        //パラメータが足りているか確認
+        for ( let termIndex in paramRequire ) {
+            if ( dat[paramRequire[termIndex]] === undefined ) {
+                console.log("-------------------------------");
+                console.log("ERROR IN ", dat);
+                console.log("does not have enough parameter > " + paramRequire[termIndex]);
+                console.log("-------------------------------");
+
+            }
+
+        }
+
+    }
+    catch(e) {
+        console.log("index :: checkDataIntegrality : " + funcName + " : error -> " + e);
+        return false;
+
+    }
+
+    //セッションIDの確認
+    if ( !auth.checkUserSession(dat.reqSender) ) { return false; }
+
+    console.log("index :: checkDataIntegrality : 確認できた => " + funcName);
+
+    //確認できたと返す
+    return true;
+
+}
+exports.checkDataIntegrality = checkDataIntegrality;
 
 //Socketハンドラのインポート
 require("./socketHandlers/socketHandler.js")(io);

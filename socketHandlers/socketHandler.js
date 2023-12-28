@@ -4,8 +4,8 @@ const msg = require("../src/Message.js"); //メッセージの処理関連
 const auth = require("../src/auth.js"); //認証関連
 const infoUpdate = require("../src/infoUpdate.js");
 
-const index = require("../index.js");
-const SERVER_VERSION = index.SERVER_VERSION;
+const indexJS = require("../index.js");
+const SERVER_VERSION = indexJS.SERVER_VERSION;
 
 //ライブラリインポート、設定
 const fs = require("fs");
@@ -13,8 +13,8 @@ const fsPromise = require("fs").promises;
 
 
 //アクティブなsocketとユーザーIDリストをインポート
-let socketOnline = index.socketOnline;
-let userOnline = index.userOnline;
+let socketOnline = indexJS.socketOnline;
+let userOnline = indexJS.userOnline;
 
 /*********************************************************************************************************************/
 //ホスト設定を読み込む
@@ -37,38 +37,7 @@ if ( dataHostConfig === undefined ) {
     const port = dataHostConfig.port || 33333; //無効なら33333にする
 /*********************************************************************************************************************/
 
-//データが正規のものか確認する
-function checkDataIntegrality(dat, paramRequire, funcName) {
 
-    try{
-        //パラメータが足りているか確認
-        for ( let termIndex in paramRequire ) {
-            if ( dat[paramRequire[termIndex]] === undefined ) {
-                console.log("-------------------------------");
-                console.log("ERROR IN ", dat);
-                console.log("does not have enough parameter > " + paramRequire[termIndex]);
-                console.log("-------------------------------");
-
-            }
-
-        }
-
-    }
-    catch(e) {
-        console.log("index :: checkDataIntegrality : " + funcName + " : error -> " + e);
-        return false;
-
-    }
-
-    //セッションIDの確認
-    if ( !auth.checkUserSession(dat.reqSender) ) { return false; }
-
-    console.log("index :: checkDataIntegrality : 確認できた => " + funcName);
-
-    //確認できたと返す
-    return true;
-
-}
 
 ////////////////////////////////////////////////////////////////
 
@@ -141,7 +110,7 @@ io.on("connection", (socket) => {
         if ( m.userid === "SYSTEM" ) return -1;
 
         //整合性の確認
-        if ( !checkDataIntegrality(m, paramsRequire, "msgSend") ) return -1;
+        if ( !indexJS.checkDataIntegrality(m, paramsRequire, "msgSend") ) return -1;
         
         let msgCompiled = await msg.msgMix(m); //メッセージに情報をつける
         if ( msgCompiled === -1 ) { return; } //処理中にエラーがあったなら止める
@@ -245,7 +214,7 @@ io.on("connection", (socket) => {
             "registerAnnounceChannel",
             "defaultJoinChannels"
         ];
-        if ( checkDataIntegrality(dat, paramRequire, "changeServerSettings") ) {
+        if ( indexJS.checkDataIntegrality(dat, paramRequire, "changeServerSettings") ) {
             infoUpdate.changeServerSettings(dat); //設定更新
 
         } else {
@@ -296,7 +265,7 @@ io.on("connection", (socket) => {
         ];
 
         //データ整合性の確認
-        if ( !checkDataIntegrality(dat, paramRequire, "changeChannelSettings") ) return -1;
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "changeChannelSettings") ) return -1;
 
         //チャンネル名と概要の長さ制限
         if ( dat.description > 128 ) return -1;
@@ -446,7 +415,7 @@ io.on("connection", (socket) => {
         let paramRequire = ["name", "targetid"];
 
         //整合性確認
-        if ( !checkDataIntegrality(dat, paramRequire, "changeProfile") ) {
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "changeProfile") ) {
             return -1;
 
         }
@@ -488,7 +457,7 @@ io.on("connection", (socket) => {
         ];
 
         //データの整合性を調べる
-        if ( !checkDataIntegrality(dat, paramRequire, "changeProfileIcon") ) return;
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "changeProfileIcon") ) return;
 
         //もしJPEGかGIFじゃないなら、またファイルサイズ制限に引っかかったら拒否
         if (
@@ -565,7 +534,7 @@ io.on("connection", (socket) => {
         ];
 
         //整合性確認
-        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSaveConfig") ) { return -1; }
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "updateUserSaveConfig") ) { return -1; }
 
         //ユーザーの個人用データ保存
         infoUpdate.updateUserSaveConfig(dat);
@@ -589,7 +558,7 @@ io.on("connection", (socket) => {
         ];
 
         //整合性確認
-        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSaveMsgReadState") ) { return -1; }
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "updateUserSaveMsgReadState") ) { return -1; }
 
         //ユーザーの個人用データ保存
         infoUpdate.updateUserSaveMsgReadState(dat);
@@ -637,7 +606,7 @@ io.on("connection", (socket) => {
         let paramRequire = ["channelOrder"];
 
         //整合性確認
-        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSaveChannelOrder") ) { return -1; }
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "updateUserSaveChannelOrder") ) { return -1; }
 
         //ユーザーの個人用データ保存
         infoUpdate.updateUserSaveChannelOrder(dat);
@@ -657,7 +626,7 @@ io.on("connection", (socket) => {
 
         //整合性確認
         let paramRequire = ["targetSessionid", "sessionName"];
-        if ( !checkDataIntegrality(dat, paramRequire, "updateUserSessionName") ) return -1;
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "updateUserSessionName") ) return -1;
 
         //セッション名を更新(無理だったらここで処理停止)
         try {
@@ -751,7 +720,7 @@ io.on("connection", (socket) => {
 
         console.log("index :: getInfoUser : データ->", dat);
 
-        if ( !checkDataIntegrality(dat, paramRequire, "getInfoUser") ) return -1;
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "getInfoUser") ) return -1;
 
         info = db.getInfoUser(dat); //情報収集
 
@@ -762,7 +731,7 @@ io.on("connection", (socket) => {
     //セッションデータの取得
     socket.on("getInfoSessions", (dat) => {
         //整合性確認
-        if ( !checkDataIntegrality(dat, [], "getInfoSessions") ) return -1;
+        if ( !indexJS.checkDataIntegrality(dat, [], "getInfoSessions") ) return -1;
         //セッションデータの取得
         let infoSessions = db.getInfoSessions(dat);
 
@@ -783,7 +752,7 @@ io.on("connection", (socket) => {
         let paramRequire = [
         ];
 
-        if ( !checkDataIntegrality(dat, paramRequire, "getSessionOnline") ) {
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "getSessionOnline") ) {
             return -1;
 
         }
@@ -827,7 +796,7 @@ io.on("connection", (socket) => {
             "targetid"
         ];
 
-        if ( !checkDataIntegrality(dat, paramRequire, "getInfoChannel") ) return -1;
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "getInfoChannel") ) return -1;
 
         info = db.getInfoChannel(dat); //情報収集
 
@@ -854,7 +823,7 @@ io.on("connection", (socket) => {
             "targetid"
         ];
 
-        if ( !checkDataIntegrality(dat, paramRequire, "getInfoChannelJoinedUserList") ) {
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "getInfoChannelJoinedUserList") ) {
             return -1;
 
         }
@@ -883,7 +852,7 @@ io.on("connection", (socket) => {
         let paramRequire = [
             "query"
         ];
-        if ( !checkDataIntegrality(dat, paramRequire, "searchUserDynamic") ) {
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "searchUserDynamic") ) {
             return -1;
 
         }
@@ -909,7 +878,7 @@ io.on("connection", (socket) => {
 
         let paramRequire = [];
 
-        if ( !checkDataIntegrality(dat, paramRequire, "getUserSaveConfig") ) { return -1; }
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "getUserSaveConfig") ) { return -1; }
 
         //ユーザーの個人用データ取得
         let userSave = db.getUserSave(dat);
@@ -935,7 +904,7 @@ io.on("connection", (socket) => {
 
         let paramRequire = [];
 
-        if ( !checkDataIntegrality(dat, paramRequire, "getUserSaveMsgReadState") ) { return -1; }
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "getUserSaveMsgReadState") ) { return -1; }
 
         //ユーザーの個人用データ取得
         let userSave = db.getUserSave(dat);
@@ -961,7 +930,7 @@ io.on("connection", (socket) => {
 
         let paramRequire = [];
 
-        if ( !checkDataIntegrality(dat, paramRequire, "getUserSaveChannelOrder") ) { return -1; }
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "getUserSaveChannelOrder") ) { return -1; }
 
         //ユーザーの個人用データ取得
         let userSave = db.getUserSave(dat);
@@ -991,7 +960,7 @@ io.on("connection", (socket) => {
         */
        
         //パケットの整合性確認
-        if ( !checkDataIntegrality(dat, ["startLength"], "getModlog") ) return -1;
+        if ( !indexJS.checkDataIntegrality(dat, ["startLength"], "getModlog") ) return -1;
 
         //監査ログ取得(getModlog関数は時間がかかるためasyncにしているのでawait)
         let modLog = await db.getModlog(dat);
@@ -1026,7 +995,7 @@ io.on("connection", (socket) => {
         try {
             //権限と整合性チェック
             if (
-                !checkDataIntegrality(dat, [], "getInfoServerFull") &&
+                !indexJS.checkDataIntegrality(dat, [], "getInfoServerFull") &&
                 db.dataServer.user[dat.reqSender.userid].role !== "Admin"
             ) {
                 return -1;
@@ -1068,7 +1037,7 @@ io.on("connection", (socket) => {
             //"startLength" undefinedだったら0として扱う
        ];
 
-        if ( !checkDataIntegrality(req, paramRequire, "getInfoChannelJoinedUserList") ) {
+        if ( !indexJS.checkDataIntegrality(req, paramRequire, "getInfoChannelJoinedUserList") ) {
             return -1;
 
         }
@@ -1113,7 +1082,7 @@ io.on("connection", (socket) => {
             "channelid",
             "messageid"
         ];
-        if ( !checkDataIntegrality(req, paramRequire, "getMessageSingle") ) {return -1;}
+        if ( !indexJS.checkDataIntegrality(req, paramRequire, "getMessageSingle") ) {return -1;}
 
         //メッセージ取得
         let msgData = msg.getMessage(req.channelid, req.messageid);
@@ -1144,7 +1113,7 @@ io.on("connection", (socket) => {
             "channelid",
             "messageid",
         ];
-        if ( !checkDataIntegrality(dat, paramRequire, "actMessage") ) {
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "actMessage") ) {
             return -1;
 
         }
@@ -1227,7 +1196,7 @@ io.on("connection", (socket) => {
         */
 
         let paramRequire = ["textEditing", "messageid", "channelid"];
-        if ( !checkDataIntegrality(dat, paramRequire, "editMessage") ) return -1;
+        if ( !indexJS.checkDataIntegrality(dat, paramRequire, "editMessage") ) return -1;
 
         //処理を適用してデータ送信
         let contentEdited = msg.msgEdit(dat);

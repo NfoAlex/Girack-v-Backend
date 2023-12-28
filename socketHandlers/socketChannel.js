@@ -40,7 +40,7 @@ module.exports = (io) => {
             ];
 
             //データの整合性を確認
-            if ( !checkDataIntegrality(dat, paramRequire, "channelAction") ) { return -1; }
+            if ( !indexJS.checkDataIntegrality(dat, paramRequire, "channelAction") ) { return -1; }
 
             //操作して更新されたデータを操作者が受け取る
             let result = infoUpdate.channelAction(dat);
@@ -185,7 +185,7 @@ module.exports = (io) => {
             //必要パラメータ
             let paramRequire = ["channelname"];
             //整合性確認
-            if ( !checkDataIntegrality(dat, paramRequire, "channelCreate") ) return -1;
+            if ( !indexJS.checkDataIntegrality(dat, paramRequire, "channelCreate") ) return -1;
 
             //チャンネル作成をする
             let ans = await infoUpdate.channelCreate(dat);
