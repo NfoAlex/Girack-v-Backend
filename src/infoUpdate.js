@@ -771,7 +771,7 @@ let recordModeration = function recordModeration(actionBy,actionTo,actionInfo) {
     //JSONのファイル名
     let nameOfJson = "modlog_" + tDateForName;
     //監査ログを書きこむJSONファイルのディレクトリ
-    let pathOfJson = "./modlog/" + nameOfJson + ".json";
+    let pathOfJson = "./serverFiles/modlog/" + nameOfJson + ".json";
 
     //JSONファイルを開いてみて、いけたらそのまま読み込んで処理、なかったら作る
     try { //JSONの存在確認
