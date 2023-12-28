@@ -28,6 +28,27 @@ let userOnline = {
     */
 };
 
+/*********************************************************************************************************************/
+//ホスト設定を読み込む
+
+//サーバーをホストするための環境設定を読み込む
+const dataHostConfig = require("../HOST_CONFIG.js").HOST_CONFIG;
+console.log("dbControl :: 読み込んだホスト設定 -> ", dataHostConfig);
+
+//もしそもそも設定が無効なら警告して止める
+if ( dataHostConfig === undefined ) {
+    console.error("\nindex :: サーバーホスト設定が取得できませんでした。リポジトリより'HOST_CONFIG.js'を再取得してください。\n");
+    return -1;
+
+}
+
+    //Origin許可設定
+    const ALLOWED_ORIGIN = dataHostConfig.allowedOrigin || []; //無効なら全ドメイン許可
+
+    //ポート番号
+    const port = dataHostConfig.port || 33333; //無効なら33333にする
+/*********************************************************************************************************************/
+
 //データが正規のものか確認する
 function checkDataIntegrality(dat, paramRequire, funcName) {
 
@@ -75,21 +96,19 @@ io.on("connection", (socket) => {
         メッセージのデータ型
         m {
             type: "message"
-            userid: userid, //ユーザー固有のID
             channelid: channelid, //チャンネルのID
             content: inputRef.current.input.value, //内容
-            hasURL: (true|false), //URLが含まれるかどうか
-            sessionid: sessionid //送信者のセッションID
+            replyData: {...} //返信データ
+            fileData: {...} //ファイルデータ
         }
         */
 
         //データに必要なパラメータ
         let paramsRequire = [
-            "userid",
             "channelid",
             "content",
             "replyData",
-            "sessionid"
+            "fileData"
         ];
 
         //なんかSYSTEMを装ってたらここで停止
@@ -293,7 +312,10 @@ io.on("connection", (socket) => {
         if ( descChanged ) {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
-                userid: "SYSTEM",
+                reqSender: {
+                    userid: "SYSTEM",
+                    sessionid: null
+                },
                 channelid: dat.targetid,
                 replyData: {
                     isReplying: false,
@@ -321,7 +343,10 @@ io.on("connection", (socket) => {
         if ( nameChanged ) {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
-                userid: "SYSTEM",
+                reqSender: {
+                    userid: "SYSTEM",
+                    sessionid: null
+                },
                 channelid: dat.targetid,
                 replyData: {
                     isReplying: false,
@@ -349,7 +374,10 @@ io.on("connection", (socket) => {
         if ( scopeChanged && db.dataServer.config.CHANNEL.CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER ) {
             //記録するシステムメッセージ
             let SystemMessageLogging = {
-                userid: "SYSTEM",
+                reqSender: {
+                    userid: "SYSTEM",
+                    sessionid: null
+                },
                 channelid: dat.targetid,
                 replyData: {
                     isReplying: false,
@@ -778,7 +806,10 @@ io.on("connection", (socket) => {
 
         //記録するシステムメッセージ
         let SystemMessageLogging = {
-            userid: "SYSTEM",
+            reqSender: {
+                userid: "SYSTEM",
+                sessionid: null
+            },
             channelid: dat.channelid,
             role: "SYSTEM",
             replyData: {
@@ -899,7 +930,6 @@ io.on("connection", (socket) => {
         }
 
     });
-
 
 // ===========================================================
 // 情報取得系
@@ -1365,7 +1395,10 @@ io.on("connection", (socket) => {
 
                 //記録するシステムメッセージ
                 let SystemMessageLogging = {
-                    userid: "SYSTEM",
+                    reqSender: {
+                        userid: "SYSTEM",
+                        sessionid: null
+                    },
                     channelid: dat.channelid,
                     replyData: {
                         isReplying: false,

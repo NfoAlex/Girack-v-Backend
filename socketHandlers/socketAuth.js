@@ -219,7 +219,10 @@ module.exports = (io) => {
 
                 //記録するシステムメッセージ
                 let SystemMessageLogging = {
-                    userid: "SYSTEM",
+                    reqSender: {
+                        userid: "SYSTEM",
+                        sessionid: null
+                    },
                     channelid: db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE,
                     role: "SYSTEM",
                     replyData: {
