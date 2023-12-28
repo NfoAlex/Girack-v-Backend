@@ -239,13 +239,15 @@ module.exports = (io) => {
             console.log("index :: channelRemove : チャンネル消すぜ");
             console.log(dat);
 
-            let userChanged = [];
-
-            //セッションが適合か確認
-            if ( auth.checkUserSession(dat.reqSender) ) {
-                userChanged = infoUpdate.channelRemove(dat);
-
+            //整合性確認
+            if ( !indexJS.checkDataIntegrality(dat, ["channelid"], "channelRemove") ) {
+                return -1;
             }
+
+            //チャンネル削除
+            let userChanged = infoUpdate.channelRemove(dat);
+            //もし削除に失敗していたら停止
+            if ( userChanged === -1 ) return -1;
 
             //現在のチャンネルリストを取得
             let channelList = db.getInfoList({
