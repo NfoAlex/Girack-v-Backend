@@ -3,6 +3,8 @@ const msg = require("../src/Message.js"); //メッセージの処理関連
 const auth = require("../src/auth.js"); //認証関連
 const infoUpdate = require("../src/infoUpdate.js");
 
+const fs = require("fs");
+
 const index = require("../index.js");
 const SERVER_VERSION = index.SERVER_VERSION;
 
