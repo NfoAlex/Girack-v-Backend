@@ -3,7 +3,7 @@
 const fs = require('fs'); //履歴書き込んだり読み込むために
 const db = require("./dbControl.js"); //データベース関連
 const { getLinkPreview } = require("link-preview-js");
-const indexjs = require("./index.js");
+const indexjs = require("../index.js");
 const infoUpdate = require("./infoUpdate.js");
 
 //URLプレビュー時のリダイレクト用URLのブロック対象にならないリスト
@@ -165,8 +165,8 @@ let msgMix = async function msgMix(m) {
 //ファイルが添付されているならいろいろ処理する部分
 let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePath) {
     //ファイル用ディレクトリを作成
-    try{fs.mkdirSync("./files/"+channelid);}catch(e){}
-    try{fs.mkdirSync("./files/"+channelid+"/"+receivedDatePath);}catch(e){}
+    try{fs.mkdirSync("./userFiles/files/"+channelid);}catch(e){}
+    try{fs.mkdirSync("./userFiles/files/"+channelid+"/"+receivedDatePath);}catch(e){}
 
     //ファイルの書き込み(複数の書き込み用にfor)
     for ( let index in fileData.attatchmentData ) {
@@ -178,7 +178,7 @@ let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePat
             try {
                 //ファイルを書き込み
                 fs.writeFile(
-                    "./files/"+channelid+"/"+receivedDatePath+"/"+fileData.attatchmentData[index].name,
+                    "./userFiles/files/"+channelid+"/"+receivedDatePath+"/"+fileData.attatchmentData[index].name,
                     fileData.attatchmentData[index].buffer,
                     (err) => {
                         console.log("Message :: uploadFile : アップロード結果 -> ", err);
@@ -641,7 +641,7 @@ let msgDelete = function msgDelete(dat) {
             //ファイルIDからJSON名を取得(日付は複数ファイルでも同じになるはずなのでとりあえず最初を参照)
             fileidPathName = fileDatas[0].fileid.slice(0,4) + "_" + fileDatas[0].fileid.slice(4,6) + "_" + fileDatas[0].fileid.slice(6,8);
             //ファイルインデックスを取得
-            fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + dat.channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+            fileidIndex = JSON.parse(fs.readFileSync('./userFiles/fileidIndex/' + dat.channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
 
             //ファイルの数だけ処理
             for ( let index in fileDatas ) {
@@ -657,7 +657,7 @@ let msgDelete = function msgDelete(dat) {
             }
 
             //ファイルインデックスを書き込み
-            fs.writeFileSync('./fileidIndex/' + dat.channelid + '/' + fileidPathName + '.json', JSON.stringify(fileidIndex, null, 4));
+            fs.writeFileSync('./userFiles/fileidIndex/' + dat.channelid + '/' + fileidPathName + '.json', JSON.stringify(fileidIndex, null, 4));
         } catch(e) {
             console.log("Message :: msgDelete : ファイル削除失敗", e);
         }
@@ -876,7 +876,7 @@ let msgRecord = function msgRecord(json) {
 
     //メッセージを送るチャンネルの履歴データのディレクトリ
     let pathOfJson = "./record/" + json.channelid + "/" + fulldate + ".json";
-    let pathOfJsonFileIndex = "./fileidIndex/" + json.channelid + "/" + fulldate + ".json";
+    let pathOfJsonFileIndex = "./userFiles/fileidIndex/" + json.channelid + "/" + fulldate + ".json";
     
     //JSONファイルを開いてみて、いけたらそのまま読み込み、なかったら作る
     try { //JSONの存在確認
@@ -896,7 +896,7 @@ let msgRecord = function msgRecord(json) {
 
     } catch(err) { //存在無しなら(読み込みエラーなら)
         //そのチャンネルのファイルＩＤ用ディレクトリ作成もトライ(過去に作ってたならスルー)
-        try{fs.mkdirSync("./fileidIndex/" + json.channelid);}catch(e){/* ここにくるなら存在するから過去に作っていたということ */}
+        try{fs.mkdirSync("./userFiles/fileidIndex/" + json.channelid);}catch(e){/* ここにくるなら存在するから過去に作っていたということ */}
         fs.writeFileSync(pathOfJsonFileIndex, "{}"); //空のJSONを保存
 
     }
