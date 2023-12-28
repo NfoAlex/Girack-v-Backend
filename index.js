@@ -251,12 +251,77 @@ exports.checkOrigin = checkOrigin;
 ////////////////////////////////////////////////////////////////
 
 //Socketハンドラのインポート
-require("./socketHandlers/socketHandler.js")(io);
 require("./socketHandlers/socketAuth.js")(io);
 require("./socketHandlers/socketChannel.js")(io);
 require("./socketHandlers/socketGetInfo.js")(io);
 require("./socketHandlers/socketMessage.js")(io);
 require("./socketHandlers/socketUpdateInfo.js")(io);
+
+//Socket切断時の処理
+io.on("connection", (socket) => {
+    //切断時のログ
+    socket.on("disconnect", () => {
+        console.log("*** " + socket.id + " 切断 ***");
+        let useridDisconnecting = socketOnline[socket.id];
+
+        //ユーザーのオンライン状態をオフラインと設定してJSONファイルへ書き込む
+        try {
+            //もしユーザーの接続数が1以下ならオフラインと記録(次の処理で減算して接続数が0になるから)
+            if ( userOnline[useridDisconnecting] <= 1 ) {
+                //オフラインと設定
+                db.dataUser.user[useridDisconnecting].state.loggedin = false;
+                //DBをJSONへ保存
+                fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+
+            }
+        } catch(e) {
+            console.log("index :: disconnect : こいつでオフラインにしようとしたらエラー", useridDisconnecting);
+        }
+
+        //切断したユーザーをオンラインセッションリストから外す
+        try {
+            //切断されるsocketIDからユーザーIDを取り出す
+            console.log("index :: disconnect : これから消すuserid", useridDisconnecting, socketOnline);
+
+            //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
+            if ( userOnline[useridDisconnecting] >= 2 ) {
+                userOnline[useridDisconnecting] -= 1;
+
+            } else {
+                delete userOnline[useridDisconnecting];
+
+            }
+
+            delete socketOnline[socket.id]; //接続していたsocketid項目を削除
+        } catch(e) {
+            console.log("index :: disconnect : 切断時のオンラインユーザー管理でエラー", e);
+        }
+
+        //-------------------------------------------
+        try {
+            //known bug: keyがundefinedの時がある
+            if ( useridDisconnecting === undefined ) {
+                console.log("index :: disconnect : ユーザーIDがundefinedになっている");
+                console.log(useridDisconnecting);
+                try {
+                    delete userOnline[useridDisconnecting];
+                    console.log("index :: disconnect : 不正なユーザーID分は消した");
+                } catch(e) {console.log("index :: disconnect : しかも消せなかった");}
+
+            }
+        } catch (e) {
+            console.log("index :: disconnect : エラー回避用でエラー", e);
+        }
+        //-------------------------------------------
+
+        //オンライン人数を更新
+        io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
+
+        console.log("index :: disconnect : 現在のオンラインセッションりすと -> ");
+        console.log(userOnline);
+
+    });
+})
 
 //サーバーを開く
 server.listen(port, () => {
