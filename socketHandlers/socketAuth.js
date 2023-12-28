@@ -6,6 +6,10 @@ const infoUpdate = require("../src/infoUpdate.js");
 const index = require("../index.js");
 const SERVER_VERSION = index.SERVER_VERSION;
 
+//アクティブなsocketとユーザーIDリストをインポート
+let socketOnline = index.socketOnline;
+let userOnline = index.userOnline;
+
 console.log("socketAuth :: 認証部分");
 
 module.exports = (io) => {

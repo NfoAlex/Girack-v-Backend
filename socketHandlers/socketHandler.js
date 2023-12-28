@@ -12,21 +12,9 @@ const fs = require("fs");
 const fsPromise = require("fs").promises;
 
 
-//接続しているSocketJSON
-let socketOnline = {
-    /*
-    "g1r4ck": "12345",
-    "asdfghjkl": "12345",
-    "socketの接続id": "ユーザーid"
-    */
-};
-//オンラインのユーザーJSON
-let userOnline = {
-    /*
-    "12345": 2,
-    "ユーザーid": 接続数
-    */
-};
+//アクティブなsocketとユーザーIDリストをインポート
+let socketOnline = index.socketOnline;
+let userOnline = index.userOnline;
 
 /*********************************************************************************************************************/
 //ホスト設定を読み込む

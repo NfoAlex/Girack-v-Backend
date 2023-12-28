@@ -14,6 +14,24 @@ const socketIo = require("socket.io");
 const SERVER_VERSION = "alpha_20231218";
 exports.SERVER_VERSION = SERVER_VERSION;
 
+//接続しているSocketJSON
+let socketOnline = {
+    /*
+    "g1r4ck": "12345",
+    "asdfghjkl": "12345",
+    "socketの接続id": "ユーザーid"
+    */
+};
+exports.socketOnline = socketOnline;
+//オンラインのユーザーJSON
+let userOnline = {
+    /*
+    "12345": 2,
+    "ユーザーid": 接続数
+    */
+};
+exports.userOnline = userOnline;
+
 /*********************************************************************************************************************/
 //ホスト設定を読み込む
 
