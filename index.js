@@ -257,7 +257,7 @@ require("./socketHandlers/socketGetInfo.js")(io);
 require("./socketHandlers/socketMessage.js")(io);
 require("./socketHandlers/socketUpdateInfo.js")(io);
 
-//Socket切断時の処理
+//Socketの初期処理の割り当て他
 io.on("connection", (socket) => {
     //切断時のログ
     socket.on("disconnect", () => {
