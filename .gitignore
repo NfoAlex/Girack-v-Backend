@@ -1,8 +1,6 @@
 #ユーザーファイルや履歴のディレクトリなど
-files/*
-fileidIndex/*
+userFiles/*
 img/*
-record/*
 _____TEST_____.js
 *.json
 
