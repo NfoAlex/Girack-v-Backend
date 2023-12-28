@@ -598,14 +598,19 @@ let channelCreate = async function channelCreate(dat) {
         }, 100);
 
     }).then(() => {
-        //チャンネル作成
-        db.dataServer.channels[newChannelId] = {
-            name: dat.channelname,
-            description: dat.description,
-            pins: [],
-            scope: dat.scope,
-            canTalk: "Member"
-        };
+        try {
+            //チャンネル作成
+            db.dataServer.channels[newChannelId] = {
+                name: (dat.channelname).toString(),
+                description: (dat.description).toString(),
+                pins: [],
+                scope: dat.scope,
+                canTalk: "Member"
+            };
+        } catch(e) {
+            console.log("infoUpdate :: channelCreate : e->", e);
+            return -1;
+        }
 
         //チャンネル作成者をそのまま参加させる
         db.dataUser.user[dat.reqSender.userid].channel.push(newChannelId);
