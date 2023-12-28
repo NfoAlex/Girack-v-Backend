@@ -56,51 +56,6 @@ io.on("connection", (socket) => {
 // ===========================================================
 // ユーザーとサーバーの情報更新管理
 
-    //設定の更新とか
-    socket.on("config", (dat) => {
-        /*
-        dat
-        {
-            target: (user | channel | server),
-            targetid: (ユーザーのID | チャンネルのID),
-            reqSender: {
-                userid: userinfo.userid,
-                sessionid: userinfo.sessionid
-            }
-            [Userだったら]
-                name: "変えたい先の名前",
-                Icon: "(画像ファイル)"
-            [Channelだったら]
-                channelname: "チャンネル名",
-                description: "変えたい概要",
-                scope: "範囲"
-            [Serverだったら]
-                servername: "サーバー名",
-        }
-        */
-        
-        //セッションIDの確認
-        if ( !auth.checkUserSession({
-            userid: dat.reqSender.userid,
-            sessionid: dat.reqSender.sessionid
-        }) ) { return -1; }
-
-        let answer = infoUpdate.config(dat);
-
-        console.log("config :: 返信する情報↓");
-        console.log(answer);
-        
-        //ユーザー情報の更新ならその人にだけ送る
-        if ( dat.target === "user" ) {
-            socket.emit("infoResult", answer);
-
-        } else { //サーバーかチャンネルの更新なら全員に送信
-            io.to("loggedin").emit("infoResult", answer);
-
-        }
-
-    });
-
     //サーバー設定の更新
     socket.on("changeServerSettings", (dat) => {
         /*
