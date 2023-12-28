@@ -17,10 +17,6 @@ console.log("socketChannel :: チャンネル操作とか");
 
 module.exports = (io) => {
     io.on("connection", (socket) => {
-
-        //Originチェック
-        indexJS.checkOrigin(socket);
-
         //チャンネルへの参加(招待)、退出(キック)
         socket.on("channelAction", (dat) => {
             /*

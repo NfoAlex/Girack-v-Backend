@@ -17,10 +17,6 @@ console.log("socketUpdateInfo :: 情報更新系");
 
 module.exports = (io) => {
     io.on("connection", (socket) => {
-
-        //Originチェック
-        indexJS.checkOrigin(socket);
-
         //サーバー設定の更新
         socket.on("changeServerSettings", (dat) => {
             /*

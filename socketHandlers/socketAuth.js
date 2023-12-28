@@ -16,10 +16,6 @@ console.log("socketAuth :: 認証部分");
 
 module.exports = (io) => {
     io.on("connection", (socket) => {
-
-        //Originチェック
-        indexJS.checkOrigin(socket);
-
         //認証
         socket.on("auth", async (key, CLIENT_VERSION) => { //key = "パスワード"
             console.log("auth :: 受信 ↓");

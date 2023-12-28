@@ -17,10 +17,6 @@ console.log("socketMessage :: メッセージ関係");
 
 module.exports = (io) => {
     io.on("connection", (socket) => {
-
-        //Originチェック
-        indexJS.checkOrigin(socket);
-
         //メッセージ処理
         socket.on("msgSend", async (m) => {
             /*

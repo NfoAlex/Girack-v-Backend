@@ -17,10 +17,6 @@ console.log("socketGetInfo :: 情報取得系");
 
 module.exports = (io) => {
     io.on("connection", (socket) => {
-
-        //Originチェック
-        indexJS.checkOrigin(socket);
-
         //リスト情報を返す
         socket.on("getInfoList", (dat) => {
             /*
