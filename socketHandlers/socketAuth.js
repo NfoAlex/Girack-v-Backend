@@ -208,6 +208,13 @@ module.exports = (io) => {
 
         //新規登録
         socket.on("register", async (dat) => {
+            /*
+            dat
+            {
+                username: this.usernameForRegister,
+                code: this.invcodeForRegister,
+            }
+            */
             //ユーザー名が２文字以下なら停止
             if ( dat.username.length <= 2 ) {
                 socket.emit("registerEnd", {"pass":"", "result": "FAILED"});
