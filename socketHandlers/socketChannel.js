@@ -245,9 +245,9 @@ module.exports = (io) => {
             }
 
             //チャンネル削除
-            let userChanged = infoUpdate.channelRemove(dat);
+            let userChangedEffected = infoUpdate.channelRemove(dat);
             //もし削除に失敗していたら停止
-            if ( userChanged === -1 ) return -1;
+            if ( userChangedEffected === -1 ) return -1;
 
             //現在のチャンネルリストを取得
             let channelList = db.getInfoList({
@@ -259,17 +259,17 @@ module.exports = (io) => {
             io.to("loggedin").emit("infoList", channelList);
 
             //消去したチャンネル分、人のプロフィールを更新
-            for ( let index in userChanged ) {
+            for ( let index in userChangedEffected ) {
                 //チャンネル削除したのを伝えるためにユーザー情報を収集
-                let userNow = db.getInfoUser({
-                    targetid: userChanged[index],
+                let userInfoNow = db.getInfoUser({
+                    targetid: userChangedEffected[index],
                     reqSender: {
-                        userid: userChanged[index], //フル情報をとるため
+                        userid: userChangedEffected[index], //フル情報をとるため
                     }
                 });
 
                 //ユーザー情報送信
-                io.to("loggedin").emit("infoUser", userNow);
+                io.to("loggedin").emit("infoUser", userInfoNow);
                 
             }
 
