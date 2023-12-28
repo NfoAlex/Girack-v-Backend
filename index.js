@@ -43,16 +43,20 @@ const io = socketIo(server, {
     maxHttpBufferSize: 1e8, // 100 MB
 });
 
-require("./socketHandler.js")(io);
+//require("./socketHandler.js")(io);
 require("./socketAuth.js")(io);
 
 //必要なディレクトリの確認、なければ作成
-try{fs.mkdirSync("./fileidIndex/");}catch(e){}
-try{fs.mkdirSync("./files/");}catch(e){}
-try{fs.mkdirSync("./usersave/")}catch(e){}
-try{fs.mkdirSync("./record/");}catch(e){}
-try{fs.mkdirSync("./img/");}catch(e){}
-try{fs.mkdirSync("./modlog/");}catch(e){}
+    //フォルダ親
+try{fs.mkdirSync("./userFiles/");}catch(e){}
+try{fs.mkdirSync("./serverFiles/");}catch(e){}
+    //その下
+try{fs.mkdirSync("./userFiles/fileidIndex/");}catch(e){}
+try{fs.mkdirSync("./userFiles/files/");}catch(e){}
+try{fs.mkdirSync("./userFiles/usersave/")}catch(e){}
+try{fs.mkdirSync("./userFiles/img/");}catch(e){}
+try{fs.mkdirSync("./serverFiles/record/");}catch(e){}
+try{fs.mkdirSync("./serverFiles/modlog/");}catch(e){}
 
 //もしバックエンドに直接アクセスされたら用
 app.get('/', (req, res) => {
