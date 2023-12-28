@@ -254,6 +254,8 @@ exports.checkOrigin = checkOrigin;
 require("./socketHandlers/socketHandler.js")(io);
 require("./socketHandlers/socketAuth.js")(io);
 require("./socketHandlers/socketChannel.js")(io);
+require("./socketHandlers/socketGetInfo.js")(io);
+require("./socketHandlers/socketMessage.js")(io);
 
 
 //サーバーを開く
