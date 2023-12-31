@@ -859,7 +859,6 @@ let recordModeration = function recordModeration(
 
 }
 
-exports.config = config;
 exports.mod = mod; //管理者からのユーザー管理
 exports.changeServerSettings = changeServerSettings; //サーバーの設定変更
 exports.changeChannelSettings = changeChannelSettings; //チャンネルの設定変更
