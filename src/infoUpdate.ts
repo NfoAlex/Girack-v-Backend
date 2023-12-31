@@ -28,13 +28,13 @@ let config = function config(dat:any) {
         case "channel":
             //変更対象が名前なら
             if ( dat.name !== undefined ) {
-                db.dataServer[dat.targetid].channelname = dat.channelname;
+                dataServer[dat.targetid].channelname = dat.channelname;
 
             }
 
             //変更対象が概要なら
             if ( dat.description !== undefined ) {
-                db.dataServer[dat.targetid].description = dat.description;
+                dataServer[dat.targetid].description = dat.description;
 
             }
 
@@ -252,12 +252,12 @@ let changeServerSettings = function changeServerSettings(dat:{
     if ( sendersInfo.role !== "Admin" ) { return; }
 
     //インスタンスのアカウント登録設定を更新
-    db.dataServer.registration = dat.registration;
+    dataServer.registration = dat.registration;
     //インスタンス名の更新
-    db.dataServer.servername = dat.servername;
+    dataServer.servername = dat.servername;
 
     //インスタンス設定をマージ
-    db.dataServer.config = {...db.dataServer.config, ...dat.config};
+    dataServer.config = {...dataServer.config, ...dat.config};
 
     //監査ログへの記録処理
     recordModeration(
@@ -276,14 +276,14 @@ let changeServerSettings = function changeServerSettings(dat:{
     );
 
     //書き込み
-    fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
+    fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
 
 }
 
 //チャンネル設定の更新
 let changeChannelSettings = function changeChannelSettings(dat) {
     //名前を変更するなら監査記録
-    if ( db.dataServer.channels[dat.targetid].name !== dat.channelname ) {
+    if ( dataServer.channels[dat.targetid].name !== dat.channelname ) {
         //監査ログへの記録処理
         recordModeration(
             dat.reqSender.userid,
@@ -295,7 +295,7 @@ let changeChannelSettings = function changeChannelSettings(dat) {
             },
             {
                 actionname: "channelEditName",
-                valueBefore: db.dataServer.channels[dat.targetid].name,
+                valueBefore: dataServer.channels[dat.targetid].name,
                 valueAfter: dat.channelname
             }
         );
@@ -303,7 +303,7 @@ let changeChannelSettings = function changeChannelSettings(dat) {
     }
 
     //概要を変更するなら監査記録
-    if ( db.dataServer.channels[dat.targetid].description !== dat.description ) {
+    if ( dataServer.channels[dat.targetid].description !== dat.description ) {
         //監査ログへの記録処理
         recordModeration(
             dat.reqSender.userid,
@@ -315,7 +315,7 @@ let changeChannelSettings = function changeChannelSettings(dat) {
             },
             {
                 actionname: "channelEditDesc",
-                valueBefore: db.dataServer.channels[dat.targetid].description,
+                valueBefore: dataServer.channels[dat.targetid].description,
                 valueAfter: dat.description
             }
         );
@@ -323,7 +323,7 @@ let changeChannelSettings = function changeChannelSettings(dat) {
     }
 
     //公開範囲を変更するなら監査記録
-    if ( db.dataServer.channels[dat.targetid].scope !== dat.scope ) {
+    if ( dataServer.channels[dat.targetid].scope !== dat.scope ) {
         //監査ログへの記録処理
         recordModeration(
             dat.reqSender.userid,
@@ -335,7 +335,7 @@ let changeChannelSettings = function changeChannelSettings(dat) {
             },
             {
                 actionname: "channelEditScope",
-                valueBefore: db.dataServer.channels[dat.targetid].scope,
+                valueBefore: dataServer.channels[dat.targetid].scope,
                 valueAfter: dat.scope
             }
         );
@@ -343,21 +343,21 @@ let changeChannelSettings = function changeChannelSettings(dat) {
     }
 
     //名前と概要と公開範囲を更新
-    db.dataServer.channels[dat.targetid].name = dat.channelname;
-    db.dataServer.channels[dat.targetid].description = dat.description;
-    db.dataServer.channels[dat.targetid].canTalk = dat.canTalk;
+    dataServer.channels[dat.targetid].name = dat.channelname;
+    dataServer.channels[dat.targetid].description = dat.description;
+    dataServer.channels[dat.targetid].canTalk = dat.canTalk;
 
     //公開範囲をMemberでも変えられる設定、あるいはMemberじゃないならだったら適用
     if ( 
         db.dataUser.user[dat.reqSender.userid].role !== "Member" ||
-        db.dataServer.config.CHANNEL.CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER
+        dataServer.config.CHANNEL.CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER
     ) {
-        db.dataServer.channels[dat.targetid].scope = dat.scope;
+        dataServer.channels[dat.targetid].scope = dat.scope;
 
     }
 
     //JSONへ書き込み
-    fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
+    fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
 
 }
 
@@ -537,7 +537,7 @@ let channelAction = function channelAction(dat) {
 
         //チャンネルがプライベートで参加者が権力者でなく、また招待者がそのチャンネルに参加していなら拒否
         if (
-            db.dataServer.channels[dat.channelid].scope === "private" &&
+            dataServer.channels[dat.channelid].scope === "private" &&
             db.dataUser.user[dat.userid].role !== "Admin" &&
             !senderInfo.channelJoined.includes(dat.channelid)
         ) {
@@ -627,7 +627,7 @@ let channelCreate = async function channelCreate(dat) {
             console.log("infoUpdate :: channelCreate : チャンネルIDを選んでいます...");
             newChannelId = parseInt(Math.random()*9999).toString().padStart(4,0);
             //作ったチャンネルIDが空いていたらループを消す
-            if ( db.dataServer.channels[newChannelId] === undefined ) { //チャンネル情報がないことを確認
+            if ( dataServer.channels[newChannelId] === undefined ) { //チャンネル情報がないことを確認
                 resolve();
     
             }
@@ -637,7 +637,7 @@ let channelCreate = async function channelCreate(dat) {
     }).then(() => {
         try {
             //チャンネル作成
-            db.dataServer.channels[newChannelId] = {
+            dataServer.channels[newChannelId] = {
                 name: (dat.channelname).toString(),
                 description: (dat.description).toString(),
                 pins: [],
@@ -672,7 +672,7 @@ let channelCreate = async function channelCreate(dat) {
         fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
         //サーバー情報をファイルへ書き込み
-        fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
+        fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
         
         return {result:true, channelid:newChannelId};
 
@@ -694,10 +694,10 @@ let channelRemove = function channelRemove(dat) {
     */
 
     //そもそも指定のチャンネルIDがないなら処理停止
-    if ( db.dataServer.channels[dat.channelid] === undefined ) return -1;
+    if ( dataServer.channels[dat.channelid] === undefined ) return -1;
 
     //チャンネル削除
-    delete db.dataServer.channels[dat.channelid];
+    delete dataServer.channels[dat.channelid];
 
     //消去されたチャンネルにいたユーザーリスト
     let userChangedEffected = [];
@@ -714,19 +714,19 @@ let channelRemove = function channelRemove(dat) {
     }
 
     //もし登録通知用チャンネルに設定されていたら書き換え
-    if ( db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE === dat.channelid ) {
+    if ( dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE === dat.channelid ) {
         //チャンネルIDの最初をとりあえず取り出す
-        let channelIdFallback = Object.keys(db.dataServer.channels)[0];
+        let channelIdFallback = Object.keys(dataServer.channels)[0];
         //設定
-        db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE = channelIdFallback;
+        dataServer.config.CHANNEL.CHANNEL_DEFAULT_REGISTERANNOUNCE = channelIdFallback;
 
     }
     //登録時の自動参加チャンネルに設定されていたら
-    if ( db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER.indexOf(dat.channelid) !== -1 ) {
+    if ( dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER.indexOf(dat.channelid) !== -1 ) {
         //そのチャンネルIDのインデックス番号を取得
-        let index = db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER.indexOf(dat.channelid);
+        let index = dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER.indexOf(dat.channelid);
         //そのチャンネルIDを削除
-        db.dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER.splice(index, 1);
+        dataServer.config.CHANNEL.CHANNEL_DEFAULT_JOINONREGISTER.splice(index, 1);
 
     }
 
@@ -749,7 +749,7 @@ let channelRemove = function channelRemove(dat) {
 
     //サーバー情報をファイルへ書き込み
     fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
-    fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
+    fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
 
     //参加していた人リストにそれぞれクライアントで更新させる
     return userChangedEffected;
