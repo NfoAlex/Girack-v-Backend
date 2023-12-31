@@ -1,6 +1,8 @@
-let db = require("./dbControl.js");
+//let db = require("./dbControl.js");
+import { dataServer, dataUser, getInfoUser } from "./dbControl";
+import * as srcInterface from "./interfaceSrc";
 
-const fs = require('fs'); //履歴書き込むため
+import * as fs from "fs"; //履歴書き込むため
 
 //ユーザーの情報更新とか(いらない...?)
 let config = function config(dat) {
