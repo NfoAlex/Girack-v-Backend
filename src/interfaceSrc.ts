@@ -37,6 +37,7 @@ export interface dataServer {
     }
 };
 
+//チャンネル格納用
 export interface channel {
     [key:string]: {
         name: string,
@@ -45,6 +46,16 @@ export interface channel {
         scope: string,
         canTalk: string
     }
+};
+
+//チャンネル単体用
+export interface channelSingle {
+    channelid: string,
+    channelname: string,
+    description: string,
+    pins: string[],
+    scope: string,
+    canTalk: string
 }
 
 //ユーザーデータの型定義
