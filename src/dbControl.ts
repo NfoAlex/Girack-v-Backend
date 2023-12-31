@@ -372,7 +372,7 @@ let getInfoChannel = function getInfoChannel(dat:{
     };
 
     //権限チェックのためにユーザー情報を取得
-    let reqSenderInfo = getInfoUser({
+    let reqSenderInfo:srcInterface.userSingle = getInfoUser({
         targetid: dat.reqSender.userid,
         reqSender: dat.reqSender
     });
