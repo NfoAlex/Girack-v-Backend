@@ -141,7 +141,7 @@ console.log("DB認識!");
 console.log("=========================");
 
 //チャンネルリストの取得
-let getInfoList = function getInfoList(dat:{
+export let getInfoList = function getInfoList(dat:{
     target: string,
     reqSender: srcInterface.reqSender
 }):{ //返すデータの型
@@ -236,7 +236,7 @@ let getInfoList = function getInfoList(dat:{
 }
 
 //ユーザー情報の取得
-let getInfoUser = function getInfoUser(dat:{
+export let getInfoUser = function getInfoUser(dat:{
     targetid: string,
     reqSender: srcInterface.reqSender
 }) {
@@ -344,7 +344,7 @@ let getInfoUser = function getInfoUser(dat:{
 }
 
 //ユーザー本人のセッションデータを取得
-let getInfoSessions = function getInfoSessions(dat:{reqSender:srcInterface.reqSender}) {
+export let getInfoSessions = function getInfoSessions(dat:{reqSender:srcInterface.reqSender}) {
     /*
     dat
     {
@@ -357,7 +357,7 @@ let getInfoSessions = function getInfoSessions(dat:{reqSender:srcInterface.reqSe
 }
 
 //チャンネル情報の取得
-let getInfoChannel = function getInfoChannel(dat:{
+export let getInfoChannel = function getInfoChannel(dat:{
     targetid: string,
     reqSender: srcInterface.reqSender
 }) {
@@ -426,7 +426,7 @@ let getInfoChannel = function getInfoChannel(dat:{
 }
 
 //チャンネルに参加しているユーザーのリスト取得
-let getInfoChannelJoinedUserList = function getInfoChannelJoinedUserList(dat:{
+export let getInfoChannelJoinedUserList = function getInfoChannelJoinedUserList(dat:{
     targetid: string,
     reqSender: srcInterface.reqSender
 }) {
@@ -470,7 +470,7 @@ let getInfoChannelJoinedUserList = function getInfoChannelJoinedUserList(dat:{
 }
 
 //ユーザーを検索する関数
-let searchUserDynamic = function searchUserDynamic(dat:{
+export let searchUserDynamic = function searchUserDynamic(dat:{
     query: string,
     reqSender: srcInterface.reqSender
 }) {
@@ -528,7 +528,7 @@ let searchUserDynamic = function searchUserDynamic(dat:{
 }
 
 //ユーザーの設定や既読状態などのデータを取得
-let getUserSave = function getUserSave(dat:{
+export let getUserSave = function getUserSave(dat:{
     reqSender: srcInterface.reqSender
 }) {
     //ユーザーの個人データ格納用
@@ -564,7 +564,7 @@ let getUserSave = function getUserSave(dat:{
 }
 
 //監査ログの取得
-let getModlog = async function getModlog(dat:{
+export let getModlog = async function getModlog(dat:{
     startLength: number,
     reqSender: srcInterface.reqSender
 }) {
@@ -662,7 +662,7 @@ let getModlog = async function getModlog(dat:{
 }
 
 //サーバーの設定情報を取得
-let getInfoServer = function getInfoServer() {
+export let getInfoServer = function getInfoServer() {
     //サーバー情報を構成
     let ServerSettings = {
         servername: dataServer.servername,
@@ -676,7 +676,7 @@ let getInfoServer = function getInfoServer() {
 }
 
 //サーバーの初期情報を取得する
-let getInitInfo = function getInitInfo() {
+export let getInitInfo = function getInitInfo() {
     return {
         servername: dataServer.servername, //サーバー名
         registerAvailable: dataServer.registration.available, //登録可能かどうか
@@ -709,16 +709,16 @@ function mergeDeeply(target:any, source:any, opts:any) {
     return result;
 }
 
-exports.getInfoUser = getInfoUser; //ユーザー情報を取得
-exports.getInfoSessions = getInfoSessions; //ユーザーのセッションデータを返す
-exports.getInfoChannel = getInfoChannel; //チャンネル情報を取得
-exports.getInfoChannelJoinedUserList = getInfoChannelJoinedUserList; //チャンネルに参加したユーザーのリスト取得
-exports.getInfoList = getInfoList; //チャンネルリストの取得
-exports.searchUserDynamic = searchUserDynamic; //ユーザーを検索する関数
-exports.getUserSave = getUserSave; //ユーザーの個人データ(設定や既読状態)を取得
-exports.getModlog = getModlog; //監査ログを取得
-exports.getInfoServer = getInfoServer; //サーバーの詳細設定を取得
-exports.getInitInfo = getInitInfo; //サーバーの初期情報
+// exports.getInfoUser = getInfoUser; //ユーザー情報を取得
+// exports.getInfoSessions = getInfoSessions; //ユーザーのセッションデータを返す
+// exports.getInfoChannel = getInfoChannel; //チャンネル情報を取得
+// exports.getInfoChannelJoinedUserList = getInfoChannelJoinedUserList; //チャンネルに参加したユーザーのリスト取得
+// exports.getInfoList = getInfoList; //チャンネルリストの取得
+// exports.searchUserDynamic = searchUserDynamic; //ユーザーを検索する関数
+// exports.getUserSave = getUserSave; //ユーザーの個人データ(設定や既読状態)を取得
+// exports.getModlog = getModlog; //監査ログを取得
+// exports.getInfoServer = getInfoServer; //サーバーの詳細設定を取得
+// exports.getInitInfo = getInitInfo; //サーバーの初期情報
 
-exports.dataServer = dataServer; //サーバー情報
-exports.dataUser = dataUser; //ユーザー情報
+// exports.dataServer = dataServer; //サーバー情報
+// exports.dataUser = dataUser; //ユーザー情報
