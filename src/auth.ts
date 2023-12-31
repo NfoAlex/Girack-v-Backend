@@ -3,7 +3,7 @@
 import * as fs from "fs"; //履歴書き込むため
 import * as srcInterface from "./interfaceSrc";
 const bcrypt = require("bcrypt"); //ハッシュ化用
-let db = require("./dbControl.js");
+let db = require("./dbControl");
 //import { db } from "./dbControl";
 
 //ユーザー認証
