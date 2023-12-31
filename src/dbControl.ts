@@ -156,6 +156,17 @@ let getInfoList = function getInfoList(dat: {
     }
     */
 
+    //結果格納用
+    let infoParsed:{
+        type: string,
+        userList: {}, //暫定
+        channelList: {} //暫定
+    } = {
+        type: "",
+        userList: {},
+        channelList: {}
+    };
+
     //チャンネルリストをとる
     if ( dat.target === "channel" ) {
         let channelList:srcInterface.channel = {};
@@ -179,7 +190,8 @@ let getInfoList = function getInfoList(dat: {
         //送る情報
         infoParsed = {
             type: "channel",
-            channelList: channelList
+            channelList: channelList,
+            userList: {}
         };
     
     }
@@ -209,6 +221,7 @@ let getInfoList = function getInfoList(dat: {
         //送る情報
         infoParsed = {
             type: "user",
+            channelList: {},
             userList: userList
         };
     
