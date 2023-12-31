@@ -369,7 +369,11 @@ let changeChannelSettings = function changeChannelSettings(dat:{
 }
 
 //プロフィール変更
-let changeProfile = function changeProfile(dat) {
+let changeProfile = function changeProfile(dat:{
+    targetid: string,
+    name: string,
+    reqSender: srcInterface.reqSender
+}) {
     //変えるユーザーと送信者が違うなら権限チェック
     if ( dat.reqSender.userid !== dat.targetid ) {
         //Adminじゃないならキャンセル
@@ -399,7 +403,7 @@ let changeProfile = function changeProfile(dat) {
     //ユーザー名被ってるフラグ
     let usernameAlreadyUsedFlag = false;
     //ユーザーデータを配列化
-    let objUser = Object.entries(db.dataUser.user);
+    let objUser:any = Object.entries(db.dataUser.user);
     for ( let index in objUser ) {
         if ( objUser[index][1].name === dat.name ) {
             //ユーザー名がすでに使われていると設定
