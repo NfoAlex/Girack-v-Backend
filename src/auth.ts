@@ -204,9 +204,9 @@ let registerUser = async function registerUser(dat:{
     code: string,
 }) { //dat=[0=>name(名前), 1=>key(招待コード)]
     //招待制だったらコードを確認
-    if ( db.dataServer.registration.invite.inviteOnly && db.dataServer.registration.available ) { //招待制かどうか
+    if ( dataServer.registration.invite.inviteOnly && dataServer.registration.available ) { //招待制かどうか
         //招待コードが一致しているかどうか
-        if ( db.dataServer.registration.invite.inviteCode !== dat.code ) {
+        if ( dataServer.registration.invite.inviteCode !== dat.code ) {
             console.log("auth :: registerUser : 招待コード違うわ");
             return {result: "FAILED", pass:"", userid:""};
 
