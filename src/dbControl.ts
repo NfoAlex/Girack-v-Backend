@@ -277,7 +277,7 @@ let getInfoUser = function getInfoUser(dat: {
 
     try{
         dataUser.user[dat.targetid].channel;
-        if ( dataUser.user[dat.targetid] === undefined ) return -1;
+        if ( dataUser.user[dat.targetid] === undefined ) return infoParsed;
     } catch(e) {
         console.log("dbControl :: getInfoUser : ユーザーデータを読み取れませんでした->", e);
         return {
