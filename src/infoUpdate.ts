@@ -435,14 +435,24 @@ let changeProfile = function changeProfile(dat:{
 }
 
 //ユーザーの設定のデータを上書き保存する
-let updateUserSaveConfig = function updateUserSaveConfig(dat) {
-    let dataUserSave = {};
+let updateUserSaveConfig = function updateUserSaveConfig(dat:{
+    config: any,
+    reqSender: srcInterface.reqSender
+}) {
+    //ユーザー個人データ格納用変数
+    let dataUserSave:srcInterface.dataUserSave = {
+        configAvailable: false,
+        config: {},
+        msgReadStateAvailable: false,
+        msgReadState: {},
+        channelOrder: []
+    };
 
     //データ読み取り、なければ作成
     try{
         dataUserSave = JSON.parse(fs.readFileSync('./userFiles/usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     } catch(e) {
-        let dataUserSaveInit = `
+        let dataUserSaveInit:string = `
             {
                 "configAvailable": false,
                 "config": {
@@ -458,9 +468,10 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat) {
         dataUserSave = JSON.parse(fs.readFileSync('./userFiles/usersave/'+dat.reqSender.userid+'.json', 'utf-8')); //ユーザーデータのJSON読み込み
     }
 
+    //上書き、JSONファイル保存
     dataUserSave.config = dat.config;
     dataUserSave.configAvailable = true;
-    fs.writeFileSync("./userFiles/usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4)); //JSONファイル保存
+    fs.writeFileSync("./userFiles/usersave/"+dat.reqSender.userid+".json", JSON.stringify(dataUserSave, null, 4));
 
 }
 
