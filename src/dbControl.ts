@@ -144,7 +144,11 @@ console.log("=========================");
 let getInfoList = function getInfoList(dat: {
     target: string,
     reqSender: srcInterface.reqSender
-}) {
+}):{ //返すデータの型
+    type: string,
+    userList: {}, //暫定
+    channelList: {} //暫定
+} {
     /*
     dat
     {
