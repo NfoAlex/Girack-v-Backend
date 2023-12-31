@@ -4,6 +4,7 @@ import * as fs from "fs"; //履歴書き込むため
 import * as srcInterface from "./interfaceSrc";
 const bcrypt = require("bcrypt"); //ハッシュ化用
 let db = require("./dbControl");
+import { dataServer, dataUser } from "./dbControl";
 //import { db } from "./dbControl";
 
 //ユーザー認証
@@ -22,21 +23,21 @@ let authUser = async function authUser(
     let password = cred.password;
 
     //それぞれのユーザーリストの中でパスワードが一致しているやつを探す
-    for (let i=0; i<Object.keys(db.dataUser.user).length; i++ ) {
+    for (let i=0; i<Object.keys(dataUser.user).length; i++ ) {
         //ユーザーIDを巡回
-        let index = Object.keys(db.dataUser.user)[i];
+        let index = Object.keys(dataUser.user)[i];
 
         //ユーザー名とパスワードの一致を確認してセッションIDを生成する
-        if ( db.dataUser.user[index].name === username ) {
+        if ( dataUser.user[index].name === username ) {
             //パスワードのハッシュ値計算
-            let passComparedResult = await bcrypt.compare(password, db.dataUser.user[index].pw);
+            let passComparedResult = await bcrypt.compare(password, dataUser.user[index].pw);
             //認証成功したら
             if ( passComparedResult ) {
                 //セッションID入れるよう
                 let _session = "";
 
                 //BANされているならそう結果を返す
-                if ( db.dataUser.user[index].state.banned ) {
+                if ( dataUser.user[index].state.banned ) {
                     return {result: false};
 
                 }
@@ -46,7 +47,7 @@ let authUser = async function authUser(
                 let sessionidLength = 24; //文字数
                 _session = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
 
-                let username = db.dataUser.user[index].name; //ユーザー名取得
+                let username = dataUser.user[index].name; //ユーザー名取得
                 
                 //ログイン時間を記録する用
                 let t = new Date();
@@ -54,15 +55,15 @@ let authUser = async function authUser(
                 let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,"0") + t.getDate().toString().padStart(2,"0") + t.getHours().toString().padStart(2,"0") + t.getMinutes().toString().padStart(2,"0");
                 try {
                     //セッションコードとデバイスを設定
-                    db.dataUser.user[index].state.sessions[_session] = {
+                    dataUser.user[index].state.sessions[_session] = {
                         sessionName: "とあるデバイス",
                         loggedinTime: _loginTime,
                         loggedinTimeFirst: _loginTime
                     };
                 } catch(e) {
                     //セッションいれるところすらないなら作る
-                    db.dataUser.user[index].state.sessions = {};
-                    db.dataUser.user[index].state.sessions[_session] = {
+                    dataUser.user[index].state.sessions = {};
+                    dataUser.user[index].state.sessions[_session] = {
                         sessionName: "とあるデバイス",
                         loggedinTime: _loginTime,
                         loggedinTimeFirst: _loginTime
@@ -72,26 +73,26 @@ let authUser = async function authUser(
                 // !!!! ↓↓将来削除する↓↓ !!!!
                 /************************************************************/
                 //パスワードが平文保存されているならハッシュ化して保存
-                if ( db.dataUser.user[index].pw === password ) {
-                    db.dataUser.user[index].pw = await bcrypt.hash(cred.password, 10);
+                if ( dataUser.user[index].pw === password ) {
+                    dataUser.user[index].pw = await bcrypt.hash(cred.password, 10);
 
                 }
                 //以前の形式のせっしょんIDがあるなら削除
-                if ( db.dataUser.user[index].state.session_id !== undefined ) {
-                    delete db.dataUser.user[index].state.session_id;
+                if ( dataUser.user[index].state.session_id !== undefined ) {
+                    delete dataUser.user[index].state.session_id;
                 }
                 /************************************************************/
                 
                 //サーバーのJSONファイルを更新
-                fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+                fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4));
                 
                 return {
                     result: true, //ログイン成功の印
                     userid: index, //ユーザーID
                     username: username, //ユーザー名
                     sessionid: _session, //セッションコード
-                    role: db.dataUser.user[index].role, //ロール
-                    channelJoined: db.dataUser.user[index].channel //参加しているチャンネル
+                    role: dataUser.user[index].role, //ロール
+                    channelJoined: dataUser.user[index].channel //参加しているチャンネル
                 }; //ユーザーの情報を送信
 
             }
@@ -113,11 +114,11 @@ let changePassword = async function changePassword(dat:{
     reqSender: srcInterface.reqSender
 }):Promise<number> {
     //現在のパスワードをハッシュ比較
-    let passComparedResult = await bcrypt.compare(dat.currentPassword, db.dataUser.user[dat.reqSender.userid].pw);
+    let passComparedResult = await bcrypt.compare(dat.currentPassword, dataUser.user[dat.reqSender.userid].pw);
 
     //今のパスワードが一致しないならここで停止
     if (
-        db.dataUser.user[dat.reqSender.userid].pw !== dat.currentPassword && //平文でも比較　次期ビルドで削除
+        dataUser.user[dat.reqSender.userid].pw !== dat.currentPassword && //平文でも比較　次期ビルドで削除
         !passComparedResult
     ) {
         return -1;
@@ -127,8 +128,8 @@ let changePassword = async function changePassword(dat:{
     let newPassword = await bcrypt.hash(dat.newPassword, 10);
 
     //パスワード変更
-    db.dataUser.user[dat.reqSender.userid].pw = newPassword;
-    fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+    dataUser.user[dat.reqSender.userid].pw = newPassword;
+    fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4));
 
     return 1;
 
@@ -145,9 +146,9 @@ let authUserBySession = function authUserBySession(cred:{
 
     //セッションIDが一致してるなら
     try {
-        if ( sessionid in db.dataUser.user[userid].state.sessions ) {
+        if ( sessionid in dataUser.user[userid].state.sessions ) {
             //BANされているなら-1を返す
-            if ( db.dataUser.user[userid].state.banned ) {
+            if ( dataUser.user[userid].state.banned ) {
                 return {result: false};
 
             }
@@ -158,11 +159,11 @@ let authUserBySession = function authUserBySession(cred:{
             let sessionidLength:number = 24;
             let _sessionid:string = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
                 //セッションデータを記憶
-            let currentSessionData = db.dataUser.user[userid].state.sessions[sessionid];
+            let currentSessionData = dataUser.user[userid].state.sessions[sessionid];
                 //セッションデータをコピー
-            db.dataUser.user[userid].state.sessions[_sessionid] = structuredClone(currentSessionData);
+            dataUser.user[userid].state.sessions[_sessionid] = structuredClone(currentSessionData);
                 //今までのセッションデータを削除
-            delete db.dataUser.user[userid].state.sessions[sessionid];
+            delete dataUser.user[userid].state.sessions[sessionid];
 
             //セッションＩＤを更新
             sessionid = _sessionid;
@@ -173,23 +174,23 @@ let authUserBySession = function authUserBySession(cred:{
             let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
             //セッションIDを適用
             try {
-                db.dataUser.user[userid].state.sessions[sessionid].loggedinTime = _loginTime;
+                dataUser.user[userid].state.sessions[sessionid].loggedinTime = _loginTime;
             } catch (e) {
-                console.log("auth :: authUserBySession : 記録エラー ユーザーセッションデータ->", db.dataUser.user[userid].state.sessions);
+                console.log("auth :: authUserBySession : 記録エラー ユーザーセッションデータ->", dataUser.user[userid].state.sessions);
                 console.log("auth :: authUserBySession : 記録エラー詳細->", e);
                 
                 return {result: false};
             }
 
-            let username = db.dataUser.user[userid].name; //ユーザー名取得
+            let username = dataUser.user[userid].name; //ユーザー名取得
 
             return {
                 result: true, //ログイン成功の印
                 userid: userid, //ユーザーID
                 username: username, //ユーザー名
                 sessionid: sessionid, //セッションコード
-                role: db.dataUser.user[userid].role, //ロール
-                channelJoined: db.dataUser.user[userid].channel //参加しているチャンネル
+                role: dataUser.user[userid].role, //ロール
+                channelJoined: dataUser.user[userid].channel //参加しているチャンネル
             }; //ユーザーの情報を送信
 
         }
@@ -228,9 +229,9 @@ let registerUser = async function registerUser(dat:{
     let CheckIDInterval:ReturnType<typeof setInterval>;
 
     //ユーザー名の空きを調べる
-    for ( let index in db.dataUser.user ) {
+    for ( let index in dataUser.user ) {
         //ユーザー名がすでに使われていたら停止
-        if ( db.dataUser.user[index].name === dat.username ) {
+        if ( dataUser.user[index].name === dat.username ) {
             return {result: "FAILED", pass:"", userid:""};
 
         }
@@ -249,7 +250,7 @@ let registerUser = async function registerUser(dat:{
             }
 
             //もし生成したIDが空いてるならここで次の処理へ
-            if ( db.dataUser.user[newID] === undefined ) resolve();
+            if ( dataUser.user[newID] === undefined ) resolve();
 
         }, 10);
 
@@ -259,9 +260,9 @@ let registerUser = async function registerUser(dat:{
         clearInterval(CheckIDInterval);
 
         //DBに登録
-        db.dataUser.user[newID] = {
+        dataUser.user[newID] = {
             "name": dat.username,
-            "role": Object.keys(db.dataUser.user).length === 0?"Admin":"Member", //一番最初のユーザーならAdminとして登録
+            "role": Object.keys(dataUser.user).length === 0?"Admin":"Member", //一番最初のユーザーならAdminとして登録
             "pw": pwHashed,
             "icon": "",
             "state": {
@@ -274,10 +275,10 @@ let registerUser = async function registerUser(dat:{
         };
 
         console.log("registerUser :: 登録結果 ↓");
-        console.log(db.dataUser.user[newID]);
+        console.log(dataUser.user[newID]);
 
         //サーバーのJSONファイルを更新
-        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+        fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4));
 
         //デフォルトアイコンを新規ユーザー用にクローン
         fs.copyFileSync("./img/default.jpeg", "./img/" + newID + ".jpeg");
@@ -296,13 +297,13 @@ export let checkUserSession = function checkUserSession(
     try {
         //ID確認
         if (
-            dat.sessionid in db.dataUser.user[dat.userid].state.sessions && //セッションIDがあって
-            db.dataUser.user[dat.userid].state.banned === false //BANされていない
+            dat.sessionid in dataUser.user[dat.userid].state.sessions && //セッションIDがあって
+            dataUser.user[dat.userid].state.banned === false //BANされていない
         ) {
             return true;
 
         } else { //IDが違う
-            console.log("checkUserSession :: ///FALSE/// dat->" + dat.sessionid + "; DBsession_id->" + db.dataUser.user[dat.userid].state.session_id);
+            console.log("checkUserSession :: ///FALSE/// dat->" + dat.sessionid + "; DBsession_id->" + dataUser.user[dat.userid].state.session_id);
             return false;
 
         }
