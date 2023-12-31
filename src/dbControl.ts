@@ -564,13 +564,16 @@ let getUserSave = function getUserSave(dat:{
 }
 
 //監査ログの取得
-let getModlog = async function getModlog(dat) {
+let getModlog = async function getModlog(dat:{
+    startLength: number,
+    reqSender: srcInterface.reqSender
+}) {
     //JSONファイル一覧を格納する変数
-    let ListOfJson = [];
+    let ListOfJson:string[] = [];
 
     //JSONファイルの一覧を取得
     try {
-        ListOfJson = await new Promise((resolve) => { //取得が完了するまで処理を待つ
+        ListOfJson = await new Promise<void>((resolve) => { //取得が完了するまで処理を待つ
             //読み込み
             fs.readdir("./serverFiles/modlog/", (err, files) => {
                 ListOfJson = files; //ファイルの名前取得
