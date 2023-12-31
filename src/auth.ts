@@ -260,10 +260,8 @@ let registerUser = async function registerUser(dat:{
             "name": dat.username,
             "role": Object.keys(dataUser.user).length === 0?"Admin":"Member", //一番最初のユーザーならAdminとして登録
             "pw": pwHashed,
-            "icon": "",
             "state": {
                 "loggedin": false,
-                "session_id": "",
                 "sessions": {},
                 "banned": false
             },
