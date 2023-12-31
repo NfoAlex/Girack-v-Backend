@@ -202,7 +202,10 @@ let authUserBySession = function authUserBySession(cred:{
 }
 
 //ユーザーの新規登録、そしてパスワードを返す
-let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=>key(招待コード)]
+let registerUser = async function registerUser(dat:{
+    username: string,
+    code: string,
+}) { //dat=[0=>name(名前), 1=>key(招待コード)]
     //招待制だったらコードを確認
     if ( db.dataServer.registration.invite.inviteOnly && db.dataServer.registration.available ) { //招待制かどうか
         //招待コードが一致しているかどうか
@@ -222,7 +225,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
     //DBに書くためにハッシュ化する
     const pwHashed = await bcrypt.hash(pwGenerated, 10);
     //setIntervalを格納する変数
-    let CheckIDInterval = null;
+    let CheckIDInterval:ReturnType<typeof setInterval>;
 
     //ユーザー名の空きを調べる
     for ( let index in db.dataUser.user ) {
@@ -235,7 +238,7 @@ let registerUser = async function registerUser(dat) { //dat=[0=>name(名前), 1=
     }
 
     //ユーザーIDの空きを調べて作る
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
         CheckIDInterval = setInterval(() => {
             //ID用変数を初期化
             newID = "";
