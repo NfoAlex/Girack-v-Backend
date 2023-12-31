@@ -4,61 +4,6 @@ import * as srcInterface from "./interfaceSrc";
 
 import * as fs from "fs"; //履歴書き込むため
 
-//ユーザーの情報更新とか(いらない...?)
-let config = function config(dat:any) {
-    let answer;
-    console.log("config :: データ更新↓");
-    console.log(dat);
-
-    //変更したいデータの型合わせて更新、そしてそのデータを転送
-    switch( dat.target ) {
-        //ユーザーの情報を変更する
-        case "user":
-            if ( dat.name !== undefined ) {
-                db.dataUser.user[dat.targetid].name = dat.name; //DB更新
-
-            }
-            
-            answer = db.parseInfos({target:"user", targetid:dat.targetid}); //更新したデータを収集
-            fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4)); //DBをリモート保存
-
-            return answer;
-
-        //チャンネル情報とか設定を変える
-        case "channel":
-            //変更対象が名前なら
-            if ( dat.name !== undefined ) {
-                dataServer[dat.targetid].channelname = dat.channelname;
-
-            }
-
-            //変更対象が概要なら
-            if ( dat.description !== undefined ) {
-                dataServer[dat.targetid].description = dat.description;
-
-            }
-
-            //新しいチャンネルの情報取得
-            answer = db.getInfoChannel({
-                targetid: dat.targetid
-            });
-
-            fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4)); //DBをJSONへ保存
-            
-            return answer;
-
-        //サーバーの情報とか設定を変える
-        case "server":
-            console.log("Server...");
-            break;
-
-        default:
-            return -1;
-
-    }
-
-}
-
 //ユーザーの管理(ロール変更とBANとか)
 let mod = function mod(dat:{
     targetid: string,
@@ -650,7 +595,10 @@ let channelAction = function channelAction(dat:{
 }
 
 //チャンネル作成
-let channelCreate = async function channelCreate(dat) {
+let channelCreate = async function channelCreate(dat:{
+    channelname: string,
+    reqSender: srcInterface.reqSender
+}) {
     /*
     dat
     {
@@ -726,7 +674,10 @@ let channelCreate = async function channelCreate(dat) {
 }
 
 //チャンネル削除
-let channelRemove = function channelRemove(dat) {
+let channelRemove = function channelRemove(dat:{
+    channelid: string,
+    reqSender: srcInterface.reqSender
+}) {
     /*
     dat
     {
@@ -802,7 +753,20 @@ let channelRemove = function channelRemove(dat) {
 }
 
 //監査ログへの書き込み
-let recordModeration = function recordModeration(actionBy,actionTo,actionInfo) {
+let recordModeration = function recordModeration(
+    actionBy:string,
+    actionTo:{
+        type: string,
+        userid: string,
+        channelid: string | null,
+        messageid: string | null
+    },
+    actionInfo:{
+        actionname: string,
+        valueBefore: string,
+        valueAfter: string
+    }
+) {
     /*
     actionBy => 変更を起こしたユーザーID
         例 : xxxxxx
