@@ -236,7 +236,10 @@ let getInfoList = function getInfoList(dat: {
 }
 
 //ユーザー情報の取得
-let getInfoUser = function getInfoUser(dat) {
+let getInfoUser = function getInfoUser(dat: {
+    targetid: string,
+    reqSender: srcInterface.reqSender
+}) {
     /*
     dat
     {
@@ -248,8 +251,23 @@ let getInfoUser = function getInfoUser(dat) {
     }
     */
 
-    let infoParsed = {}; //収集した情報を入れる
-    let targetChannelJoined = []; //チャンネル参加リスト。プライベートは隠す処理をするため予め変数を設定
+    //ユーザーから収集した情報を入れる
+    let infoParsed:{
+        username: string,
+        userid: string,
+        channelJoined: string[],
+        role: string,
+        loggedin: boolean,
+        banned: boolean
+    } = {
+        username: "",
+        userid: "",
+        channelJoined: [],
+        role: "",
+        loggedin: false,
+        banned: false
+    };
+    let targetChannelJoined:string[] = []; //チャンネル参加リスト。プライベートは隠す処理をするため予め変数を設定
 
     //システムメッセージ用の返答
     if ( dat.targetid === "SYSTEM" ) {
@@ -266,7 +284,7 @@ let getInfoUser = function getInfoUser(dat) {
 
     try{
         dataUser.user[dat.targetid].channel;
-        if ( dataUser.user[dat.targetid] === undefined ) throw err;
+        if ( dataUser.user[dat.targetid] === undefined ) return -1;
     } catch(e) {
         console.log("dbControl :: getInfoUser : ユーザーデータを読み取れませんでした->", e);
         return {
@@ -313,7 +331,7 @@ let getInfoUser = function getInfoUser(dat) {
             role: dataUser.user[dat.targetid].role, //ユーザーのロール
             loggedin: dataUser.user[dat.targetid].state.loggedin, //ユーザーがログインしている状態かどうか
             banned: dataUser.user[dat.targetid].state.banned //BANされているかどうか
-        }
+        };
 
     }
     catch(e) {
