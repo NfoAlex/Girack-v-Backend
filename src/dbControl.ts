@@ -591,12 +591,15 @@ let getModlog = async function getModlog(dat:{
     }
     
     //データを確認した回数
-    let dataCheckedCount = 0;
+    let dataCheckedCount:number = 0;
     //取り出したデータの個数(デフォルトで１回に30個まで取り出すようにする)
-    let dataSavedCount = 0;
+    let dataSavedCount:number = 0;
 
     //送信する監査ログデータ
-    let dataModlogResult = {
+    let dataModlogResult:{
+        endOfData: boolean,
+        data: any[] //暫定
+    } = {
         endOfData: false, //監査ログの終わりまで入れたってことを示す
         data: [] //監査ログのデータいれるところ
     };
