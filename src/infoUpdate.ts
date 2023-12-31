@@ -5,7 +5,7 @@ import * as srcInterface from "./interfaceSrc";
 import * as fs from "fs"; //履歴書き込むため
 
 //ユーザーの情報更新とか(いらない...?)
-let config = function config(dat) {
+let config = function config(dat:any) {
     let answer;
     console.log("config :: データ更新↓");
     console.log(dat);
