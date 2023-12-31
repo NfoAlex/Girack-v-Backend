@@ -1,8 +1,11 @@
 #ユーザーファイルや履歴のディレクトリなど
 userFiles/*
 img/*
+serverFiles/*
+userFiles/*
 _____TEST_____.js
-*.json
+server.json
+user.json
 
 #パッケージ情報用のJSONとデフォルトのアイコンは除外
 !img/default.jpeg
