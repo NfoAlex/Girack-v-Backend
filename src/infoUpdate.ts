@@ -197,7 +197,35 @@ let mod = function mod(dat:{
 }
 
 //サーバーの設定を更新
-let changeServerSettings = function changeServerSettings(dat) {
+let changeServerSettings = function changeServerSettings(dat:{
+    servername: string,
+    config: {
+        PROFILE: {
+            PROFILE_ICON_MAXSIZE: string,
+            PROFILE_USERNAME_MAXLENGTH: number
+        },
+        CHANNEL: {
+            CHANNEL_DEFAULT_REGISTERANNOUNCE: string,
+            CHANNEL_DEFAULT_JOINONREGISTER: string[],
+            CHANNEL_CREATE_AVAILABLE: boolean,
+            CHANNEL_DELETE_AVAILABLEFORMEMBER: boolean,
+            CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER: boolean
+        },
+        MESSAGE: {
+            MESSAGE_PIN_ROLE: string,
+            MESSAGE_TXT_MAXLENGTH: string,
+            MESSAGE_FILE_MAXSIZE: string
+        }
+    },
+    registration: {
+        available: boolean,
+        invite: {
+            inviteOnly: boolean,
+            inviteCode: string
+        }
+    }
+    reqSender: srcInterface.reqSender
+}) {
     /*
     servername: "xxx",
     config: this.displaySettings.config,
