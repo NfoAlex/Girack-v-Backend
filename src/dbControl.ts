@@ -470,7 +470,10 @@ let getInfoChannelJoinedUserList = function getInfoChannelJoinedUserList(dat:{
 }
 
 //ユーザーを検索する関数
-let searchUserDynamic = function searchUserDynamic(dat) {
+let searchUserDynamic = function searchUserDynamic(dat:{
+    query: string,
+    reqSender: srcInterface.reqSender
+}) {
     /*
     dat
     {
