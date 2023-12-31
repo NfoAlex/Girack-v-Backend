@@ -135,7 +135,10 @@ let changePassword = async function changePassword(dat:{
 }
 
 //クッキーを使ったユーザー認証
-let authUserBySession = function authUserBySession(cred) {
+let authUserBySession = function authUserBySession(cred:{
+    userid: string,
+    sessionid:string
+}) {
     console.log("authUserBySession :: これから確認... -> ", cred);
     let userid = cred.userid;
     let sessionid = cred.sessionid;
@@ -151,9 +154,9 @@ let authUserBySession = function authUserBySession(cred) {
 
             //セッションIDを更新
                 //セッションID用に24文字のコードを生成
-            let sessionidCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            let sessionidLength = 24;
-            _sessionid = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
+            let sessionidCharset:string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let sessionidLength:number = 24;
+            let _sessionid:string = Array.from(Array(sessionidLength)).map(()=>sessionidCharset[Math.floor(Math.random()*sessionidCharset.length)]).join('');
                 //セッションデータを記憶
             let currentSessionData = db.dataUser.user[userid].state.sessions[sessionid];
                 //セッションデータをコピー
@@ -165,7 +168,7 @@ let authUserBySession = function authUserBySession(cred) {
             sessionid = _sessionid;
 
             //ログイン時間を記録する用
-            let t = new Date();
+            let t:Date = new Date();
             //ログイン時間(分まで)を変数へ格納
             let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
             //セッションIDを適用
