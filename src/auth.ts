@@ -50,7 +50,7 @@ let authUser = async function authUser(
                 //ログイン時間を記録する用
                 let t = new Date();
                 //ログイン時間(分まで)を変数へ格納
-                let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
+                let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,"0") + t.getDate().toString().padStart(2,"0") + t.getHours().toString().padStart(2,"0") + t.getMinutes().toString().padStart(2,"0");
                 try {
                     //セッションコードとデバイスを設定
                     db.dataUser.user[index].state.sessions[_session] = {
