@@ -597,6 +597,8 @@ let channelAction = function channelAction(dat:{
 //チャンネル作成
 let channelCreate = async function channelCreate(dat:{
     channelname: string,
+    scope: string,
+    description: string,
     reqSender: srcInterface.reqSender
 }) {
     /*
@@ -613,12 +615,12 @@ let channelCreate = async function channelCreate(dat:{
     //チャンネル名が32文字以上ならスルー
     if ( dat.channelname.length > 32 ) return -1;
 
-    let newChannelId = "";
-    return new Promise((resolve) => {
+    let newChannelId:string = "";
+    return new Promise<void>((resolve) => {
         //IDを探すまでループ
         setTimeout(() => {
             console.log("infoUpdate :: channelCreate : チャンネルIDを選んでいます...");
-            newChannelId = parseInt(Math.random()*9999).toString().padStart(4,0);
+            newChannelId = parseInt(Math.random()*9999).toString().padStart(4,"0");
             //作ったチャンネルIDが空いていたらループを消す
             if ( dataServer.channels[newChannelId] === undefined ) { //チャンネル情報がないことを確認
                 resolve();
