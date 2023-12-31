@@ -440,12 +440,12 @@ let getInfoChannelJoinedUserList = function getInfoChannelJoinedUserList(dat:{
         },
     }
     */
-    let channelJoinedUserList = []; //送信予定の配列
+    let channelJoinedUserList:srcInterface.userSingle[] = []; //送信予定の配列
     let objUser = Object.entries(dataUser.user); //JSONをオブジェクト化
 
     try {
         //情報収集
-        for ( index in objUser ) {
+        for ( let index in objUser ) {
             //ユーザー情報の中で指定のチャンネルに参加しているなら配列追加
             if ( objUser[index][1].channel.includes(dat.targetid) ) {
                 //配列追加
@@ -454,7 +454,8 @@ let getInfoChannelJoinedUserList = function getInfoChannelJoinedUserList(dat:{
                     username: objUser[index][1].name,
                     role: objUser[index][1].role,
                     loggedin : objUser[index][1].state.loggedin,
-                    banned: objUser[index][1].state.banned
+                    banned: objUser[index][1].state.banned,
+                    channelJoined: objUser[index][1].channel
                 });
 
             }
