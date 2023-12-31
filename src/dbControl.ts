@@ -351,7 +351,7 @@ let getInfoUser = function getInfoUser(dat: {
 }
 
 //ユーザー本人のセッションデータを取得
-let getInfoSessions = function getInfoSessions(dat) {
+let getInfoSessions = function getInfoSessions(dat:{reqSender:srcInterface.reqSender}) {
     /*
     dat
     {
