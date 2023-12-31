@@ -56,7 +56,7 @@ export interface channelSingle {
     pins: string[],
     scope: string,
     canTalk: string
-}
+};
 
 //ユーザーデータの型定義
 export interface dataUser {

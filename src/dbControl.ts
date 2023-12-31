@@ -426,7 +426,10 @@ let getInfoChannel = function getInfoChannel(dat:{
 }
 
 //チャンネルに参加しているユーザーのリスト取得
-let getInfoChannelJoinedUserList = function getInfoChannelJoinedUserList(dat) {
+let getInfoChannelJoinedUserList = function getInfoChannelJoinedUserList(dat:{
+    targetid: string,
+    reqSender: srcInterface.reqSender
+}) {
     /*
     dat
     {
