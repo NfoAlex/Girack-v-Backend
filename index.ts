@@ -4,7 +4,8 @@ import { Server, Socket } from "socket.io";
 import express from "express";
 import { HOST_CONFIG } from "./HOST_CONFIG";
 import { checkUserSession } from "./src/auth"; // authモジュールから適切な関数をimportする
-import { registerSocketHandlers } from "./socketHandlers"; // 仮定のsocketHandlersモジュールから関数をimportする
+import { dataUser } from "./src/dbControl";
+//import { registerSocketHandlers } from "./socketHandlers"; // 仮定のsocketHandlersモジュールから関数をimportする
 
 // 型定義 (適切な型に置き換える必要があるかもしれません)
 interface SocketOnline {
@@ -14,8 +15,6 @@ interface SocketOnline {
 interface UserOnline {
   [key: string]: number;
 }
-
-// ...rest of your variables and types...
 
 // 初期設定
 const SERVER_VERSION: string = "alpha_20231228";
@@ -29,7 +28,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: HOST_CONFIG.ALLOWED_ORIGIN as string[],
+    origin: HOST_CONFIG.allowedOrigin as string[],
     methods: ["GET", "POST"]
   }
 });
@@ -43,7 +42,7 @@ interface reqSender {
 };
 
 //URLデータを更新させる
-let sendUrlPreview = function sendUrlPreview(urlDataItem, channelid:string, msgId:string) {
+let sendUrlPreview = function sendUrlPreview(urlDataItem:any, channelid:string, msgId:string) {
     // let dat = {
     //     action: "urlData",
     //     channelid: channelid,
@@ -103,7 +102,7 @@ function checkOrigin(socket:Socket) {
         socket.handshake.headers.origin !== undefined
             &&
         //許可するドメインが指定されており、
-        HOST_CONFIG.ALLOWED_ORIGIN.length !== 0
+        HOST_CONFIG.allowedOrigin.length !== 0
             &&
         ( //同一環境からのアクセスでないなら
             !socket.handshake.headers.origin.startsWith("http://localhost")
@@ -114,9 +113,9 @@ function checkOrigin(socket:Socket) {
         //許可されているかどうか
         let flagOriginAllowed:boolean = false;
         //許可されたドメインの数分ループを回して判別
-        for ( let index in HOST_CONFIG.ALLOWED_ORIGIN)  {
+        for ( let index in HOST_CONFIG.allowedOrigin)  {
             //Originがそのドメインから始まっているかどうかで判別
-            if ( socket.handshake.headers.origin.startsWith(HOST_CONFIG.ALLOWED_ORIGIN[index]) ) {
+            if ( socket.handshake.headers.origin.startsWith(HOST_CONFIG.allowedOrigin[index]) ) {
                 flagOriginAllowed = true; //許可されたドメインと設定
                 break; //ループ停止
             }
@@ -149,9 +148,9 @@ io.on("connection", (socket:Socket) => {
             //もしユーザーの接続数が1以下ならオフラインと記録(次の処理で減算して接続数が0になるから)
             if ( userOnline[useridDisconnecting] <= 1 ) {
                 //オフラインと設定
-                db.dataUser.user[useridDisconnecting].state.loggedin = false;
+                dataUser.user[useridDisconnecting].state.loggedin = false;
                 //DBをJSONへ保存
-                fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+                fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4));
 
             }
         } catch(e) {
