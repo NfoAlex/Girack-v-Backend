@@ -1,45 +1,11 @@
 import * as fs from "fs"; //履歴書き込むため
+import * as srcInterface from "./interfaceSrc";
 
-//サーバーデータ用の型定義
-interface dataServer {
-    servername: string,
-    "registration": {
-        "available": boolean,
-        "invite": {
-            "inviteOnly": boolean,
-            "inviteCode": string
-        }
-    },
-    "config": {
-        "PROFILE": {
-            "PROFILE_ICON_MAXSIZE": string,
-            "PROFILE_USERNAME_MAXLENGTH": number
-        },
-        "CHANNEL": {
-            "CHANNEL_DEFAULT_REGISTERANNOUNCE": string,
-            "CHANNEL_DEFAULT_JOINONREGISTER": string[],
-            "CHANNEL_CREATE_AVAILABLE": boolean,
-            "CHANNEL_DELETE_AVAILABLEFORMEMBER": boolean,
-            "CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER": boolean
-        },
-        "MESSAGE": {
-            "MESSAGE_PIN_ROLE": string,
-            "MESSAGE_TXT_MAXLENGTH": string,
-            "MESSAGE_FILE_MAXSIZE": string
-        }
-    },
-    "channels": {
-        [key:string]: {
-            name: string,
-            description: string,
-            pins: any[],
-            scope: string,
-            canTalk: string
-        }
-    }
-};
+////////////////////////////////////////////////////////////////
+//dataServer
+
 //サーバー情報や設定を記録しているJSONファイルを読み取る
-const dataServerTemplate:dataServer = {
+const dataServerTemplate:srcInterface.dataServer = {
     "servername": "Girack",
     "registration": {
         "available": true,
@@ -77,7 +43,35 @@ const dataServerTemplate:dataServer = {
     }
 };
 //サーバー設定適用用変数
-let dataServerLoaded:dataServer = {};
+let dataServerLoaded:srcInterface.dataServer = {
+    servername: "",
+    registration: {
+        available: false,
+        invite: {
+            inviteOnly: false,
+            inviteCode: ""
+        }
+    },
+    config: {
+        PROFILE: {
+            PROFILE_ICON_MAXSIZE: "",
+            PROFILE_USERNAME_MAXLENGTH: 0
+        },
+        CHANNEL: {
+            CHANNEL_DEFAULT_REGISTERANNOUNCE: "",
+            CHANNEL_DEFAULT_JOINONREGISTER: [],
+            CHANNEL_CREATE_AVAILABLE: false,
+            CHANNEL_DELETE_AVAILABLEFORMEMBER: false,
+            CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER: false
+        },
+        MESSAGE: {
+            MESSAGE_PIN_ROLE: "",
+            MESSAGE_TXT_MAXLENGTH: "",
+            MESSAGE_FILE_MAXSIZE: ""
+        }
+    },
+    channels: {}
+};
 try { //読み込んでみる
     //serverデータを読み取り
     dataServerLoaded = JSON.parse(fs.readFileSync('./server.json', 'utf-8')); //サーバー情報のJSON読み込み
@@ -103,13 +97,19 @@ try { //読み込んでみる
 
 }
 //サーバー情報変数を適用
-const dataServer = dataServerLoaded;
+export const dataServer = dataServerLoaded;
 //この時点で一度書き込み保存
 fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
 
+
+////////////////////////////////////////////////////////////////
+//dataUser周り
+
 //ユーザーを記録しているJSONファイルを読み取る
     //この変数はホルダー
-let dataUserLoaded = {};
+let dataUserLoaded:srcInterface.dataUser = {
+    user: {}
+};
 try { //JSONファイルを読み込んでみる
     dataUserLoaded = JSON.parse(fs.readFileSync('./user.json', 'utf-8')); //ユーザーデータのJSON読み込み
 } catch(e) {
@@ -127,7 +127,7 @@ try { //JSONファイルを読み込んでみる
 
 }
 //ユーザーデータを適用
-const dataUser = dataUserLoaded;
+export const dataUser = dataUserLoaded;
 
 //起動したときに全員をオフライン状態にする
 for ( let index in Object.keys(dataUser.user) ) {
@@ -141,7 +141,10 @@ console.log("DB認識!");
 console.log("=========================");
 
 //チャンネルリストの取得
-let getInfoList = function getInfoList(dat) {
+let getInfoList = function getInfoList(dat: {
+    target: string,
+    reqSender: srcInterface.reqSender
+}) {
     /*
     dat
     {
@@ -155,7 +158,7 @@ let getInfoList = function getInfoList(dat) {
 
     //チャンネルリストをとる
     if ( dat.target === "channel" ) {
-        let channelList = {};
+        let channelList:srcInterface.channel = {};
         let objServer = Object.entries(dataServer.channels)
 
         //サーバーの情報分、転送する配列へ追加
