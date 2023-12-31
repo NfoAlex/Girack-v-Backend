@@ -77,10 +77,6 @@ let authUser = async function authUser(
                     dataUser.user[index].pw = await bcrypt.hash(cred.password, 10);
 
                 }
-                //以前の形式のせっしょんIDがあるなら削除
-                if ( dataUser.user[index].state.session_id !== undefined ) {
-                    delete dataUser.user[index].state.session_id;
-                }
                 /************************************************************/
                 
                 //サーバーのJSONファイルを更新
