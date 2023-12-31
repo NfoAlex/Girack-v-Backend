@@ -701,11 +701,11 @@ let channelRemove = function channelRemove(dat:{
     let userChangedEffected = [];
 
     //ユーザー全員から消したチャンネルをユーザーの"参加チャンネル"リストから消去
-    for ( index in Object.entries(db.dataUser.user) ) {
+    for ( let index in Object.entries(db.dataUser.user) ) {
         //一時的にユーザーIDを抽出
         let userid = Object.entries(db.dataUser.user)[index][0];
         //ユーザーの参加チャンネルリストを加工
-        db.dataUser.user[userid].channel = Object.entries(db.dataUser.user)[index][1].channel.filter(cid => cid!==dat.channelid);
+        db.dataUser.user[userid].channel = Object.entries(dataUser.user)[index][1].channel.filter((cid:string) => cid!==dat.channelid);
         //消去されたチャンネルにいたユーザーリストに追加
         userChangedEffected.push(userid);
 
@@ -816,9 +816,9 @@ let recordModeration = function recordModeration(
     let t = new Date();  // 正しいコード
     //日付
     let tY = t.getFullYear();
-    let tM = (t.getMonth()+1).toString().padStart(2,0);
-    let tD = t.getDate().toString().padStart(2,0);
-    let tTime = t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0) + t.getSeconds().toString().padStart(2,0);
+    let tM = (t.getMonth()+1).toString().padStart(2,"0");
+    let tD = t.getDate().toString().padStart(2,"0");
+    let tTime = t.getHours().toString().padStart(2,"0") + t.getMinutes().toString().padStart(2,"0") + t.getSeconds().toString().padStart(2,"0");
     let tDateForName = tY + "_" +  tM + "_" + tD;
 
     //変更ID(actionId)用
