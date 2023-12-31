@@ -484,13 +484,18 @@ let searchUserDynamic = function searchUserDynamic(dat:{
     }
     */
 
-    let searchResult = []; //検索結果を入れる配列
-    let objUser = Object.entries(dataUser.user); //ユーザー名を配列化
+    //検索結果を入れる配列
+    let searchResult:{
+        userid: string,
+        username: string
+    }[] = [];
+    //ユーザー名を配列化
+    let objUser = Object.entries(dataUser.user);
 
     //検索クエリーが空じゃないなら検索開始
     if ( dat.query !== "" ) {
         //検索開始
-        for ( index in objUser ) {
+        for ( let index in objUser ) {
             //名前と検索クエリーを小文字にして判別
             if ( (objUser[index][1].name.toLowerCase()).includes(dat.query.toLowerCase()) ) {
                 searchResult.push({
