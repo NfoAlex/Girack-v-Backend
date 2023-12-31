@@ -297,7 +297,7 @@ export let checkUserSession = function checkUserSession(dat:{
             return true;
 
         } else { //IDが違う
-            console.log("checkUserSession :: ///FALSE/// dat->" + dat.sessionid + "; DBsession_id->" + dataUser.user[dat.userid].state.session_id);
+            console.log("checkUserSession :: ///FALSE/// dat->" + dat.sessionid);
             return false;
 
         }
