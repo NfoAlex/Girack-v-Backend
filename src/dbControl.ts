@@ -686,9 +686,9 @@ let getInitInfo = function getInitInfo() {
 }
 
 //JSONをマージするだけの関数 (https://qiita.com/riversun/items/60307d58f9b2f461082a)
-function mergeDeeply(target, source, opts) {
-    const isObject = obj => obj && typeof obj === 'object' && !Array.isArray(obj);
-    const isConcatArray = opts && opts.concatArray;
+function mergeDeeply(target:any, source:any, opts:any) {
+    const isObject = (obj:any) => obj && typeof obj === 'object' && !Array.isArray(obj);
+    const isConcatArray:boolean = opts && opts.concatArray;
     let result = Object.assign({}, target);
     //ここからメイン（型を調べてから）
     if (isObject(target) && isObject(source)) {
