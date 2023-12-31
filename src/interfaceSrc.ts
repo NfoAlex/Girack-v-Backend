@@ -81,6 +81,16 @@ export interface dataUser {
     }
 };
 
+//ユーザー単体用
+export interface userSingle {
+    username: string,
+    userid: string,
+    role: string,
+    banned: boolean,
+    loggedin: boolean,
+    channelJoined: string[]
+};
+
 //リクエストの送信者
 export interface reqSender {
     userid: string,
