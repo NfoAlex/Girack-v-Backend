@@ -167,7 +167,7 @@ let authUserBySession = function authUserBySession(cred:{
             //ログイン時間を記録する用
             let t:Date = new Date();
             //ログイン時間(分まで)を変数へ格納
-            let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,0) + t.getDate().toString().padStart(2,0) + t.getHours().toString().padStart(2,0) + t.getMinutes().toString().padStart(2,0);
+            let _loginTime = t.getFullYear() + (t.getMonth()+1).toString().padStart(2,"0") + t.getDate().toString().padStart(2,"0") + t.getHours().toString().padStart(2,"0") + t.getMinutes().toString().padStart(2,"0");
             //セッションIDを適用
             try {
                 dataUser.user[userid].state.sessions[sessionid].loggedinTime = _loginTime;
