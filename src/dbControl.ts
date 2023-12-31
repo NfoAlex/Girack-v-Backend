@@ -610,7 +610,7 @@ let getModlog = async function getModlog(dat:{
     //それぞれのJSONファイルからデータを取得して配列に追加
     for ( let jsonIndex in ListOfJson) {
         //監査ログJSONを取り出し
-        let dataModlog = JSON.parse(fs.readFileSync("./serverFiles/modlog/"+ListOfJson[jsonIndex]));
+        let dataModlog = JSON.parse(fs.readFileSync("./serverFiles/modlog/"+ListOfJson[jsonIndex], "utf-8"));
         //監査ログのデータを配列化
         let objModlog = Object.entries(dataModlog);
 
