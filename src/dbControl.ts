@@ -141,7 +141,7 @@ console.log("DB認識!");
 console.log("=========================");
 
 //チャンネルリストの取得
-let getInfoList = function getInfoList(dat: {
+let getInfoList = function getInfoList(dat:{
     target: string,
     reqSender: srcInterface.reqSender
 }):{ //返すデータの型
@@ -236,7 +236,7 @@ let getInfoList = function getInfoList(dat: {
 }
 
 //ユーザー情報の取得
-let getInfoUser = function getInfoUser(dat: {
+let getInfoUser = function getInfoUser(dat:{
     targetid: string,
     reqSender: srcInterface.reqSender
 }) {
