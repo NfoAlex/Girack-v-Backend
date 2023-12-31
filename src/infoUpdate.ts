@@ -281,7 +281,14 @@ let changeServerSettings = function changeServerSettings(dat:{
 }
 
 //チャンネル設定の更新
-let changeChannelSettings = function changeChannelSettings(dat) {
+let changeChannelSettings = function changeChannelSettings(dat:{
+    targetid: string,
+    channelname: string,
+    description: string,
+    scope: string,
+    canTalk: string,
+    reqSender: srcInterface.reqSender
+}) {
     //名前を変更するなら監査記録
     if ( dataServer.channels[dat.targetid].name !== dat.channelname ) {
         //監査ログへの記録処理
