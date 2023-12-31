@@ -133,6 +133,13 @@ function checkOrigin(socket:Socket) {
 
 }
 
+//Socketハンドラのインポート
+require("./socketHandlers/socketAuth.js")(io);
+require("./socketHandlers/socketChannel.js")(io);
+require("./socketHandlers/socketGetInfo.js")(io);
+require("./socketHandlers/socketMessage.js")(io);
+require("./socketHandlers/socketUpdateInfo.js")(io);
+
 // Socketイベントハンドラの設定
 io.on("connection", (socket:Socket) => {
     //Origin判別
