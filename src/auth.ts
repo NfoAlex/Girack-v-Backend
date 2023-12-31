@@ -313,10 +313,10 @@ export let checkUserSession = function checkUserSession(dat:{
 }
 
 //パスワード生成
-function generateKey(){
-    const LENGTH = 24; //生成したい文字列の長さ
-    const SOURCE = "abcdefghijklmnopqrstuvwxyz0123456789"; //元になる文字
-    let result = "";
+function generateKey():string{
+    const LENGTH:number = 24; //生成したい文字列の長さ
+    const SOURCE:string = "abcdefghijklmnopqrstuvwxyz0123456789"; //元になる文字
+    let result:string = "";
 
     for(let i=0; i<LENGTH; i++){
       result += SOURCE[Math.floor(Math.random() * SOURCE.length)];
