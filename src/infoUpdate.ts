@@ -60,7 +60,14 @@ let config = function config(dat:any) {
 }
 
 //ユーザーの管理(ロール変更とBANとか)
-let mod = function mod(dat) {
+let mod = function mod(dat:{
+    targetid: string,
+    action: {
+        change: string,
+        value: any
+    },
+    reqSender: srcInterface.reqSender
+}) {
     /*
     dat
     {
@@ -74,7 +81,7 @@ let mod = function mod(dat) {
     */
 
     //権限確認のために
-    let sendersInfo = db.getInfoUser({
+    let sendersInfo = getInfoUser({
         targetid: dat.reqSender.userid,
         reqSender: dat.reqSender
     });
