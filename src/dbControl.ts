@@ -357,8 +357,19 @@ let getInfoSessions = function getInfoSessions(dat:{reqSender:srcInterface.reqSe
 }
 
 //チャンネル情報の取得
-let getInfoChannel = function getInfoChannel(dat) {
-    let infoParsed = {};
+let getInfoChannel = function getInfoChannel(dat:{
+    targetid: string,
+    reqSender: srcInterface.reqSender
+}) {
+    //チャンネル情報格納用
+    let infoParsed:srcInterface.channelSingle = {
+        channelid: "",
+        channelname: "",
+        description: "",
+        pins: [],
+        scope: "",
+        canTalk: ""
+    };
 
     //権限チェックのためにユーザー情報を取得
     let reqSenderInfo = getInfoUser({
