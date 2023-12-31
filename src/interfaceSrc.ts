@@ -91,6 +91,15 @@ export interface userSingle {
     channelJoined: string[]
 };
 
+//ユーザーの個人データ(設定とか既読状態とか)
+export interface dataUserSave {
+    configAvailable: boolean,
+    config: any, //暫定
+    msgReadStateAvailable: boolean,
+    msgReadState: any, //暫定
+    channelOrder: string[]
+}
+
 //リクエストの送信者
 export interface reqSender {
     userid: string,

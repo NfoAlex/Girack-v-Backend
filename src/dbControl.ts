@@ -528,8 +528,17 @@ let searchUserDynamic = function searchUserDynamic(dat:{
 }
 
 //ユーザーの設定や既読状態などのデータを取得
-let getUserSave = function getUserSave(dat) {
-    let dataUserSave = {};
+let getUserSave = function getUserSave(dat:{
+    reqSender: srcInterface.reqSender
+}) {
+    //ユーザーの個人データ格納用
+    let dataUserSave:srcInterface.dataUserSave = {
+        configAvailable: false,
+        config: undefined,
+        msgReadStateAvailable: false,
+        msgReadState: undefined,
+        channelOrder: []
+    };
 
     //データ読み取り、なければ作成
     try{
