@@ -252,14 +252,7 @@ let getInfoUser = function getInfoUser(dat: {
     */
 
     //ユーザーから収集した情報を入れる
-    let infoParsed:{
-        username: string,
-        userid: string,
-        channelJoined: string[],
-        role: string,
-        loggedin: boolean,
-        banned: boolean
-    } = {
+    let infoParsed:srcInterface.userSingle = {
         username: "",
         userid: "",
         channelJoined: [],
