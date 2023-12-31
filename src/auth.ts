@@ -291,9 +291,9 @@ let registerUser = async function registerUser(dat:{
 }
 
 //セッションが適切かどうかを確認するだけの関数
-export let checkUserSession = function checkUserSession(
-        dat:{userid:string, sessionid:string}
-    ) { //{userid="ユーザーID", sessionid="セッションのID"}
+export let checkUserSession = function checkUserSession(dat:{
+    userid:string, sessionid:string
+}) { //{userid="ユーザーID", sessionid="セッションのID"}
     try {
         //ID確認
         if (
