@@ -1,6 +1,7 @@
 //auth.js
 
 import * as fs from "fs"; //履歴書き込むため
+import * as srcInterface from "./interfaceSrc";
 const bcrypt = require("bcrypt"); //ハッシュ化用
 let db = require("./dbControl.js");
 //import { db } from "./dbControl";
@@ -106,7 +107,11 @@ let authUser = async function authUser(
 }
 
 //パスワードを変更
-let changePassword = async function changePassword(dat) {
+let changePassword = async function changePassword(dat:{
+    currentPassword: string,
+    newPassword: string,
+    reqSender: srcInterface.reqSender
+}):Promise<number> {
     //現在のパスワードをハッシュ比較
     let passComparedResult = await bcrypt.compare(dat.currentPassword, db.dataUser.user[dat.reqSender.userid].pw);
 
