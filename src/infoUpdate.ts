@@ -476,8 +476,17 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat:{
 }
 
 //ユーザーの既読状態のデータを上書き保存する
-let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat) {
-    let dataUserSave = {};
+let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat:{
+    msgReadState: any,
+    reqSender: srcInterface.reqSender
+}) {
+    let dataUserSave:srcInterface.dataUserSave = {
+        configAvailable: false,
+        config: undefined,
+        msgReadStateAvailable: false,
+        msgReadState: undefined,
+        channelOrder: []
+    };
 
     //データ読み取り、なければ作成
     try{
@@ -506,9 +515,18 @@ let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat) {
 }
 
 //ユーザーが設定しているチャンネルの順番を上書き保存
-let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat) {
+let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat:{
+    channelOrder: string[],
+    reqSender: srcInterface.reqSender
+}) {
     //ユーザーデータの取り込み先
-    let dataUserSave = {};
+    let dataUserSave:srcInterface.dataUserSave = {
+        configAvailable: false,
+        config: undefined,
+        msgReadStateAvailable: false,
+        msgReadState: undefined,
+        channelOrder: []
+    };
 
     //データ読み取り、なければ作成
     try{
@@ -536,7 +554,12 @@ let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat) {
 }
 
 //チャンネルの参加・退出処理
-let channelAction = function channelAction(dat) {
+let channelAction = function channelAction(dat:{
+    action: string,
+    channelid: string,
+    userid: string,
+    reqSender: srcInterface.reqSender
+}) {
     /*
     dat
     {
@@ -617,7 +640,7 @@ let channelAction = function channelAction(dat) {
     fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4)); //DBをリモート保存
 
     //更新したデータを収集
-    let answer = db.getInfoUser({
+    let answer:srcInterface.dataUser = db.getInfoUser({
         targetid: dat.userid,
         reqSender: dat.reqSender
     });
