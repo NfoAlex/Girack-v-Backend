@@ -1,6 +1,6 @@
 
 //サーバーのホスト設定
-const HOST_CONFIG:HOST_CONFIG = {
+export const HOST_CONFIG:HOST_CONFIG = {
 
   /********************************************************/
   //アクセス関係
