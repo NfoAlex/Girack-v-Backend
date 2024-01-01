@@ -620,7 +620,8 @@ let channelCreate = async function channelCreate(dat:{
         //IDを探すまでループ
         setTimeout(() => {
             console.log("infoUpdate :: channelCreate : チャンネルIDを選んでいます...");
-            newChannelId = parseInt(Math.random()*9999).toString().padStart(4,"0");
+            //チャンネルID生成
+            newChannelId = Math.floor(Math.random()*9999).toString().padStart(4,"0");
             //作ったチャンネルIDが空いていたらループを消す
             if ( dataServer.channels[newChannelId] === undefined ) { //チャンネル情報がないことを確認
                 resolve();
