@@ -35,6 +35,89 @@ const io = new Server(server, {
 
 // ミドルウェア、ルーティングの設定など...
 
+//もしバックエンドに直接アクセスされたら用
+app.get('/', (req, res) => {
+    res.send("<h1 style='width:100vw; text-align:center'>😏</h1>");
+
+});
+
+//アイコン用ファイルを返す
+app.get('/img/:src', (req, res) => {
+    //JPEG
+    try {
+        fs.statSync(__dirname + '/userFiles/img/' + req.params.src + ".jpeg");
+        res.sendFile(__dirname + '/userFiles/img/' + req.params.src + ".jpeg");
+        return;
+    }
+    catch(e) {
+    }
+
+    //PNG
+    try {
+        fs.statSync(__dirname + '/userFiles/img/' + req.params.src + ".png");
+        res.sendFile(__dirname + '/userFiles/img/' + req.params.src + ".png");
+        return;
+    }
+    catch(e) {
+    }
+
+    //GIF
+    try {
+        fs.statSync(__dirname + '/userFiles/img/' + req.params.src + ".gif");
+        res.sendFile(__dirname + '/userFiles/img/' + req.params.src + ".gif");
+    }
+    catch(e) {
+        console.log("index :: これがなかった -> " + req.params.src + ".gif");
+        res.sendFile(__dirname + '/userFiles/img/default.jpeg');
+    }
+
+});
+
+//ファイルを返す
+app.get('/file/:channelid/:fileid', (req, res) => {
+    let fileid = req.params.fileid; //ファイルIDを取得
+    let channelid = req.params.channelid; //チャンネルIDを取得
+
+    //JSONファイル名
+    let fileidPathName = "";
+    //JSONファイルから取り出したJSONそのもの
+    let fileidIndex:{
+        [key:string]: {
+            name: string,
+            userid: string,
+            size: number,
+            type: string
+        }
+    } = {};
+
+    //JSONファイルの取り出し準備
+    try {
+        //ファイルIDからJSON名を取得(日付部分)
+        fileidPathName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
+        //ファイルIDインデックスを取得
+        fileidIndex = JSON.parse(fs.readFileSync('./userFiles/fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+    } catch(error) {
+        res.send("内部エラー", error);
+    }
+
+    //JSONから添付ファイルを探して返す
+    try {        
+        //もし画像ファイルならダウンロードじゃなく表示させる
+        if ( fileidIndex[fileid].type.includes("image/") ) { //typeにimageが含まれるなら
+            //ブラウザで表示
+            res.sendFile(__dirname + "/userFiles/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
+
+        } else { //画像じゃないなら
+            //ダウンロードさせる
+            res.download(__dirname + "/userFiles/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
+
+        }
+    } catch(error) {
+        res.send("ファイルがねえ", error);
+    }
+
+});
+
 //reqSenderの型定義
 interface reqSender {
     userid: string,
