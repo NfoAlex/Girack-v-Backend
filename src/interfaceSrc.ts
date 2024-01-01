@@ -100,6 +100,41 @@ export interface dataUserSave {
     channelOrder: string[]
 }
 
+//メッセージ用
+export interface message {
+    userid: string | null,
+    channelid: string,
+    content: string,
+    replyData: {
+        isReplying: boolean,
+        userid: string,
+        messageid: string
+    },
+    fileData: {
+        isAttatched: boolean,
+        attatchmentData: [{
+            name: string,
+            size: number,
+            type: string,
+            fileid: string
+        }] | null
+    },
+    hasUrl: boolean,
+    urlData: {
+        dataLoaded: boolean,
+        data: [{
+            url: string,
+            mediaType: string,
+            title: string,
+            img: string[],
+            video: string[],
+            favicon: string
+        }] | null
+    },
+    isSystemMessage: boolean | null,
+    reqSender: reqSender
+}
+
 //リクエストの送信者
 export interface reqSender {
     userid: string,

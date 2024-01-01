@@ -21,7 +21,7 @@ const blackRedirectUrls:string[] = [
 ];
 
 //メッセージを処理して送れる形にする
-let msgMix = async function msgMix(m) {
+let msgMix = async function msgMix(m:srcInterface.message) {
     /*
     m
     {
@@ -34,8 +34,8 @@ let msgMix = async function msgMix(m) {
 
     try {
         //送信者のロールとそのチャンネルで話せるロールを取得
-        let userRole = db.dataUser.user[m.reqSender.userid].role;
-        let channelCanTalkRole = db.dataServer.channels[m.channelid].canTalk;
+        let userRole = dataUser.user[m.reqSender.userid].role;
+        let channelCanTalkRole = dataServer.channels[m.channelid].canTalk;
 
         //もし送信者がMemberで話せるロールがMember以外なら処理停止
         if ( userRole === "Member" && channelCanTalkRole !== "Member" && channelCanTalkRole !== undefined ) {
