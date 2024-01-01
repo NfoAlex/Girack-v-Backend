@@ -182,7 +182,11 @@ let msgMix = async function msgMix(m:srcInterface.message) {
 }
 
 //ファイルが添付されているならいろいろ処理する部分
-let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePath) {
+let writeUploadedFile = function uploadFile(
+    fileData: srcInterface.message["fileData"],
+    channelid: string,
+    receivedDatePath: string
+) {
     //ファイル用ディレクトリを作成
     try{fs.mkdirSync("./userFiles/files/"+channelid);}catch(e){}
     try{fs.mkdirSync("./userFiles/files/"+channelid+"/"+receivedDatePath);}catch(e){}
@@ -190,15 +194,15 @@ let writeUploadedFile = function uploadFile(fileData, channelid, receivedDatePat
     //ファイルの書き込み(複数の書き込み用にfor)
     for ( let index in fileData.attatchmentData ) {
         //ファイルサイズが大きかったら書き込まない
-        if ( fileData.attatchmentData[index].size >= db.dataServer.config.MESSAGE.MESSAGE_FILE_MAXSIZE ) {
+        if ( fileData.attatchmentData[parseInt(index)].size >= dataServer.config.MESSAGE.MESSAGE_FILE_MAXSIZE ) {
             console.log("Message :: writeUploadedFile : このファイルのサイズが大きい");
         
         } else {
             try {
                 //ファイルを書き込み
                 fs.writeFile(
-                    "./userFiles/files/"+channelid+"/"+receivedDatePath+"/"+fileData.attatchmentData[index].name,
-                    fileData.attatchmentData[index].buffer,
+                    "./userFiles/files/"+channelid+"/"+receivedDatePath+"/"+fileData.attatchmentData[parseInt(index)].name,
+                    fileData.attatchmentData[parseInt(index)].buffer,
                     (err) => {
                         console.log("Message :: uploadFile : アップロード結果 -> ", err);
                     }
