@@ -22,7 +22,6 @@ module.exports = (io) => {
             /*
             メッセージのデータ型
             m {
-                type: "message"
                 channelid: channelid, //チャンネルのID
                 content: inputRef.current.input.value, //内容
                 replyData: {...} //返信データ

@@ -116,7 +116,8 @@ export interface message {
             name: string,
             size: number,
             type: string,
-            fileid: string
+            fileid: string,
+            buffer: any|null //履歴として書き込む際は削除される
         }] | null
     },
     hasUrl: boolean,

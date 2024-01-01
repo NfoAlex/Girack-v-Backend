@@ -58,7 +58,7 @@ let msgMix = async function msgMix(m:srcInterface.message) {
         //メッセージがそもそも有効なものかどうか
         if (
             m.content === undefined ||
-            m.content.length > db.dataServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH || //長さがサーバー規定を超えてるなら
+            m.content.length > dataServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH || //長さがサーバー規定を超えてるなら
             ( m.content.includes("<img") && m.content.includes("onerror") ) || //XSS避け
             ( m.content.length === 0 && !m.fileData.isAttatched ) || //長さが0だったら
             ( m.content.replace(/　/g,"").length === 0 && !m.fileData.isAttatched ) || //添付ファイルがなく、空白だけのメッセージだった時用
@@ -79,12 +79,14 @@ let msgMix = async function msgMix(m:srcInterface.message) {
             //空データとして整理
             m.replyData = {
                 isReplying: false,
+                userid: "",
                 messageid: ""
             };
         } else if ( !(m["replyData"].hasOwnProperty("isReplying")) ) {
             //空データとして整理
             m.replyData = {
                 isReplying: false,
+                userid: "",
                 messageid: ""
             };
         }
@@ -116,7 +118,7 @@ let msgMix = async function msgMix(m:srcInterface.message) {
     //URLデータホルダーを追加
     m.urlData = {
         dataLoaded: false,
-        data: []
+        data: null
     };
 
     //もしURLがあるようならそうデータに設定
@@ -137,9 +139,9 @@ let msgMix = async function msgMix(m:srcInterface.message) {
         //ファイル名被り防止(一時的)
         for ( let index in m.fileData.attatchmentData ) {
             //先頭につけるための乱数4桁
-            let fileNameAdding = parseInt(Math.random() * 9999).toString().padStart(4,0);
+            let fileNameAdding = Math.floor(Math.random() * 9999).toString().padStart(4,"0");
             //ファイル名の先頭に生成した乱数を追加
-            m.fileData.attatchmentData[index].name = fileNameAdding + "_" + m.fileData.attatchmentData[index].name
+            m.fileData.attatchmentData[parseInt(index)].name = fileNameAdding + "_" + m.fileData.attatchmentData[parseInt(index)].name
 
         }
         /*************************************/
@@ -147,12 +149,12 @@ let msgMix = async function msgMix(m:srcInterface.message) {
         //ID振り分け用の時間データ
         let t = new Date();
         //ディレクトリ
-        let receivedDatePath = t.getFullYear() + "_" + (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
+        let receivedDatePath = t.getFullYear() + "_" + (t.getMonth()+1).toString().padStart(2,"0") + "_" +  t.getDate().toString().padStart(2,"0");
         writeUploadedFile(m.fileData, m.channelid, receivedDatePath); //ファイル処理開始
 
         //履歴へ書き込む際は不要なためファイルデータそのものを削除
         for ( let index in m.fileData.attatchmentData ) {
-            delete m.fileData.attatchmentData[index].buffer;
+            delete m.fileData.attatchmentData[parseInt(index)].buffer;
 
         }
 
@@ -399,7 +401,7 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
 
     //ToDo :: 現時点のこのメッセージのURLデータをすべて送信して更新させる
-    indexjs.sendUrlPreview(dataHistory[msgId].urlData.data, channelid, msgId);
+    sendUrlPreview(dataHistory[msgId].urlData.data, channelid, msgId);
 
 }
 
@@ -407,7 +409,7 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
 let getLatestMessage = function latestMessage(channelid) {
     let messageData = {}; //返すメッセージデータ
     let t = new Date(); //履歴に時間を追加する用
-    let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
+    let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,"0") + "_" +  t.getDate().toString().padStart(2,"0");
 
     //メッセージを送るチャンネルの履歴データのディレクトリ
     let pathOfJson = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
@@ -736,7 +738,7 @@ let msgReaction = function msgReaction(dat) {
     */
 
     let t = new Date(); //履歴に時間を追加する用
-    //let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
+    //let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,"0") + "_" +  t.getDate().toString().padStart(2,"0");
     //メッセージIDから送信日付を取得
     let fulldate = dat.messageid.slice(0,4) + "_" + dat.messageid.slice(4,6) + "_" + dat.messageid.slice(6,8);
     
@@ -879,15 +881,15 @@ let msgEdit = function msgEdit(dat) {
 let msgRecord = function msgRecord(json) {
     let t = new Date(); //履歴に時間を追加する用
     //JSONパス用
-    let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,0) + "_" +  t.getDate().toString().padStart(2,0);
+    let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,"0") + "_" +  t.getDate().toString().padStart(2,"0");
     //受信時間
     let receivedTime = [
         t.getFullYear(),
-        (t.getMonth()+1).toString().padStart(2,0),
-        t.getDate().toString().padStart(2,0),
-        t.getHours().toString().padStart(2,0),
-        t.getMinutes().toString().padStart(2,0),
-        t.getSeconds().toString().padStart(2,0),
+        (t.getMonth()+1).toString().padStart(2,"0"),
+        t.getDate().toString().padStart(2,"0"),
+        t.getHours().toString().padStart(2,"0"),
+        t.getMinutes().toString().padStart(2,"0"),
+        t.getSeconds().toString().padStart(2,"0"),
         t.getMilliseconds().toString().padStart(6,0)
     ].join("");
 
