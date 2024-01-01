@@ -96,8 +96,8 @@ app.get('/file/:channelid/:fileid', (req, res) => {
         fileidPathName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
         //ファイルIDインデックスを取得
         fileidIndex = JSON.parse(fs.readFileSync('./userFiles/fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
-    } catch(error) {
-        res.send("内部エラー", error);
+    } catch(e) {
+        res.send("内部エラー :: " + e);
     }
 
     //JSONから添付ファイルを探して返す
