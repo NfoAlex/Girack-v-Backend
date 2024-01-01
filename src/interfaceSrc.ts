@@ -22,7 +22,7 @@ export interface dataServer {
         },
         MESSAGE: {
             MESSAGE_PIN_ROLE: string,
-            MESSAGE_TXT_MAXLENGTH: string,
+            MESSAGE_TXT_MAXLENGTH: number,
             MESSAGE_FILE_MAXSIZE: string
         }
     },

@@ -28,7 +28,7 @@ const dataServerTemplate:srcInterface.dataServer = {
         },
         "MESSAGE": {
             "MESSAGE_PIN_ROLE": "Admin",
-            "MESSAGE_TXT_MAXLENGTH": "250",
+            "MESSAGE_TXT_MAXLENGTH": 250,
             "MESSAGE_FILE_MAXSIZE": "5e7"
         }
     },
