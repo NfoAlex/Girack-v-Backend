@@ -1,19 +1,22 @@
 //メッセージ関連
 
-const fs = require('fs'); //履歴書き込んだり読み込むために
-const db = require("./dbControl.js"); //データベース関連
-const { getLinkPreview } = require("link-preview-js");
-const indexjs = require("../index.js");
-const infoUpdate = require("./infoUpdate.js");
+import * as fs from "fs"; //履歴書き込んだり読み込むために
+//const db = require("./dbControl.js"); //データベース関連
+import { dataUser, dataServer } from "./dbControl";
+import { getLinkPreview } from "link-preview-js";
+import { sendUrlPreview } from "../index";
+//const infoUpdate = require("./infoUpdate.js");
+import { recordModeration } from "./infoUpdate"
+import * as srcInterface from "./interfaceSrc";
 
 //URLプレビュー時のリダイレクト用URLのブロック対象にならないリスト
-const knownRedirectUrls = [
+const knownRedirectUrls:string[] = [
     "discord.gg",
     "youtu.be",
 ];
 
 //URLプレビュー時に強制的にリダイレクト用URLのブロック対象になるリスト
-const blackRedirectUrls = [
+const blackRedirectUrls:string[] = [
 
 ];
 
