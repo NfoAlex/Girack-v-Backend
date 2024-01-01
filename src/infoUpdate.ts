@@ -5,7 +5,7 @@ import * as srcInterface from "./interfaceSrc";
 import * as fs from "fs"; //履歴書き込むため
 
 //ユーザーの管理(ロール変更とBANとか)
-let mod = function mod(dat:{
+export let mod = function mod(dat:{
     targetid: string,
     action: {
         change: string,
@@ -39,9 +39,9 @@ let mod = function mod(dat:{
         //ユーザーのロール変更
         case "role":
             //監査ログ用
-            let roleBefore = db.dataUser.user[dat.targetid].role;
+            let roleBefore = dataUser.user[dat.targetid].role;
             //ロール更新
-            db.dataUser.user[dat.targetid].role = dat.action.value;
+            dataUser.user[dat.targetid].role = dat.action.value;
             
             //監査ログへの記録処理
             recordModeration(
@@ -65,7 +65,7 @@ let mod = function mod(dat:{
         case "ban":
             console.log("infoUpdate :: mod : BAN状態を更新 -> " + dat.targetid);
             //BAN状態を更新
-            db.dataUser.user[dat.targetid].state.banned = dat.action.value;
+            dataUser.user[dat.targetid].state.banned = dat.action.value;
             //BAN状態に応じて監査ログへの記録
             if ( dat.action.value ) {
                 //監査ログへの記録処理
@@ -127,7 +127,7 @@ let mod = function mod(dat:{
                 }
             );
 
-            delete db.dataUser.user[dat.targetid]; //削除
+            delete dataUser.user[dat.targetid]; //削除
             break;
 
         default:
@@ -137,12 +137,12 @@ let mod = function mod(dat:{
     }
 
     //JSONへ書き込み
-    fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+    fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4));
 
 }
 
 //サーバーの設定を更新
-let changeServerSettings = function changeServerSettings(dat:{
+export let changeServerSettings = function changeServerSettings(dat:{
     servername: string,
     config: {
         PROFILE: {
@@ -188,7 +188,7 @@ let changeServerSettings = function changeServerSettings(dat:{
     */
 
     //権限を確認するために送信者の情報を取得
-    let sendersInfo = db.getInfoUser({
+    let sendersInfo = getInfoUser({
         targetid: dat.reqSender.userid,
         reqSender: dat.reqSender
     });
@@ -226,7 +226,7 @@ let changeServerSettings = function changeServerSettings(dat:{
 }
 
 //チャンネル設定の更新
-let changeChannelSettings = function changeChannelSettings(dat:{
+export let changeChannelSettings = function changeChannelSettings(dat:{
     targetid: string,
     channelname: string,
     description: string,
@@ -301,7 +301,7 @@ let changeChannelSettings = function changeChannelSettings(dat:{
 
     //公開範囲をMemberでも変えられる設定、あるいはMemberじゃないならだったら適用
     if ( 
-        db.dataUser.user[dat.reqSender.userid].role !== "Member" ||
+        dataUser.user[dat.reqSender.userid].role !== "Member" ||
         dataServer.config.CHANNEL.CHANNEL_PRIVATIZE_AVAILABLEFORMEMBER
     ) {
         dataServer.channels[dat.targetid].scope = dat.scope;
@@ -314,7 +314,7 @@ let changeChannelSettings = function changeChannelSettings(dat:{
 }
 
 //プロフィール変更
-let changeProfile = function changeProfile(dat:{
+export let changeProfile = function changeProfile(dat:{
     targetid: string,
     name: string,
     reqSender: srcInterface.reqSender
@@ -322,7 +322,7 @@ let changeProfile = function changeProfile(dat:{
     //変えるユーザーと送信者が違うなら権限チェック
     if ( dat.reqSender.userid !== dat.targetid ) {
         //Adminじゃないならキャンセル
-        if ( db.dataUser.user[dat.reqSender.userid].role !== "Admin" ) {
+        if ( dataUser.user[dat.reqSender.userid].role !== "Admin" ) {
             return -1;
 
         }
@@ -338,7 +338,7 @@ let changeProfile = function changeProfile(dat:{
             },
             {
                 actionname: "userChangeName",
-                valueBefore: db.dataUser.user[dat.targetid].name,
+                valueBefore: dataUser.user[dat.targetid].name,
                 valueAfter: dat.name
             }
         );
@@ -348,7 +348,7 @@ let changeProfile = function changeProfile(dat:{
     //ユーザー名被ってるフラグ
     let usernameAlreadyUsedFlag = false;
     //ユーザーデータを配列化
-    let objUser:any = Object.entries(db.dataUser.user);
+    let objUser:any = Object.entries(dataUser.user);
     for ( let index in objUser ) {
         if ( objUser[index][1].name === dat.name ) {
             //ユーザー名がすでに使われていると設定
@@ -361,16 +361,16 @@ let changeProfile = function changeProfile(dat:{
 
     //もしユーザー名があいているなら
     if ( !usernameAlreadyUsedFlag ) {
-        db.dataUser.user[dat.targetid].name = dat.name; //DB更新
+        dataUser.user[dat.targetid].name = dat.name; //DB更新
     
         //DBをJSONへ保存
-        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+        fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4));
 
     }
     
     //更新したデータを収集
     //let answer = db.parseInfos({target:"user", targetid:dat.targetid});
-    let answer = db.getInfoUser({
+    let answer = getInfoUser({
         targetid: dat.reqSender.userid,
         reqSender: dat.reqSender
     });
@@ -380,7 +380,7 @@ let changeProfile = function changeProfile(dat:{
 }
 
 //ユーザーの設定のデータを上書き保存する
-let updateUserSaveConfig = function updateUserSaveConfig(dat:{
+export let updateUserSaveConfig = function updateUserSaveConfig(dat:{
     config: any,
     reqSender: srcInterface.reqSender
 }) {
@@ -421,7 +421,7 @@ let updateUserSaveConfig = function updateUserSaveConfig(dat:{
 }
 
 //ユーザーの既読状態のデータを上書き保存する
-let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat:{
+export let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat:{
     msgReadState: any,
     reqSender: srcInterface.reqSender
 }) {
@@ -460,7 +460,7 @@ let updateUserSaveMsgReadState = function updateUserSaveMsgReadState(dat:{
 }
 
 //ユーザーが設定しているチャンネルの順番を上書き保存
-let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat:{
+export let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat:{
     channelOrder: string[],
     reqSender: srcInterface.reqSender
 }) {
@@ -499,7 +499,7 @@ let updateUserSaveChannelOrder = function updateUserSaveChannelOrder(dat:{
 }
 
 //チャンネルの参加・退出処理
-let channelAction = function channelAction(dat:{
+export let channelAction = function channelAction(dat:{
     action: string,
     channelid: string,
     userid: string,
@@ -520,7 +520,7 @@ let channelAction = function channelAction(dat:{
 
     if ( dat.action === "join" ) {        
         //送信者の情報取得
-        let senderInfo = db.getInfoUser({
+        let senderInfo = getInfoUser({
             targetid: dat.reqSender.userid,
             reqSender: dat.reqSender
         });
@@ -528,7 +528,7 @@ let channelAction = function channelAction(dat:{
         //チャンネルがプライベートで参加者が権力者でなく、また招待者がそのチャンネルに参加していなら拒否
         if (
             dataServer.channels[dat.channelid].scope === "private" &&
-            db.dataUser.user[dat.userid].role !== "Admin" &&
+            dataUser.user[dat.userid].role !== "Admin" &&
             !senderInfo.channelJoined.includes(dat.channelid)
         ) {
             return -1;
@@ -536,7 +536,7 @@ let channelAction = function channelAction(dat:{
         }
 
         //配列へチャンネルIDをプッシュ
-        db.dataUser.user[dat.userid].channel.push(dat.channelid);
+        dataUser.user[dat.userid].channel.push(dat.channelid);
 
     }
 
@@ -544,7 +544,7 @@ let channelAction = function channelAction(dat:{
         //もし送信者と抜ける人が違っていたら権限確認
         if ( dat.userid !== dat.reqSender.userid ) {
             //送信者の情報取得
-            let senderInfo = db.getInfoUser({
+            let senderInfo = getInfoUser({
                 targetid: dat.reqSender.userid,
                 reqSender: dat.reqSender
             });
@@ -577,15 +577,15 @@ let channelAction = function channelAction(dat:{
         }
 
         //配列からチャンネルIDを削除
-        db.dataUser.user[dat.userid].channel.splice(db.dataUser.user[dat.userid].channel.indexOf(dat.channelid), 1);
+        dataUser.user[dat.userid].channel.splice(dataUser.user[dat.userid].channel.indexOf(dat.channelid), 1);
 
     }
 
     //JSONファイルへ書き込み
-    fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4)); //DBをリモート保存
+    fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4)); //DBをリモート保存
 
     //更新したデータを収集
-    let answer:srcInterface.dataUser = db.getInfoUser({
+    let answer:srcInterface.userSingle = getInfoUser({
         targetid: dat.userid,
         reqSender: dat.reqSender
     });
@@ -595,7 +595,7 @@ let channelAction = function channelAction(dat:{
 }
 
 //チャンネル作成
-let channelCreate = async function channelCreate(dat:{
+export let channelCreate = async function channelCreate(dat:{
     channelname: string,
     scope: string,
     description: string,
@@ -646,7 +646,7 @@ let channelCreate = async function channelCreate(dat:{
         }
 
         //チャンネル作成者をそのまま参加させる
-        db.dataUser.user[dat.reqSender.userid].channel.push(newChannelId);
+        dataUser.user[dat.reqSender.userid].channel.push(newChannelId);
     
         //監査ログへの記録処理
         recordModeration(
@@ -665,7 +665,7 @@ let channelCreate = async function channelCreate(dat:{
         );
 
         //ユーザー情報をファイルへ書き込み
-        fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+        fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4));
 
         //サーバー情報をファイルへ書き込み
         fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
@@ -677,7 +677,7 @@ let channelCreate = async function channelCreate(dat:{
 }
 
 //チャンネル削除
-let channelRemove = function channelRemove(dat:{
+export let channelRemove = function channelRemove(dat:{
     channelid: string,
     reqSender: srcInterface.reqSender
 }) {
@@ -702,11 +702,11 @@ let channelRemove = function channelRemove(dat:{
     let userChangedEffected = [];
 
     //ユーザー全員から消したチャンネルをユーザーの"参加チャンネル"リストから消去
-    for ( let index in Object.entries(db.dataUser.user) ) {
+    for ( let index in Object.entries(dataUser.user) ) {
         //一時的にユーザーIDを抽出
-        let userid = Object.entries(db.dataUser.user)[index][0];
+        let userid = Object.entries(dataUser.user)[index][0];
         //ユーザーの参加チャンネルリストを加工
-        db.dataUser.user[userid].channel = Object.entries(dataUser.user)[index][1].channel.filter((cid:string) => cid!==dat.channelid);
+        dataUser.user[userid].channel = Object.entries(dataUser.user)[index][1].channel.filter((cid:string) => cid!==dat.channelid);
         //消去されたチャンネルにいたユーザーリストに追加
         userChangedEffected.push(userid);
 
@@ -747,7 +747,7 @@ let channelRemove = function channelRemove(dat:{
     );
 
     //サーバー情報をファイルへ書き込み
-    fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+    fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4));
     fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
 
     //参加していた人リストにそれぞれクライアントで更新させる
@@ -756,7 +756,7 @@ let channelRemove = function channelRemove(dat:{
 }
 
 //監査ログへの書き込み
-let recordModeration = function recordModeration(
+export let recordModeration = function recordModeration(
     actionBy:string,
     actionTo:{
         type: string,
@@ -862,14 +862,14 @@ let recordModeration = function recordModeration(
 
 }
 
-exports.mod = mod; //管理者からのユーザー管理
-exports.changeServerSettings = changeServerSettings; //サーバーの設定変更
-exports.changeChannelSettings = changeChannelSettings; //チャンネルの設定変更
-exports.changeProfile = changeProfile; //プロフィールの変更
-exports.updateUserSaveConfig = updateUserSaveConfig; //ユーザーの個人データで設定データを上書き保存
-exports.updateUserSaveMsgReadState = updateUserSaveMsgReadState; //ユーザーの個人データで既読状態を上書き保存
-exports.updateUserSaveChannelOrder = updateUserSaveChannelOrder; //ユーザーの個人データでチャンネルの順番を上書き保存
-exports.channelAction = channelAction; //チャンネルの参加・退出
-exports.channelCreate = channelCreate; //チャンネル作成
-exports.channelRemove = channelRemove; //チャンネル削除
-exports.recordModeration = recordModeration; //監査ログを書き込む関数
+// exports.mod = mod; //管理者からのユーザー管理
+// exports.changeServerSettings = changeServerSettings; //サーバーの設定変更
+// exports.changeChannelSettings = changeChannelSettings; //チャンネルの設定変更
+// exports.changeProfile = changeProfile; //プロフィールの変更
+// exports.updateUserSaveConfig = updateUserSaveConfig; //ユーザーの個人データで設定データを上書き保存
+// exports.updateUserSaveMsgReadState = updateUserSaveMsgReadState; //ユーザーの個人データで既読状態を上書き保存
+// exports.updateUserSaveChannelOrder = updateUserSaveChannelOrder; //ユーザーの個人データでチャンネルの順番を上書き保存
+// exports.channelAction = channelAction; //チャンネルの参加・退出
+// exports.channelCreate = channelCreate; //チャンネル作成
+// exports.channelRemove = channelRemove; //チャンネル削除
+// exports.recordModeration = recordModeration; //監査ログを書き込む関数
