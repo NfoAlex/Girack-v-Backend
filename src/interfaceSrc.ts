@@ -10,7 +10,7 @@ export interface dataServer {
     },
     config: {
         PROFILE: {
-            PROFILE_ICON_MAXSIZE: string,
+            PROFILE_ICON_MAXSIZE: number,
             PROFILE_USERNAME_MAXLENGTH: number
         },
         CHANNEL: {
@@ -23,7 +23,7 @@ export interface dataServer {
         MESSAGE: {
             MESSAGE_PIN_ROLE: string,
             MESSAGE_TXT_MAXLENGTH: number,
-            MESSAGE_FILE_MAXSIZE: string
+            MESSAGE_FILE_MAXSIZE: number
         }
     },
     channels: {
