@@ -426,7 +426,7 @@ let addUrlPreview = async function addUrlPreview(url:string, channelid:string, m
 let getLatestMessage = function latestMessage(channelid:string, reqSender:srcInterface.reqSender) {
     //返す予定のメッセージデータそのもの
     let messageData:srcInterface.messageRead = {
-        userid: null,
+        userid: "",
         channelid: "",
         content: "",
         replyData: {
