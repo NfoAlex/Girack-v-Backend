@@ -21,8 +21,6 @@ const SERVER_VERSION: string = "alpha_20231228";
 const socketOnline: SocketOnline = {};
 const userOnline: UserOnline = {};
 
-// ...rest of your code...
-
 // ExpressとSocket.IOのサーバー作成
 const app = express();
 const server = http.createServer(app);
@@ -32,8 +30,6 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   }
 });
-
-// ミドルウェア、ルーティングの設定など...
 
 //もしバックエンドに直接アクセスされたら用
 app.get('/', (req, res) => {
