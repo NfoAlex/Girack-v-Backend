@@ -100,7 +100,7 @@ export interface dataUserSave {
     channelOrder: string[]
 }
 
-//メッセージ用
+//処理前のメッセージ用
 export interface message {
     userid: string | null,
     channelid: string,
@@ -134,6 +134,47 @@ export interface message {
         }] | null
     },
     isSystemMessage: boolean | null
+};
+
+//処理されたメッセージ用
+export interface messageRead {
+    userid: string | null,
+    channelid: string,
+    time: string,
+    pinned: boolean,
+    content: string,
+    replyData: {
+        isReplying: boolean,
+        userid: string,
+        messageid: string
+    },
+    fileData: {
+        isAttatched: boolean,
+        attatchmentData: [{
+            name: string,
+            size: number,
+            type: string,
+            fileid: string,
+            buffer: any|null //履歴として書き込む際は削除される
+        }] | null
+    },
+    hasUrl: boolean,
+    urlData: {
+        dataLoaded: boolean,
+        data: [{
+            url: string,
+            mediaType: string,
+            title: string,
+            description: string,
+            img: string[],
+            video: string[],
+            favicon: string | null
+        }] | null
+    },
+    isSystemMessage: boolean | null,
+    reaction: {
+        [key:string]: number
+    }
 }
 
 //リクエストの送信者
