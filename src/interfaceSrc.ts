@@ -127,10 +127,11 @@ export interface message {
             url: string,
             mediaType: string,
             title: string,
+            description: string,
             img: string[],
             video: string[],
-            favicon: string
-        }] | null
+            favicon: string | null
+        }]
     },
     isSystemMessage: boolean | null,
     reqSender: reqSender
