@@ -551,19 +551,19 @@ let msgPin = function msgPin(dat:{
     let channelid = dat.channelid;
 
     //ピン留めができるロール
-    let pinnableRole = db.dataServer.config.MESSAGE.MESSAGE_PIN_ROLE || "Member";
+    let pinnableRole = dataServer.config.MESSAGE.MESSAGE_PIN_ROLE || "Member";
     //ロールチェック
     if (        //設定がAdminならAdminじゃないやつを弾く
         pinnableRole === "Admin"
             &&
-        db.dataUser.user[dat.reqSender.userid].role !== "Admin"
+        dataUser.user[dat.reqSender.userid].role !== "Admin"
     ) {
         return -1;
 
     } else if ( //設定がModeratorならMemberを弾く
         pinnableRole === "Moderator"
             &&
-        db.dataUser.user[dat.reqSender.userid].role === "Member"
+        dataUser.user[dat.reqSender.userid].role === "Member"
     ) {
         return -1;
 
@@ -574,24 +574,24 @@ let msgPin = function msgPin(dat:{
     let pathOfJson = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
 
     //チャンネルデータにpinsないなら作成
-    if ( db.dataServer.channels[channelid].pins === undefined ) {
-        db.dataServer.channels[channelid].pins = [];
+    if ( dataServer.channels[channelid].pins === undefined ) {
+        dataServer.channels[channelid].pins = [];
 
     }
 
     //すでにピン留めされていたら削除、そうでないなら追加
-    if ( db.dataServer.channels[channelid].pins.indexOf(messageid) !== -1 ) {
+    if ( dataServer.channels[channelid].pins.indexOf(messageid) !== -1 ) {
         //配列上のピンの位置
-        let pinIndex = db.dataServer.channels[channelid].pins.indexOf(messageid);
+        let pinIndex = dataServer.channels[channelid].pins.indexOf(messageid);
         //ピン削除
-        db.dataServer.channels[channelid].pins.splice(pinIndex, 1);
+        dataServer.channels[channelid].pins.splice(pinIndex, 1);
     } else {
         //ピン追加
-        db.dataServer.channels[channelid].pins.push(messageid);
+        dataServer.channels[channelid].pins.push(messageid);
     }
 
     //チャンネルの更新のためにJSONへ書き込み
-    fs.writeFileSync("./server.json", JSON.stringify(db.dataServer, null, 4));
+    fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
 
     //データ取り出し、更新
     try{
@@ -806,7 +806,7 @@ let msgEdit = function msgEdit(dat) {
 
     //もじサーバー設定の最大文字数よりも多ければ、また空だったら処理を停止
     if ( 
-        db.dataServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH
+        dataServer.config.MESSAGE.MESSAGE_TXT_MAXLENGTH
         <
         dat.textEditing.length
         ||
