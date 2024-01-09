@@ -17,7 +17,7 @@ interface UserOnline {
 }
 
 // 初期設定
-const SERVER_VERSION: string = "alpha_20231228";
+const SERVER_VERSION: string = "alpha_20240109";
 const socketOnline: SocketOnline = {};
 const userOnline: UserOnline = {};
 
