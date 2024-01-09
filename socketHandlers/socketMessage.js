@@ -43,7 +43,7 @@ module.exports = (io) => {
             //整合性の確認
             if ( !indexJS.checkDataIntegrality(m, paramsRequire, "msgSend") ) return -1;
             
-            let msgCompiled = await msg.msgMix(m); //メッセージに情報をつける
+            let msgCompiled = await msg.msgMix(m, m.reqSender); //メッセージに情報をつける
             if ( msgCompiled === -1 ) { return; } //処理中にエラーがあったなら止める
 
             //メッセージにURLが含まれるのではあれば

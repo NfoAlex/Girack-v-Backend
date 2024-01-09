@@ -34,7 +34,7 @@ let msgMix = async function msgMix(m:srcInterface.message, reqSender:srcInterfac
 
     try {
         //送信者のロールとそのチャンネルで話せるロールを取得
-        let userRole = dataUser.user[m.reqSender.userid].role;
+        let userRole = dataUser.user[reqSender.userid].role;
         let channelCanTalkRole = dataServer.channels[m.channelid].canTalk;
 
         //もし送信者がMemberで話せるロールがMember以外なら処理停止
@@ -71,7 +71,7 @@ let msgMix = async function msgMix(m:srcInterface.message, reqSender:srcInterfac
     }
 
     //ユーザーIDの偽装を防ぐ
-    m.userid = m.reqSender.userid;
+    m.userid = reqSender.userid;
 
     try {
         //もし返信データに必須のプロパティがないならホルダーを作る
@@ -175,7 +175,7 @@ let msgMix = async function msgMix(m:srcInterface.message, reqSender:srcInterfac
     msgRecord(m); //メッセージをDBに記録
 
     //DBから最新メッセージ取得して送信
-    let MessageCompiled = getLatestMessage(m.channelid);
+    let MessageCompiled = getLatestMessage(m.channelid, reqSender);
 
     return MessageCompiled;
 
