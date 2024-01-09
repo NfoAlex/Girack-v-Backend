@@ -425,7 +425,7 @@ let addUrlPreview = async function addUrlPreview(url:string, channelid:string, m
 //指定したチャンネルの最新メッセージを返す(contentだけではない)
 let getLatestMessage = function latestMessage(channelid:string, reqSender:srcInterface.reqSender) {
     //返す予定のメッセージデータそのもの
-    let messageData:srcInterface.message = {
+    let messageData:srcInterface.messageRead = {
         userid: null,
         channelid: "",
         content: "",
@@ -444,6 +444,10 @@ let getLatestMessage = function latestMessage(channelid:string, reqSender:srcInt
             data: null
         },
         isSystemMessage: null,
+        time: "",
+        pinned: false,
+        reaction: {},
+        messageid: undefined
     };
     let t = new Date(); //履歴に時間を追加する用
     let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,"0") + "_" +  t.getDate().toString().padStart(2,"0");
@@ -451,7 +455,7 @@ let getLatestMessage = function latestMessage(channelid:string, reqSender:srcInt
     //メッセージを送るチャンネルの履歴データのディレクトリ
     let pathOfJson = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
     let dataHistory:{
-        [key:string]: srcInterface.message
+        [key:string]: srcInterface.messageRead
     } = {}; //メッセージデータのJSON読み込み
 
     try {
@@ -478,7 +482,7 @@ let getMessage = function getMessage(channelid:string, messageid:string) {
 
     //メッセージ群格納用
     let dataHistory:{
-        [key:string]: srcInterface.message
+        [key:string]: srcInterface.messageRead
     } = {};
 
     let blankMessageForError:srcInterface.messageRead = {
@@ -502,7 +506,8 @@ let getMessage = function getMessage(channelid:string, messageid:string) {
         },
         isSystemMessage: null,
         reaction: {},
-        pinned: false
+        pinned: false,
+        messageid: undefined
     };
 
     //データ取り出し
@@ -525,7 +530,12 @@ let getMessage = function getMessage(channelid:string, messageid:string) {
 }
 
 //メッセージをチャンネルへピン留めする
-let msgPin = function msgPin(dat) {
+let msgPin = function msgPin(dat:{
+    action: string,
+    channelid: string,
+    messageid: string,
+    reqSender: srcInterface.reqSender
+}) {
     /*
     dat
     {
