@@ -131,10 +131,9 @@ export interface message {
             img: string[],
             video: string[],
             favicon: string | null
-        }]
+        }] | null
     },
-    isSystemMessage: boolean | null,
-    reqSender: reqSender
+    isSystemMessage: boolean | null
 }
 
 //リクエストの送信者
