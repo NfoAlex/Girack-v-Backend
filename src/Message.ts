@@ -625,7 +625,12 @@ let msgPin = function msgPin(dat:{
 }
 
 //メッセージの削除
-let msgDelete = function msgDelete(dat) {
+let msgDelete = function msgDelete(dat:{
+    action: string,
+    channelid: string,
+    messageid: string,
+    reqSender: srcInterface.reqSender
+}) {
     /*
     dat
     {
@@ -646,7 +651,7 @@ let msgDelete = function msgDelete(dat) {
     
     //メッセージを送るチャンネルの履歴データのディレクトリ
     let pathOfJson = "./serverFiles/record/" + dat.channelid + "/" + fulldate + ".json";
-    let dataHistory = {};
+    let dataHistory:{[key:string]:srcInterface.messageRead} = {};
     //console.log("Message :: msgDelete : 消そうとしているjson -> " + pathOfJson);
 
     //データ取り出し
@@ -660,9 +665,16 @@ let msgDelete = function msgDelete(dat) {
 
     //もし添付ファイルがあればファイルを削除
     if ( dataHistory[dat.messageid].fileData.isAttatched ) {
-        let fileDatas = []; //ファイルデータ取り込み
-        let fileidPathName = ""; //欲しいファイルインデックスのパス
-        let fileidIndex = {}; //ファイルインデックスのデータ
+        let fileDatas:srcInterface.messageRead["fileData"]["attatchmentData"]; //ファイルデータ取り込み
+        let fileidPathName:string = ""; //欲しいファイルインデックスのパス
+        let fileidIndex:{
+            [key:string]: {
+                name: string,
+                userid: string,
+                size: number,
+                type: string
+            }
+        } = {}; //ファイルインデックスのデータ
 
         //削除処理開始
         try {
@@ -674,7 +686,8 @@ let msgDelete = function msgDelete(dat) {
             fileidIndex = JSON.parse(fs.readFileSync('./userFiles/fileidIndex/' + dat.channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
 
             //ファイルの数だけ処理
-            for ( let index in fileDatas ) {
+            //for ( let index in fileDatas ) {
+            for ( let index=0; index<fileDatas.length; index++ ) {
                 //ファイル削除
                 fs.unlink(__dirname + "/files/" + dat.channelid + "/" + fileidPathName + "/" + fileidIndex[fileDatas[index].fileid].name, (err) => {
                     //エラー用
