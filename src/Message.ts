@@ -471,10 +471,39 @@ let getLatestMessage = function latestMessage(channelid:string, reqSender:srcInt
 }
 
 //メッセージを単体で取得
-let getMessage = function getMessage(channelid, messageid) {
+let getMessage = function getMessage(channelid:string, messageid:string) {
     //メッセージIDから送信日付を取得
     let fulldate = messageid.slice(0,4) + "_" + messageid.slice(4,6) + "_" + messageid.slice(6,8);
     let pathOfJson = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
+
+    //メッセージ群格納用
+    let dataHistory:{
+        [key:string]: srcInterface.message
+    } = {};
+
+    let blankMessageForError:srcInterface.messageRead = {
+        userid: null,
+        channelid: "",
+        time: "20010101000000",
+        content: "ERROR",
+        replyData: {
+            isReplying: false,
+            userid: "",
+            messageid: ""
+        },
+        fileData: {
+            isAttatched: false,
+            attatchmentData: null
+        },
+        hasUrl: false,
+        urlData: {
+            dataLoaded: false,
+            data: null
+        },
+        isSystemMessage: null,
+        reaction: {},
+        pinned: false
+    };
 
     //データ取り出し
     try{
@@ -485,70 +514,12 @@ let getMessage = function getMessage(channelid, messageid) {
             return dataHistory[messageid];
 
         } else { //undefinedなら削除された体で返す
-            return {
-                "messageid": messageid,
-                "userid": "不明なユーザー",
-                "channelid": channelid,
-                "time": "20010101000000",
-                "pinned": false,
-                "content": "消去されたメッセージ",
-                "replyData": {
-                    "isReplying": false,
-                    "messageid": null
-                },
-                "fileData": {
-                    "isAttatched": false,
-                    "attatchmentData": []
-                },
-                "hasUrl": false,
-                "urlData": {
-                    "dataLoaded": false,
-                    "data": [
-                        {
-                            "title": null,
-                            "description": null,
-                            "domain": null,
-                            "img": [],
-                            "favicon": null
-                        }
-                    ]
-                },
-                "reaction": {}
-            };
+            return blankMessageForError;
 
         }
     }
     catch(e) { //エラーなら空データを渡す
-        return {
-            "messageid": messageid,
-            "userid": "不明なユーザー",
-            "channelid": channelid,
-            "time": "20010101000000",
-            "pinned": false,
-            "content": "消去されたメッセージ",
-            "replyData": {
-                "isReplying": false,
-                "messageid": null
-            },
-            "fileData": {
-                "isAttatched": false,
-                "attatchmentData": []
-            },
-            "hasUrl": false,
-            "urlData": {
-                "dataLoaded": false,
-                "data": [
-                    {
-                        "title": null,
-                        "description": null,
-                        "domain": null,
-                        "img": [],
-                        "favicon": null
-                    }
-                ]
-            },
-            "reaction": {}
-        };
+        return blankMessageForError;
     }
 
 }
