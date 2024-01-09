@@ -138,7 +138,8 @@ export interface message {
 
 //処理されたメッセージ用
 export interface messageRead {
-    userid: string | null,
+    messageid: any
+    userid: string,
     channelid: string,
     time: string,
     pinned: boolean,
