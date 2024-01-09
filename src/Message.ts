@@ -592,6 +592,8 @@ let msgPin = function msgPin(dat:{
 
     //チャンネルの更新のためにJSONへ書き込み
     fs.writeFileSync("./server.json", JSON.stringify(dataServer, null, 4));
+    //メッセージデータ群の格納用
+    let dataHistory:{[key:string]:srcInterface.messageRead};
 
     //データ取り出し、更新
     try{
