@@ -423,31 +423,42 @@ let addUrlPreview = async function addUrlPreview(url:string, channelid:string, m
 }
 
 //指定したチャンネルの最新メッセージを返す(contentだけではない)
-let getLatestMessage = function latestMessage(channelid) {
-    let messageData = {}; //返すメッセージデータ
+let getLatestMessage = function latestMessage(channelid:string, reqSender:srcInterface.reqSender) {
+    //返す予定のメッセージデータそのもの
+    let messageData:srcInterface.message = {
+        userid: null,
+        channelid: "",
+        content: "",
+        replyData: {
+            isReplying: false,
+            userid: "",
+            messageid: ""
+        },
+        fileData: {
+            isAttatched: false,
+            attatchmentData: null
+        },
+        hasUrl: false,
+        urlData: {
+            dataLoaded: false,
+            data: null
+        },
+        isSystemMessage: null,
+    };
     let t = new Date(); //履歴に時間を追加する用
     let fulldate = t.getFullYear() + "_" +  (t.getMonth()+1).toString().padStart(2,"0") + "_" +  t.getDate().toString().padStart(2,"0");
 
     //メッセージを送るチャンネルの履歴データのディレクトリ
     let pathOfJson = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
-    let dataHistory = {}; //メッセージデータのJSON読み込み
+    let dataHistory:{
+        [key:string]: srcInterface.message
+    } = {}; //メッセージデータのJSON読み込み
 
     try {
         //メッセージがあるJSONを取得
         dataHistory = JSON.parse(fs.readFileSync(pathOfJson, 'utf-8'));
         //メッセージデータをオブジェクト化して格納
         messageData = Object.entries(dataHistory)[Object.entries(dataHistory).length-1][1];
-
-        //もし返信しているメッセージなら返信先の内容を取得して追加
-        try {
-            if ( messageData.replyData.isReplying ) {
-                //返信先を取得
-                let messageDataReplied = getMessage(channelid, messageData.replyData.messageid);
-                //返信先の内容を追加
-                messageData.replyData.content = messageDataReplied.content;
-
-            }
-        } catch(e) {}
     }
     catch(e) {
         console.log("getLatestMessage :: ERROR->", e);
