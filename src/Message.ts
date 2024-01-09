@@ -21,7 +21,7 @@ const blackRedirectUrls:string[] = [
 ];
 
 //メッセージを処理して送れる形にする
-let msgMix = async function msgMix(m:srcInterface.message) {
+let msgMix = async function msgMix(m:srcInterface.message, reqSender:srcInterface.reqSender) {
     /*
     m
     {
