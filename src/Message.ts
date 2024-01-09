@@ -218,16 +218,35 @@ let writeUploadedFile = function uploadFile(
 }
 
 //メッセージ履歴にデータ追加
-let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex) {
-    let fulldate = msgId.slice(0,4) + "_" + msgId.slice(4,6) + "_" + msgId.slice(6,8);
+let addUrlPreview = async function addUrlPreview(url:string, channelid:string, msgId:string, urlIndex:number) {
+    let fulldate:string = msgId.slice(0,4) + "_" + msgId.slice(4,6) + "_" + msgId.slice(6,8);
 
-    let pathOfJson = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
-    let dataHistory = {};
+    let pathOfJson:string = "./serverFiles/record/" + channelid + "/" + fulldate + ".json";
+    //履歴取り込み用
+    let dataHistory:{
+        [key:string]: srcInterface.message
+    } = {};
 
     //URLプレビュー用JSON変数
-    let previewData = {};
+    let previewData:{
+        url: string,
+        mediaType: string,
+        title: string,
+        description: string,
+        images: string[],
+        videos: string[],
+        favicons: string[]
+    } = {
+        url: "",
+        mediaType: "",
+        title: "",
+        description: "",
+        images: [],
+        videos: [],
+        favicons: []
+    };
     //URlプレビューがエラーだったかどうか
-    let errorPreviewing = false;
+    let errorPreviewing:boolean = false;
 
     //URLプレビュー取得
     try {
@@ -310,21 +329,13 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
     //URLデータを入れる準備
     dataHistory[msgId].hasUrl = true;
     //まだ無いのならメッセージデータにURLデータ部分を新しく追加
-    if ( dataHistory[msgId].urlData.data === undefined ) {
-        dataHistory[msgId].urlData = {
-            data: [
-                // {
-                //     link: "https://example.com/?q=asdf&id=asdf4321",
-                //     title: "...",
-                //     description: "...",
-                //     domain: "https://example.com",
-                //     img: "...",
-                //     favicon: "...",
-                // }
-            ]
-        };
+    // if ( dataHistory[msgId].urlData.data === undefined ) {
+    //     dataHistory[msgId].urlData = {
+    //         dataLoaded: false,
+    //         data: null
+    //     };
 
-    }
+    // }
 
     //データ更新
     switch( previewData.mediaType ) {
@@ -358,8 +369,9 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
                 mediaType: previewData.mediaType,
                 title: previewData.title,
                 description: previewData.description,
-                img: url,
+                img: [url],
                 video: [],
+                favicon: null
             };
             break;
 
@@ -370,7 +382,8 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
                 title: previewData.title,
                 description: previewData.description,
                 img: [],
-                video: url,
+                video: [url],
+                favicon: null
             };
             break;
 
@@ -392,8 +405,8 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
                     mediaType: "website",
                     title: "",
                     description: "",
-                    img: null,
-                    video: null,
+                    img: [],
+                    video: [],
                     favicon: null
                 };
             }
