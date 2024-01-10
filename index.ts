@@ -1,76 +1,35 @@
-//ライブラリインポート、設定
-const fs = require("fs");
-const fsPromise = require("fs").promises;
-const express = require("express");
-const http = require("http");
-const socketIo = require("socket.io");
+import * as fs from "fs";
+import * as http from "http";
+import { Server, Socket } from "socket.io";
+import express from "express";
+import { HOST_CONFIG } from "./HOST_CONFIG";
+import { checkUserSession } from "./src/auth"; // authモジュールから適切な関数をimportする
+import { dataUser } from "./src/dbControl";
+//import { registerSocketHandlers } from "./socketHandlers"; // 仮定のsocketHandlersモジュールから関数をimportする
 
-//データ整合性確認用
-const auth = require("./src/auth.js");
-
-//サーバーバージョン
-const SERVER_VERSION = "alpha_20231228";
-exports.SERVER_VERSION = SERVER_VERSION;
-
-//接続しているSocketJSON
-let socketOnline = {
-    /*
-    "g1r4ck": "12345",
-    "asdfghjkl": "12345",
-    "socketの接続id": "ユーザーid"
-    */
-};
-exports.socketOnline = socketOnline;
-//オンラインのユーザーJSON
-let userOnline = {
-    /*
-    "12345": 2,
-    "ユーザーid": 接続数
-    */
-};
-exports.userOnline = userOnline;
-
-/*********************************************************************************************************************/
-//ホスト設定を読み込む
-
-//サーバーをホストするための環境設定を読み込む
-const dataHostConfig = require("./HOST_CONFIG.js").HOST_CONFIG;
-console.log("dbControl :: 読み込んだホスト設定 -> ", dataHostConfig);
-
-//もしそもそも設定が無効なら警告して止める
-if ( dataHostConfig === undefined ) {
-    console.error("\nindex :: サーバーホスト設定が取得できませんでした。リポジトリより'HOST_CONFIG.js'を再取得してください。\n");
-    return -1;
-
+// 型定義 (適切な型に置き換える必要があるかもしれません)
+interface SocketOnline {
+  [key: string]: string;
 }
 
-    //Origin許可設定
-    const ALLOWED_ORIGIN = dataHostConfig.allowedOrigin || []; //無効なら全ドメイン許可
+interface UserOnline {
+  [key: string]: number;
+}
 
-    //ポート番号
-    const port = dataHostConfig.port || 33333; //無効なら33333にする
-/*********************************************************************************************************************/
+// 初期設定
+const SERVER_VERSION: string = "alpha_20240109";
+const socketOnline: SocketOnline = {};
+const userOnline: UserOnline = {};
 
-//サーバーインスタンスを構成する
+// ExpressとSocket.IOのサーバー作成
 const app = express();
 const server = http.createServer(app);
-
-//CORS設定
-const io = socketIo(server, {
-    maxHttpBufferSize: 1e8, // 100 MB
+const io = new Server(server, {
+  cors: {
+    origin: HOST_CONFIG.allowedOrigin as string[],
+    methods: ["GET", "POST"]
+  }
 });
-
-//必要なディレクトリの確認、なければ作成
-    //フォルダ親
-try{fs.mkdirSync("./userFiles/");}catch(e){}
-try{fs.mkdirSync("./serverFiles/");}catch(e){}
-    //その下
-try{fs.mkdirSync("./userFiles/fileidIndex/");}catch(e){}
-try{fs.mkdirSync("./userFiles/files/");}catch(e){}
-try{fs.mkdirSync("./userFiles/usersave/")}catch(e){}
-try{fs.mkdirSync("./userFiles/img/");}catch(e){}
-try{fs.mkdirSync("./serverFiles/record/");}catch(e){}
-try{fs.mkdirSync("./serverFiles/modlog/");}catch(e){}
 
 //もしバックエンドに直接アクセスされたら用
 app.get('/', (req, res) => {
@@ -82,8 +41,8 @@ app.get('/', (req, res) => {
 app.get('/img/:src', (req, res) => {
     //JPEG
     try {
-        fs.statSync(__dirname + '/img/' + req.params.src + ".jpeg");
-        res.sendFile(__dirname + '/img/' + req.params.src + ".jpeg");
+        fs.statSync(__dirname + '/userFiles/img/' + req.params.src + ".jpeg");
+        res.sendFile(__dirname + '/userFiles/img/' + req.params.src + ".jpeg");
         return;
     }
     catch(e) {
@@ -91,8 +50,8 @@ app.get('/img/:src', (req, res) => {
 
     //PNG
     try {
-        fs.statSync(__dirname + '/img/' + req.params.src + ".png");
-        res.sendFile(__dirname + '/img/' + req.params.src + ".png");
+        fs.statSync(__dirname + '/userFiles/img/' + req.params.src + ".png");
+        res.sendFile(__dirname + '/userFiles/img/' + req.params.src + ".png");
         return;
     }
     catch(e) {
@@ -100,12 +59,12 @@ app.get('/img/:src', (req, res) => {
 
     //GIF
     try {
-        fs.statSync(__dirname + '/img/' + req.params.src + ".gif");
-        res.sendFile(__dirname + '/img/' + req.params.src + ".gif");
+        fs.statSync(__dirname + '/userFiles/img/' + req.params.src + ".gif");
+        res.sendFile(__dirname + '/userFiles/img/' + req.params.src + ".gif");
     }
     catch(e) {
         console.log("index :: これがなかった -> " + req.params.src + ".gif");
-        res.sendFile(__dirname + '/img/default.jpeg');
+        res.sendFile(__dirname + '/userFiles/img/default.jpeg');
     }
 
 });
@@ -115,8 +74,17 @@ app.get('/file/:channelid/:fileid', (req, res) => {
     let fileid = req.params.fileid; //ファイルIDを取得
     let channelid = req.params.channelid; //チャンネルIDを取得
 
-    let fileidPathName = ""; //JSONファイル名
-    let fileidIndex = {}; //JSONファイルから取り出したJSONそのもの
+    //JSONファイル名
+    let fileidPathName = "";
+    //JSONファイルから取り出したJSONそのもの
+    let fileidIndex:{
+        [key:string]: {
+            name: string,
+            userid: string,
+            size: number,
+            type: string
+        }
+    } = {};
 
     //JSONファイルの取り出し準備
     try {
@@ -125,7 +93,7 @@ app.get('/file/:channelid/:fileid', (req, res) => {
         //ファイルIDインデックスを取得
         fileidIndex = JSON.parse(fs.readFileSync('./userFiles/fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
     } catch(e) {
-        res.send("内部エラー", e);
+        res.send("内部エラー :: " + e);
     }
 
     //JSONから添付ファイルを探して返す
@@ -140,16 +108,20 @@ app.get('/file/:channelid/:fileid', (req, res) => {
             res.download(__dirname + "/userFiles/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
 
         }
-    } catch(e) {
-        res.send("ファイルがねえ", e);
+    } catch(error) {
+        res.send("ファイルがねえ", error);
     }
 
 });
 
-////////////////////////////////////////////////////////////////
+//reqSenderの型定義
+interface reqSender {
+    userid: string,
+    sessionid: string
+};
 
 //URLデータを更新させる
-let sendUrlPreview = function sendUrlPreview(urlDataItem, channelid, msgId) {
+let sendUrlPreview = function sendUrlPreview(urlDataItem:any, channelid:string, msgId:string) {
     // let dat = {
     //     action: "urlData",
     //     channelid: channelid,
@@ -167,13 +139,9 @@ let sendUrlPreview = function sendUrlPreview(urlDataItem, channelid, msgId) {
     io.to("loggedin").emit("messageUpdate", dat); //履歴を返す
 
 }
-//外部スクリプトで使う用
-exports.sendUrlPreview = sendUrlPreview;
-
-////////////////////////////////////////////////////////////////
 
 //データが正規のものか確認する
-function checkDataIntegrality(dat, paramRequire, funcName) {
+function checkDataIntegrality(dat:any, paramRequire:string[], funcName:string) {
 
     try{
         //パラメータが足りているか確認
@@ -196,7 +164,7 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
     }
 
     //セッションIDの確認
-    if ( !auth.checkUserSession(dat.reqSender) ) { return false; }
+    if ( !checkUserSession(dat.reqSender) ) { return false; }
 
     console.log("index :: checkDataIntegrality : 確認できた => " + funcName);
 
@@ -204,19 +172,16 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
     return true;
 
 }
-exports.checkDataIntegrality = checkDataIntegrality;
 
-////////////////////////////////////////////////////////////////
-
-//Socketのオリジンを設定に適合しているか確認
-function checkOrigin(socket) {
+//Origin判別
+function checkOrigin(socket:Socket) {
     //アクセスしたオリジンの比較、制限（人力CORS）
     if (
         //ORIGIN情報があり、
         socket.handshake.headers.origin !== undefined
             &&
         //許可するドメインが指定されており、
-        ALLOWED_ORIGIN.length !== 0
+        HOST_CONFIG.allowedOrigin.length !== 0
             &&
         ( //同一環境からのアクセスでないなら
             !socket.handshake.headers.origin.startsWith("http://localhost")
@@ -225,11 +190,11 @@ function checkOrigin(socket) {
         )
     ) { //ドメイン設定と比較して許可できるか調べる
         //許可されているかどうか
-        let flagOriginAllowed = false;
+        let flagOriginAllowed:boolean = false;
         //許可されたドメインの数分ループを回して判別
-        for ( let index in ALLOWED_ORIGIN)  {
+        for ( let index in HOST_CONFIG.allowedOrigin)  {
             //Originがそのドメインから始まっているかどうかで判別
-            if ( socket.handshake.headers.origin.startsWith(ALLOWED_ORIGIN[index]) ) {
+            if ( socket.handshake.headers.origin.startsWith(HOST_CONFIG.allowedOrigin[index]) ) {
                 flagOriginAllowed = true; //許可されたドメインと設定
                 break; //ループ停止
             }
@@ -246,9 +211,6 @@ function checkOrigin(socket) {
     }
 
 }
-exports.checkOrigin = checkOrigin;
-
-////////////////////////////////////////////////////////////////
 
 //Socketハンドラのインポート
 require("./socketHandlers/socketAuth.js")(io);
@@ -257,24 +219,24 @@ require("./socketHandlers/socketGetInfo.js")(io);
 require("./socketHandlers/socketMessage.js")(io);
 require("./socketHandlers/socketUpdateInfo.js")(io);
 
-//Socketの初期処理の割り当て他
-io.on("connection", (socket) => {
+// Socketイベントハンドラの設定
+io.on("connection", (socket:Socket) => {
     //Origin判別
     checkOrigin(socket);
 
     //切断時のログ
     socket.on("disconnect", () => {
         console.log("*** " + socket.id + " 切断 ***");
-        let useridDisconnecting = socketOnline[socket.id];
+        let useridDisconnecting:string = socketOnline[socket.id];
 
         //ユーザーのオンライン状態をオフラインと設定してJSONファイルへ書き込む
         try {
             //もしユーザーの接続数が1以下ならオフラインと記録(次の処理で減算して接続数が0になるから)
             if ( userOnline[useridDisconnecting] <= 1 ) {
                 //オフラインと設定
-                db.dataUser.user[useridDisconnecting].state.loggedin = false;
+                dataUser.user[useridDisconnecting].state.loggedin = false;
                 //DBをJSONへ保存
-                fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
+                fs.writeFileSync("./user.json", JSON.stringify(dataUser, null, 4));
 
             }
         } catch(e) {
@@ -326,9 +288,11 @@ io.on("connection", (socket) => {
     });
 })
 
-//サーバーを開く
-server.listen(port, () => {
-    console.log("*** ver : " + SERVER_VERSION + " ***");
-    console.log(`Listening on port ${port}`);
-
+// サーバーの開始
+server.listen(HOST_CONFIG.port, () => {
+  console.log(`*** ver : ${SERVER_VERSION} ***`);
+  console.log(`Listening on port ${HOST_CONFIG.port}`);
 });
+
+// モジュールエクスポート
+export { SERVER_VERSION, socketOnline, userOnline, checkDataIntegrality, sendUrlPreview, checkOrigin };
