@@ -125,7 +125,7 @@ app.get('/file/:channelid/:fileid', (req, res) => {
         //ファイルIDインデックスを取得
         fileidIndex = JSON.parse(fs.readFileSync('./userFiles/fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
     } catch(e) {
-        res.send("内部エラー", e);
+        res.send("index :: ファイル転送 : fileidIndex読み込みエラー -> ", e);
     }
 
     //JSONから添付ファイルを探して返す
@@ -141,7 +141,7 @@ app.get('/file/:channelid/:fileid', (req, res) => {
 
         }
     } catch(e) {
-        res.send("ファイルがねえ", e);
+        res.send("index :: ファイル転送 : 内部エラー -> ", e);
     }
 
 });
