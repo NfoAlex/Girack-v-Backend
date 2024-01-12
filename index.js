@@ -9,7 +9,7 @@ const socketIo = require("socket.io");
 const auth = require("./src/auth.js");
 
 //サーバーバージョン
-const SERVER_VERSION = "alpha_20231228";
+const SERVER_VERSION = "alpha_20240112";
 exports.SERVER_VERSION = SERVER_VERSION;
 
 //接続しているSocketJSON
@@ -123,9 +123,9 @@ app.get('/file/:channelid/:fileid', (req, res) => {
         //ファイルIDからJSON名を取得(日付部分)
         fileidPathName = fileid.slice(0,4) + "_" + fileid.slice(4,6) + "_" + fileid.slice(6,8);
         //ファイルIDインデックスを取得
-        fileidIndex = JSON.parse(fs.readFileSync('./fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
+        fileidIndex = JSON.parse(fs.readFileSync('./userFiles/fileidIndex/' + channelid + '/' + fileidPathName + '.json', 'utf-8')); //ユーザーデータのJSON読み込み
     } catch(e) {
-        res.send("内部エラー", e);
+        res.send("index :: ファイル転送 : fileidIndex読み込みエラー -> ", e);
     }
 
     //JSONから添付ファイルを探して返す
@@ -133,15 +133,15 @@ app.get('/file/:channelid/:fileid', (req, res) => {
         //もし画像ファイルならダウンロードじゃなく表示させる
         if ( fileidIndex[fileid].type.includes("image/") ) { //typeにimageが含まれるなら
             //ブラウザで表示
-            res.sendFile(__dirname + "/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
+            res.sendFile(__dirname + "/userFiles/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
 
         } else { //画像じゃないなら
             //ダウンロードさせる
-            res.download(__dirname + "/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
+            res.download(__dirname + "/userFiles/files/" + channelid + "/" + fileidPathName + "/" + fileidIndex[fileid].name, fileidIndex[fileid].name); //ユーザーデータのJSON読み込み);
 
         }
     } catch(e) {
-        res.send("ファイルがねえ", e);
+        res.send("index :: ファイル転送 : 内部エラー -> ", e);
     }
 
 });
