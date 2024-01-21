@@ -1,6 +1,5 @@
 //ライブラリインポート、設定
 const fs = require("fs");
-const fsPromise = require("fs").promises;
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
