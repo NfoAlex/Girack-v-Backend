@@ -8,6 +8,8 @@ const fs = require("fs");
 const indexJS = require("../index.js");
 const SERVER_VERSION = indexJS.SERVER_VERSION;
 
+//リクエストの整合性確認用
+const checkDataIntegrality = indexJS.checkDataIntegrality;
 //アクティブなsocketとユーザーIDリストをインポート
 let socketOnline = indexJS.socketOnline;
 let userOnline = indexJS.userOnline;
