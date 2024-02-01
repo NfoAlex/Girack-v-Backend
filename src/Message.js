@@ -29,29 +29,30 @@ let msgMix = async function msgMix(m) {
     }
     */
 
-    try {
-        //送信者のロールとそのチャンネルで話せるロールを取得
-        let userRole = db.dataUser.user[m.reqSender.userid].role;
-        let channelCanTalkRole = db.dataServer.channels[m.channelid].canTalk;
-
-        //もし送信者がMemberで話せるロールがMember以外なら処理停止
-        if ( userRole === "Member" && channelCanTalkRole !== "Member" && channelCanTalkRole !== undefined ) {
-            return -1;
-
-        }
-
-        //もし送信者がModeratorで話せるロールがAdminなら処理停止
-        if ( userRole === "Moderator" && channelCanTalkRole === "Admin" ) {
-            return -1;
-
-        }
-    } catch(e) {
-        console.log("Message :: msgMix : 権限エラー->", e);
-        return -1;
-    }
-
-    //システムメッセージじゃないなら内容検査
+    //システムメッセージじゃないならデータ取得、内容検査
     if ( !m.isSystemMessage ) {
+        //メッセージ記録に必要な情報を取得、設定
+        try {
+            //送信者のロールとそのチャンネルで話せるロールを取得
+            let userRole = db.dataUser.user[m.reqSender.userid].role;
+            let channelCanTalkRole = db.dataServer.channels[m.channelid].canTalk;
+
+            //もし送信者がMemberで話せるロールがMember以外なら処理停止
+            if ( userRole === "Member" && channelCanTalkRole !== "Member" && channelCanTalkRole !== undefined ) {
+                return -1;
+
+            }
+
+            //もし送信者がModeratorで話せるロールがAdminなら処理停止
+            if ( userRole === "Moderator" && channelCanTalkRole === "Admin" ) {
+                return -1;
+
+            }
+        } catch(e) {
+            console.log("Message :: msgMix : 権限エラー->", e);
+            return -1;
+        }
+
         //メッセージがそもそも有効なものかどうか
         if (
             m.content === undefined ||
