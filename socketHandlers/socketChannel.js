@@ -42,6 +42,13 @@ module.exports = (io) => {
             //データの整合性を確認
             if ( !indexJS.checkDataIntegrality(dat, paramRequire, "channelAction") ) { return -1; }
 
+            //もし標的のチャンネルがそもそも無ければ中止
+            if ( db.dataServer.channels[dat.channelid] === undefined ) {
+                console.log("socketChannels :: channelAction : error -> チャンネルがそもそも存在しません");
+                return -1;
+
+            }
+
             //操作して更新されたデータを操作者が受け取る
             let result = infoUpdate.channelAction(dat);
             socket.emit("infoUser", result);
