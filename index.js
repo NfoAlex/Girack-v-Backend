@@ -8,7 +8,7 @@ const socketIo = require("socket.io");
 const auth = require("./src/auth.js");
 
 //サーバーバージョン
-const SERVER_VERSION = "alpha_20240206";
+const SERVER_VERSION = "alpha_20240206_1";
 exports.SERVER_VERSION = SERVER_VERSION;
 
 //接続しているSocketJSON
