@@ -218,9 +218,15 @@ function checkOrigin(socket) {
         ALLOWED_ORIGIN.length !== 0
             &&
         ( //同一環境からのアクセスでないなら
-            !socket.handshake.headers.origin.startsWith("http://localhost")
-                &&
-            !socket.handshake.headers.origin.startsWith("http://127.0.0.1")
+            (
+                !socket.handshake.headers.origin.startsWith("http://localhost")
+                    &&
+                !socket.handshake.headers.origin.startsWith("http://127.0.0.1")
+                    &&
+                !socket.handshake.headers.referer.startsWith("http://localhost")
+                    &&
+                !socket.handshake.headers.referer.startsWith("http://127.0.0.1")
+            )
         )
     ) { //ドメイン設定と比較して許可できるか調べる
         //許可されているかどうか
@@ -239,7 +245,8 @@ function checkOrigin(socket) {
         if ( !flagOriginAllowed ) socket.disconnect(); //切断
 
     //そもそもOriginがなければ切断
-    } else if ( socket.handshake.headers.origin === undefined ) {
+    } else if ( socket.handshake.headers.referer === undefined && socket.handshake.headers.origin === undefined ) {
+        console.log("index :: checkOrigin : 切断 (NO_HEADER_ORIGIN_OR_REFERER)");
         socket.disconnect(); //切断
 
     }
@@ -258,6 +265,8 @@ require("./socketHandlers/socketUpdateInfo.js")(io);
 
 //Socketの初期処理の割り当て他
 io.on("connection", (socket) => {
+    console.log("index :: 接続検知");
+
     //Origin判別
     checkOrigin(socket);
 
