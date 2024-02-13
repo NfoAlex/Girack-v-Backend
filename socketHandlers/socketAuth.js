@@ -27,15 +27,8 @@ module.exports = (io) => {
                 password:this.pwForAuth
             }
             */
-            console.log("auth :: 受信 ↓");
-            console.log(key);
-
-            //バージョンチェック
-            if ( CLIENT_VERSION !== SERVER_VERSION ) {
-                console.log("クライアントとのバージョンが違います");
-                return -1;
-
-            }
+            // console.log("auth :: 受信 ↓");
+            // console.log(key);
 
             let loginAttempt = await auth.authUser(key); //ログイン結果
 
@@ -128,14 +121,6 @@ module.exports = (io) => {
                 sessionid: sessionid
             }
             */
-            console.log("index :: authByCookie : 認証time");
-            
-            //バージョンチェック
-            if ( CLIENT_VERSION !== SERVER_VERSION ) {
-                console.log("クライアントとのバージョンが違います");
-                return -1;
-
-            }
             
             //ログイン結果
             let loginAttempt = auth.authUserBySession(cred);
