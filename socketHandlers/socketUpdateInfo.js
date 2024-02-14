@@ -302,7 +302,7 @@ module.exports = (io) => {
 
             // もしJPEGが先に存在しているなら削除しておく
             try {
-                await fsPromise.unlink("./img/" + dat.reqSender.userid + ".jpeg");
+                await fs.promises.unlink("./img/" + dat.reqSender.userid + ".jpeg");
                 console.log("file action taken with JPEG");
             } catch (err) {
                 console.log("index :: changeProfileIcon : JPEGナシ");
@@ -310,7 +310,7 @@ module.exports = (io) => {
 
             // もしGIFが先に存在しているなら削除しておく
             try {
-                await fsPromise.unlink("./img/" + dat.reqSender.userid + ".gif");
+                await fs.promises.unlink("./img/" + dat.reqSender.userid + ".gif");
                 console.log("file action taken with GIF");
             } catch (err) {
                 console.log("index :: changeProfileIcon : GIFナシ");
@@ -318,7 +318,7 @@ module.exports = (io) => {
 
             // もしPNGが先に存在しているなら削除しておく
             try {
-                await fsPromise.unlink("./img/" + dat.reqSender.userid + ".png");
+                await fs.promises.unlink("./img/" + dat.reqSender.userid + ".png");
                 console.log("index :: changeProfileIcon : PNGアイコンを削除しました");
             } catch (err) {
                 console.log("index :: changeProfileIcon : PNGナシ");
@@ -339,7 +339,7 @@ module.exports = (io) => {
 
             //アイコン画像書き込み
             try {
-                await fsPromise.writeFile("./img/" + dat.reqSender.userid + iconExtension, dat.fileData.buffer);
+                await fs.promises.writeFile("./img/" + dat.reqSender.userid + iconExtension, dat.fileData.buffer);
             } catch (e) {
                 console.log(e);
             }
