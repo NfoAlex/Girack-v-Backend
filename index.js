@@ -193,7 +193,7 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
 
     }
     catch(e) {
-        console.log("index :: checkDataIntegrality : " + funcName + " : error -> " + e);
+        console.log("index :: checkDataIntegrality : " + funcName + " : (userid:" + dat.reqSender.userid + ") error -> " + e);
         return false;
 
     }
@@ -201,7 +201,7 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
     //セッションIDの確認
     if ( !auth.checkUserSession(dat.reqSender) ) { return false; }
 
-    console.log("index :: checkDataIntegrality : 確認できた => " + funcName);
+    console.log("index :: checkDataIntegrality : (userid:" + dat.reqSender.userid + ") 確認できた => " + funcName);
 
     //確認できたと返す
     return true;
