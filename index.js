@@ -267,14 +267,14 @@ require("./socketHandlers/socketUpdateInfo.js")(io);
 
 //Socketの初期処理の割り当て他
 io.on("connection", (socket) => {
-    console.log("index :: 接続検知");
+    //console.log("index :: 接続検知");
 
     //Origin判別
     checkOrigin(socket);
 
     //切断時のログ
     socket.on("disconnect", () => {
-        console.log("*** " + socket.id + " 切断 ***");
+        //console.log("*** " + socket.id + " 切断 ***");
         let useridDisconnecting = socketOnline[socket.id];
 
         //ユーザーのオンライン状態をオフラインと設定してJSONファイルへ書き込む
@@ -294,7 +294,7 @@ io.on("connection", (socket) => {
         //切断したユーザーをオンラインセッションリストから外す
         try {
             //切断されるsocketIDからユーザーIDを取り出す
-            console.log("index :: disconnect : これから消すuserid", useridDisconnecting, socketOnline);
+            //console.log("index :: disconnect : これから消すuserid", useridDisconnecting, socketOnline);
 
             //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
             if ( userOnline[useridDisconnecting] >= 2 ) {
@@ -314,11 +314,11 @@ io.on("connection", (socket) => {
         try {
             //known bug: keyがundefinedの時がある
             if ( useridDisconnecting === undefined ) {
-                console.log("index :: disconnect : ユーザーIDがundefinedになっている");
-                console.log(useridDisconnecting);
+                //console.log("index :: disconnect : ユーザーIDがundefinedになっている");
+                //console.log(useridDisconnecting);
                 try {
                     delete userOnline[useridDisconnecting];
-                    console.log("index :: disconnect : 不正なユーザーID分は消した");
+                    //console.log("index :: disconnect : 不正なユーザーID分は消した");
                 } catch(e) {console.log("index :: disconnect : しかも消せなかった");}
 
             }
@@ -329,9 +329,6 @@ io.on("connection", (socket) => {
 
         //オンライン人数を更新
         io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
-
-        console.log("index :: disconnect : 現在のオンラインセッションりすと -> ");
-        console.log(userOnline);
 
     });
 })
