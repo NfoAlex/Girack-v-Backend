@@ -73,9 +73,6 @@ module.exports = (io) => {
                 //DBをJSONへ保存
                 fs.writeFileSync("./user.json", JSON.stringify(db.dataUser, null, 4));
 
-                console.log("index :: auth : 現在のオンラインセッションりすと -> ");
-                console.log(userOnline);
-
                 //オンライン人数を更新
                 io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
 
