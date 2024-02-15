@@ -6,6 +6,8 @@ const socketIo = require("socket.io");
 
 //データ整合性確認用
 const auth = require("./src/auth.js");
+//ユーザーをオフラインにするために必要
+const db = require("./src/dbControl.js"); //データベース関連
 
 //サーバーバージョン
 const SERVER_VERSION = "alpha_20240215";
