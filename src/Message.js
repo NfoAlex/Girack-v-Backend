@@ -769,9 +769,6 @@ let msgReaction = function msgReaction(dat) {
         reaction: dataHistory[dat.messageid].reaction
     };
 
-    console.log("Message :: リアクションされた");
-    console.log(dataHistory[dat.messageid].reaction);
-
     //書き込み
     fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
 

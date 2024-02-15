@@ -6,9 +6,11 @@ const socketIo = require("socket.io");
 
 //データ整合性確認用
 const auth = require("./src/auth.js");
+//ユーザーをオフラインにするために必要
+const db = require("./src/dbControl.js"); //データベース関連
 
 //サーバーバージョン
-const SERVER_VERSION = "alpha_20240214";
+const SERVER_VERSION = "alpha_20240215";
 exports.SERVER_VERSION = SERVER_VERSION;
 
 //接続しているSocketJSON
@@ -173,6 +175,8 @@ exports.sendUrlPreview = sendUrlPreview;
 
 //データが正規のものか確認する
 function checkDataIntegrality(dat, paramRequire, funcName) {
+    //そもそも送信者情報が無効ならfalse
+    if (dat.reqSender.userid === undefined || dat.reqSender.sessionid === undefined) return false;
 
     try{
         //パラメータが足りているか確認
@@ -189,7 +193,7 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
 
     }
     catch(e) {
-        console.log("index :: checkDataIntegrality : " + funcName + " : error -> " + e);
+        console.log("index :: checkDataIntegrality : " + funcName + " : (userid:" + dat.reqSender.userid + ") error -> " + e);
         return false;
 
     }
@@ -197,7 +201,7 @@ function checkDataIntegrality(dat, paramRequire, funcName) {
     //セッションIDの確認
     if ( !auth.checkUserSession(dat.reqSender) ) { return false; }
 
-    console.log("index :: checkDataIntegrality : 確認できた => " + funcName);
+    console.log("index :: checkDataIntegrality : (userid:" + dat.reqSender.userid + ") 確認できた => " + funcName);
 
     //確認できたと返す
     return true;
@@ -265,14 +269,14 @@ require("./socketHandlers/socketUpdateInfo.js")(io);
 
 //Socketの初期処理の割り当て他
 io.on("connection", (socket) => {
-    console.log("index :: 接続検知");
+    //console.log("index :: 接続検知");
 
     //Origin判別
     checkOrigin(socket);
 
     //切断時のログ
     socket.on("disconnect", () => {
-        console.log("*** " + socket.id + " 切断 ***");
+        //console.log("*** " + socket.id + " 切断 ***");
         let useridDisconnecting = socketOnline[socket.id];
 
         //ユーザーのオンライン状態をオフラインと設定してJSONファイルへ書き込む
@@ -292,7 +296,7 @@ io.on("connection", (socket) => {
         //切断したユーザーをオンラインセッションリストから外す
         try {
             //切断されるsocketIDからユーザーIDを取り出す
-            console.log("index :: disconnect : これから消すuserid", useridDisconnecting, socketOnline);
+            //console.log("index :: disconnect : これから消すuserid", useridDisconnecting, socketOnline);
 
             //ユーザーIDの接続数が1以下(エラー回避用)ならオンラインユーザーJSONから削除、そうじゃないなら減算するだけ
             if ( userOnline[useridDisconnecting] >= 2 ) {
@@ -312,11 +316,11 @@ io.on("connection", (socket) => {
         try {
             //known bug: keyがundefinedの時がある
             if ( useridDisconnecting === undefined ) {
-                console.log("index :: disconnect : ユーザーIDがundefinedになっている");
-                console.log(useridDisconnecting);
+                //console.log("index :: disconnect : ユーザーIDがundefinedになっている");
+                //console.log(useridDisconnecting);
                 try {
                     delete userOnline[useridDisconnecting];
-                    console.log("index :: disconnect : 不正なユーザーID分は消した");
+                    //console.log("index :: disconnect : 不正なユーザーID分は消した");
                 } catch(e) {console.log("index :: disconnect : しかも消せなかった");}
 
             }
@@ -327,9 +331,6 @@ io.on("connection", (socket) => {
 
         //オンライン人数を更新
         io.to("loggedin").emit("sessionOnlineUpdate", Object.keys(userOnline).length);
-
-        console.log("index :: disconnect : 現在のオンラインセッションりすと -> ");
-        console.log(userOnline);
 
     });
 })
