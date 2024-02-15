@@ -175,6 +175,8 @@ exports.sendUrlPreview = sendUrlPreview;
 
 //データが正規のものか確認する
 function checkDataIntegrality(dat, paramRequire, funcName) {
+    //そもそも送信者情報が無効ならfalse
+    if (dat.reqSender.userid === undefined || dat.reqSender.username === undefined) return false;
 
     try{
         //パラメータが足りているか確認
