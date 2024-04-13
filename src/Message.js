@@ -257,10 +257,19 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
         console.log(e);
         console.log("\n");
 
+        //データホルダー
+        previewData = {
+            url: url,
+            mediaType: "",
+            title: "",
+            description: "",
+            img: null,
+            video: null,
+            favicon: null
+        };
+
         //エラーがあったと設定
         errorPreviewing = true;
-
-        return -1; //関数を終わらせる
     }
 
     /*
@@ -295,7 +304,11 @@ let addUrlPreview = async function addUrlPreview(url, channelid, msgId, urlIndex
 
         //書き込み
         fs.writeFileSync(pathOfJson, JSON.stringify(dataHistory, null, 4));
-        return -1; //関数を終わらせる
+        //メッセージのURLプレビューを空に更新させる
+        indexjs.sendUrlPreview(dataHistory[msgId].urlData.data, channelid, msgId);
+
+        //関数を終わらせる
+        return -1;
 
     }
 
