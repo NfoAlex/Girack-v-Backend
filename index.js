@@ -10,7 +10,7 @@ const auth = require("./src/auth.js");
 const db = require("./src/dbControl.js"); //データベース関連
 
 //サーバーバージョン
-const SERVER_VERSION = "alpha_20240413";
+const SERVER_VERSION = "alpha_20240522";
 exports.SERVER_VERSION = SERVER_VERSION;
 
 //接続しているSocketJSON
